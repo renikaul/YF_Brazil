@@ -1,0 +1,8 @@
+-----------------------
+Population Size by municipality
+Downloaded from 
+http://tabnet.datasus.gov.br/cgi/tabcgi.exe?ibge/cnv/poptbr.def on 05 June 2017 downloading years 2001-2016
+
+-----------------------
+Ave household income per capita, (Gini index)
+Downloaded from http://www2.datasus.gov.br/DATASUS/index.php?area=0206&id=8065372&VObj=http://tabnet.datasus.gov.br/cgi/ibge/censo/cnv/gini

@@ -1,0 +1,88 @@
+#change csv to txt
+cp YF_2001.csv YF_2001.txt
+cp YF_2002.csv YF_2002.txt
+cp YF_2003.csv YF_2003.txt
+cp YF_2004.csv YF_2004.txt
+cp YF_2005.csv YF_2005.txt
+cp YF_2006.csv YF_2006.txt
+cp YF_2007.csv YF_2007.txt
+cp YF_2008.csv YF_2008.txt
+cp YF_2009.csv YF_2009.txt
+cp YF_2010.csv YF_2010.txt
+cp YF_2011.csv YF_2011.txt
+cp YF_2012.csv YF_2012.txt
+cp YF_2013.csv YF_2013.txt
+cp YF_2014.csv YF_2014.txt
+
+
+#insert comma after municipality number
+awk '{$2=","$2;print $0}'  YF_2001.txt > cleaned_data/YF_2001d.txt
+awk '{$2=","$2;print $0}'  YF_2002.txt > cleaned_data/YF_2002d.txt
+awk '{$2=","$2;print $0}'  YF_2003.txt > cleaned_data/YF_2003d.txt
+awk '{$2=","$2;print $0}'  YF_2004.txt > cleaned_data/YF_2004d.txt
+awk '{$2=","$2;print $0}'  YF_2005.txt > cleaned_data/YF_2005d.txt
+awk '{$2=","$2;print $0}'  YF_2006.txt > cleaned_data/YF_2006d.txt
+awk '{$2=","$2;print $0}'  YF_2007.txt > cleaned_data/YF_2007d.txt
+awk '{$2=","$2;print $0}'  YF_2008.txt > cleaned_data/YF_2008d.txt
+awk '{$2=","$2;print $0}'  YF_2009.txt > cleaned_data/YF_2009d.txt
+awk '{$2=","$2;print $0}'  YF_2010.txt > cleaned_data/YF_2010d.txt
+awk '{$2=","$2;print $0}'  YF_2011.txt > cleaned_data/YF_2011d.txt
+awk '{$2=","$2;print $0}'  YF_2012.txt > cleaned_data/YF_2012d.txt
+awk '{$2=","$2;print $0}'  YF_2013.txt > cleaned_data/YF_2013d.txt
+awk '{$2=","$2;print $0}'  YF_2014.txt > cleaned_data/YF_2014d.txt
+
+cd cleaned_data/
+
+#delete info at bottom after line 5598
+sed '5599,$d' YF_2001.txt > YF_2001c.txt
+sed '5599,$d' YF_2002d.txt > YF_2002c.txt
+sed '5599,$d' YF_2003d.txt > YF_2003c.txt
+sed '5599,$d' YF_2004d.txt > YF_2004c.txt
+sed '5599,$d' YF_2005d.txt > YF_2005c.txt
+sed '5599,$d' YF_2006d.txt > YF_2006c.txt
+sed '5599,$d' YF_2007d.txt > YF_2007c.txt
+sed '5599,$d' YF_2008d.txt > YF_2008c.txt
+sed '5599,$d' YF_2009d.txt > YF_2009c.txt
+sed '5599,$d' YF_2010d.txt > YF_2010c.txt
+sed '5599,$d' YF_2011d.txt > YF_2011c.txt
+sed '5599,$d' YF_2012d.txt > YF_2012c.txt
+sed '5599,$d' YF_2013d.txt > YF_2013c.txt
+sed '5599,$d' YF_2014d.txt > YF_2014c.txt
+
+#remove "
+sed 's/"//g' YF_2001d.txt > YF_2001c.txt
+sed 's/"//g' YF_2002d.txt > YF_2002c.txt
+sed 's/"//g' YF_2003d.txt > YF_2003c.txt
+sed 's/"//g' YF_2004d.txt > YF_2004c.txt
+sed 's/"//g' YF_2005d.txt > YF_2005c.txt
+sed 's/"//g' YF_2006d.txt > YF_2006c.txt
+sed 's/"//g' YF_2007d.txt > YF_2007c.txt
+sed 's/"//g' YF_2008d.txt > YF_2008c.txt
+sed 's/"//g' YF_2009d.txt > YF_2009c.txt
+sed 's/"//g' YF_2010d.txt > YF_2010c.txt
+sed 's/"//g' YF_2011d.txt > YF_2011c.txt
+sed 's/"//g' YF_2012d.txt > YF_2012c.txt
+sed 's/"//g' YF_2013d.txt > YF_2013c.txt
+sed 's/"//g' YF_2014d.txt > YF_2014c.txt
+
+
+
+#replace ; with ,
+sed 's/;/,/g' YF_2001b.txt > YF_2001.txt
+sed 's/;/,/g' YF_2002b.txt > YF_2002.txt
+sed 's/;/,/g' YF_2003b.txt > YF_2003.txt
+sed 's/;/,/g' YF_2004b.txt > YF_2004.txt
+sed 's/;/,/g' YF_2005b.txt > YF_2005.txt
+sed 's/;/,/g' YF_2006b.txt > YF_2006.txt
+sed 's/;/,/g' YF_2007b.txt > YF_2007.txt
+sed 's/;/,/g' YF_2008b.txt > YF_2008.txt
+sed 's/;/,/g' YF_2009b.txt > YF_2009.txt
+sed 's/;/,/g' YF_2010b.txt > YF_2010.txt
+sed 's/;/,/g' YF_2011b.txt > YF_2011.txt
+sed 's/;/,/g' YF_2012b.txt > YF_2012.txt
+sed 's/;/,/g' YF_2013b.txt > YF_2013.txt
+sed 's/;/,/g' YF_2014b.txt > YF_2014.txt
+
+#clean up
+rm YF_20**b.txt
+rm YF_20**c.txt

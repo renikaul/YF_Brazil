@@ -1,0 +1,67 @@
+Years 2001-2006
+
+Downloaded from http://tabnet.datasus.gov.br/cgi/tabcgi.exe?sinanwin/cnv/febreamarelabr.def on 05 June 2017 
+Each year was individually downloaded with the following selections:
+	Linha (Line): Municipio de notificacao (Municipality of notification) 
+	Coluna (Column): Mes 1 Sintoma(s) (Month 1 Symptom(s))
+	Conteudo (Content): casos confirmados(Confirmed cases)
+	Periodos Disponiveis: 2001-2006 (variable)
+	
+	Exibir linhas zeradas (displayed zeroed lines)
+	
+Notes from website:
+1.Excluídos casos não residentes no Brasil
+2.Períodos Disponíveis ou período - Correspondem aos anos de notificação dos casos.
+3.Para tabular dados em série histórica selecione na linha a variável de interesse, na Coluna Ano dos 1ºs sintomas; em Períodos Disponíveis assinale o ano inicial da série e todos os posteriores até o ano atual (p/ incluir casos notificados com atraso) e em Seleções Disponíveis assinale os anos dos 1ºs sintomas (ex: série histórica de nº de casos, 2001 a 2005: selecione na linha UF de residência, na Coluna Ano de 1ºs sintomas, em Períodos disponíveis-2001 até o ano atual e em Seleções assinale Ano de 1ºs sintomas de 2001 a 2005).
+4.Para cálculo da incidência utilize locais de infecção.
+5.Dados validados pela Gerência Técnica de Febre Amarela/CGDT/DEVEP/SVS/MS, em 19/07/2006.
+
+1.Excluding cases not resident in Brazil
+2.Periods Available or period - Correspond to the years of notification of cases.
+3.To tabulate historical serial data, select the variable of interest in the row in the Year column of the 1st symptoms; In Available Periods, indicate the initial year of the series and all subsequent years up to the current year (to include cases reported late) and in Available Selections mark the years of the 1st symptoms (eg, historical case series, 2001 to 2005: Select in the UF line of residence, in the column Year of 1st symptoms, in Periods available-2001 until the current year and in Selections mark Year of 1st symptoms from 2001 to 2005).
+4.To calculate the incidence, use sites of infection.
+5.Data validated by the Technical Management of Yellow Fever / CGDT / DEVEP / SVS / MS, on 07/19/2006.
+
+---------------------
+Years 2007-2014
+Downloaded from http://tabnet.datasus.gov.br/cgi/deftohtm.exe?sinannet/cnv/febreamarelabr.def on 05 June 2017
+
+Each year was individually downloaded with the following selections:
+	Linha (Line): Municipio de notificacao (Municipality of notification) 
+	Coluna (Column): Mes 1 Sintoma(s) (Month 1 Symptom(s))
+	Conteudo (Content): casos confirmados(Confirmed cases)
+	Periodos Disponiveis: 2008-2014 (variable)
+	
+	Exibir linhas zeradas (displayed zeroed lines)
+
+Notes from website:
+1.Excluídos casos não residentes no Brasil.
+2.Períodos Disponíveis ou período - Correspondem aos anos de notificação dos casos.
+3.Para tabular dados epidemiológicos de um determinado ano selecione na linha a variável de interesse, na Coluna Ano dos 1ºs sintomas; em Períodos Disponíveis assinale o ano inicial da série e todos os posteriores até o ano atual (p/ incluir casos notificados com atraso) e em Seleções Disponíveis assinale os anos dos 1ºs sintomas (ex: nº de casos com início de sintomas 2007: selecione na linha UF de residência, na Coluna Ano de 1ºs sintomas, em Períodos disponíveis 2007 até o ano atual e em Seleções assinale Ano de 1ºs sintomas 2007).
+4.Dados de 2007 atualizados em 03/04/2012.
+5.Dados de 2008 atualizados em 03/04/2012.
+6.Dados de 2009 atualizados em 03/04/2012.
+7.Dados de 2010 atualizados em 28/06/2012.
+8.Dados de 2011 atualizados em 11/02/2015.
+9.Dados de 2012 atualizados em 10/02/2015, sujeitos à revisão.
+10.Dados de 2013 atualizados em 10/02/2015, sujeitos à revisão.
+11.Dados de 2014 atualizados em 10/02/2015, sujeitos à revisão.
+
+1.Excluded cases not resident in Brazil.
+2.Periods Available or period - Correspond to the years of notification of cases.
+3.To tabulate epidemiological data for a given year, select the variable of interest in the row in the Year column of the 1st symptoms; In Available Periods, indicate the initial year of the series and all subsequent years up to the current year (to include cases reported late) and in Available Selections mark the years of the 1st symptoms (ex. UF line of residence, in Column Year of 1st symptoms, in Periods available 2007 until the current year and in Selections tick Year of 1st symptoms 2007).
+4.Data for 2007 updated on 04/03/2012.
+5.Data from 2008 updated on 04/03/2012.
+6.Data for 2009 updated on 04/03/2012.
+7.Data from 2010 updated on 06/28/2012.
+8.Data from 2011 Updated on 11/02/2015.
+9.Data from 2012 updated on 02/10/2015, subject to revision.
+10.Data from 2013 updated on 02/02/2015, subject to revision.
+11.Data from 2014 updated on 02/02/2015, subject to revision.
+
+
+
+From http://www2.datasus.gov.br/DATASUS/index.php?area=0206&id=6942 using selection:
+Estimativas de 1992 a 2016 utilizadas pelo TCU para determinação das cotas do FPM (sem sexo e faixa etária)
+ 
+Estimates from 1992 to 2016 used by the TCU to determine FPM quotas (without sex and age group)
