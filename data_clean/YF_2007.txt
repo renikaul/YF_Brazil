@@ -1,4 +1,4 @@
-Município de notificação,Total
+Muni,Total
 110001 Alta Floresta D'Oeste,
 110037 Alto Alegre dos Parecis,
 110040 Alto Paraíso,
