@@ -16,27 +16,76 @@ library(dplyr)
 YF <- readRDS("YFlong.rds")
 ```
 
+##Temproal breakdown
+
 ```{r summary stats}
-# initial.pop <- b1 %>%
-#     filter( time==0) %>% #only look at plates that are part of the experiment
-#     group_by(Type) %>% #group populations based on treatment and time
-#     summarise(N=length(Value), Average=mean(Value), StDev=sd(Value)) #run stats on groups
+YF$case[is.na(YF$case)] <- 0 #replace case NA with 0
+
 sum.na=function(data) {sum(data, na.rm = TRUE)}
 ave.na=function(data) {mean(data, na.rm = TRUE)}
 sd.na=function(data) {sd(data, na.rm = TRUE)}
 
-#totals for each month
-YF.seasonal <- YF %>%
+#totals for each month #
+YF.monthly <- YF %>%
               filter(month.no<169) %>% #remove yearly totals
               group_by(month.no) %>% #colaspse by month
               summarise(N=length(na.omit(case)) ,total=sum.na(case), ave=ave.na(case), sd=sd.na(case))
 
+#total for each month in a yr
+YF.seasonal <- YF %>%
+              filter(month.no<169) %>% #remove yearly totals
+              group_by(month) %>% #colaspse by month
+              summarise(N=length(na.omit(case)) ,total=sum.na(case), ave=ave.na(case), sd=sd.na(case))
+
+
 ```
 
 
-```{r plots}
+```{r monthly plots}
+par(mfrow=c(1,2))
 
-plot(YF.seasonal$total ~ YF.seasonal$month.no, xaxt="n", ylab="total cases", xlab="month")
+plot(YF.monthly$total ~ YF.monthly$month.no, xaxt="n", ylab="total cases", xlab="month")
 axis(1, at=seq(12,14*12, by=24))
+
+hist(YF.monthly$total)
+```
+
+
+```{r seasonal plots}
+par(mfrow=c(1,2))
+library(gplots)
+#THIS ISN'T WORKING PROPERLY NEED TO ORDER MONTHS 
+#plotCI(x=YF.seasonal$month,y=YF.seasonal$ave,  uiw=YF.seasonal$sd , ylab="ave cases", xlab="month", gap=0)
+
+hist(YF.seasonal$ave) #average number of cases in X month over the 14 years 
+```
+
+##Spatial Breakdown
+
+```{r spatial summary}
+#break down of spatial distribution of cases
+YF.space <- YF %>%
+            filter(month.no<169) %>% #filter out year totals
+            filter(case>0) %>% #only look at rows that have cases
+            group_by(muni.no) %>% #group by muni
+            summarise(N.months=length(case), total.case=sum(case), ave.case=mean(case), sd.case=sd(case))
+#pull out those that were only infected once in space (os)
+YF.os <- YF.space[which(YF.space$N.months==1),]
+#pull out those that were infected multiple times in space (ms)
+YF.ms <- YF.space[which(YF.space$N.months>1),]
+
+```
+
+Over the time series a total of `r nrow(YF.space)` municipalities had cases. Of those, `r nrow(YF.os)` muni were only infected once.
+
+```{r spatial plots}
+hist(YF.space$N.months, ylab="# muni", xlab="# months with reported cases")
+
+par(mfrow=c(1,2))
+boxplot(YF.space$total.case ~ YF.space$N.months, xlab="# months with reported cases", ylab="total cases reported") -> tmp
+axis(3, at=c(1,2,3,4,5), labels=paste("n=",tmp$n), tick=FALSE)
+
+boxplot(YF.space$ave.case ~ YF.space$N.months, xlab="# months with reported cases", ylab="ave cases reported per month") -> tmp
+axis(3, at=c(1,2,3,4,5), labels=paste("n=",tmp$n), tick=FALSE)
 
 ```
