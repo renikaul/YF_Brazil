@@ -6,20 +6,39 @@ output: html_document
 ---
 
 ```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE)
+knitr::opts_chunk$set(echo = FALSE, warning = FALSE, message = FALSE)
 library(dplyr)
 ```
 
-#Exploring the distribution of Yellow Fever 
 
 ```{r loading data}
 YF <- readRDS("YFlong.rds")
 ```
 
-##Temproal breakdown
+#Data run down
 
+  The spatial data is broken down into 5564 county equivalent municipalities. Cases are reported monthly from 2001 to 2014 (12months X 14 yrs= 168 months). This means that there are a total of `r (5564*168) ` observations. Observations without cases could be considered true absences.    
+
+#Exploring the distribution of Yellow Fever 
+ 
+ We'd like to know how sparse the data is, so I will answer the following:
+ 
+    - number of positive observations 
+    - average number of cases per year & total cases (overall and by year)
+    - number of unique municipalities with cases
+    - number of municipalities with multiple positive months (grouped by months, ie those with 2, those with 3, etc.)
+    - number of municipalities that never have a yellow fever case
+    - when a municipality is positive, the range, mean, median of the number of cases it has during that month
+
+##Temporal breakdown
+ 
 ```{r summary stats}
 YF$case[is.na(YF$case)] <- 0 #replace case NA with 0
+
+#total number of observations
+YF.obs <- YF %>%
+          filter(month.no <169, case>0) %>%
+          nrow()
 
 sum.na=function(data) {sum(data, na.rm = TRUE)}
 ave.na=function(data) {mean(data, na.rm = TRUE)}
@@ -34,33 +53,56 @@ YF.monthly <- YF %>%
 #total for each month in a yr
 YF.seasonal <- YF %>%
               filter(month.no<169) %>% #remove yearly totals
-              group_by(year, cal.month) %>% #within yr then month
+              filter(case>0) %>% #drop zero cases
+              group_by(cal.month) %>% #within yr then month
               #group_by(cal.month) %>% #colaspse by month
               summarise(N=length(na.omit(case)) ,total=sum.na(case), ave=ave.na(case), sd=sd.na(case))
 
+#totals by year
+YF.yearly <- YF %>%
+              filter(month.no<169) %>% #remove yearly totals
+              filter(case>0) %>%
+              group_by(year) %>% #colaspse by month
+              summarise(no.muni=length(na.omit(case)) ,total=sum.na(case))
 
 ```
 
+  Plot of the entire timeseries. Months with no cases are not plotted. Of the 168 months, only `r nrow(YF.monthly)` months had any reported cases. A majority of those months only had a single case reported. A total of `r sum(YF.monthly$total)` cases were reported over the 14 year period. 
 
-```{r monthly plots}
+```{r monthly plots, fig.width=10}
 par(mfrow=c(1,2))
 
 plot(YF.monthly$total ~ YF.monthly$month.no, xaxt="n", ylab="total cases", xlab="month", type="b")
 axis(1, at=seq(12,14*12, by=24))
 
-hist(YF.monthly$total)
-
-plot(YF.seasonal$total~YF.seasonal$cal.month)
+hist(YF.monthly$total, ylab="# months with X cases", xlab="number of cases reported" , main="")
 ```
 
+###By year 
 
-```{r seasonal plots}
+There were no cases reported in 2007, 2011, and 2012. A majority of years had fewer than 10 cases. Years with fewer cases also had fewer infected municipalities. 
+
+```{r yearly plots, fig.width=10, fig.height=10}
+par(mfrow=c(2,2))
+plot(YF.yearly$total ~ YF.yearly$year, pch=19, ylab="Total cases", xlab="Year" )
+points(x=c(2007,2011,2012), y=c(0,0,0), pch=19, col=2)
+
+plot(YF.yearly$no.muni ~YF.yearly$year, pch=19,ylab="Infected muni", xlab="Year")
+points(x=c(2007,2011,2012), y=c(0,0,0), pch=19, col=2)
+
+plot(YF.yearly$no.muni~YF.yearly$total, xlab="Total cases", ylab="Infected muni")
+```
+
+###By calendar month
+We can look at the number of cases by month to get at any seasonal trends. December through March has an increase of cases, but when the number of municipalities infected are also taken into account the ave case per month is still very low. January has the most number of infected municipalities over the 14 year timeseries.
+
+```{r seasonal plots, fig.width=10}
 par(mfrow=c(1,2))
 library(gplots)
-#THIS ISN'T WORKING PROPERLY NEED TO ORDER MONTHS 
-#plotCI(x=YF.seasonal$month,y=YF.seasonal$ave,  uiw=YF.seasonal$sd , ylab="ave cases", xlab="month", gap=0)
+plotCI(x=YF.seasonal$cal.month,y=YF.seasonal$ave,  uiw=YF.seasonal$sd , ylab="ave cases per municipality", xlab="month", gap=0)
+axis(3, at=YF.seasonal$cal.month, labels=paste("n=", YF.seasonal$N))
 
-hist(YF.seasonal$ave) #average number of cases in X month over the 14 years 
+hist(YF.seasonal$total, xlab="total cases", ylab="# months with X cases", main="") #average number of cases in X month over the 14 years 
 ```
 
 ##Spatial Breakdown
@@ -79,11 +121,13 @@ YF.ms <- YF.space[which(YF.space$N.months>1),]
 
 ```
 
-Over the time series a total of `r nrow(YF.space)` municipalities had cases. Of those, `r nrow(YF.os)` muni were only infected once.
+From the 5564 municipalities, `r nrow(YF.space)` municipalities had cases. Of those, `r nrow(YF.os)` muni were only infected once.
 
-```{r spatial plots}
-hist(YF.space$N.months, ylab="# muni", xlab="# months with reported cases")
+```{r spatial plots, fig.width=5, fig.align="center"}
+hist(YF.space$N.months, ylab="# muni", xlab="# months with reported cases", main="")
+```
 
+```{r muni infected, fig.width=10}
 par(mfrow=c(1,2))
 boxplot(YF.space$total.case ~ YF.space$N.months, xlab="# months with reported cases", ylab="total cases reported") -> tmp
 axis(3, at=c(1,2,3,4,5), labels=paste("n=",tmp$n), tick=FALSE)
@@ -92,3 +136,22 @@ boxplot(YF.space$ave.case ~ YF.space$N.months, xlab="# months with reported case
 axis(3, at=c(1,2,3,4,5), labels=paste("n=",tmp$n), tick=FALSE)
 
 ```
+
+Still working on consecutive months infected and spatial relationship to other infected muni. 
+
+##Recap
+
+ I think it is safe to conclude that the data is very sparse:
+ 
+    - number of positive observations
+        *   Of the ~93K observations, only `r YF.obs` had reported YF cases. 
+    - average number of cases per year & total cases (overall and by year)
+        * Average `r mean(YF.yearly$total)` cases a year, and a total of `r sum(YF.monthly$total)` over 14 years
+    - number of unique municipalities with cases
+        * From the 5564 municipalities, `r nrow(YF.space)` municipalities had cases. Of those, `r nrow(YF.os)` muni were only infected once.
+    - number of municipalities with multiple positive months (grouped by months, ie those with 2, those with 3, etc.)
+        * `r nrow(YF.space) - nrow(YF.os)`
+    - number of municipalities that never have a yellow fever case
+        * `r 5564-nrow(YF.space)`
+    - when a municipality is positive, the range, mean, median of the number of cases it has during that month
+        * see above plots
