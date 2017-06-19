@@ -1,0 +1,42 @@
+---
+title: "Case Sparsity"
+author: "RK"
+date: "June 17, 2017"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(dplyr)
+```
+
+#Exploring the distribution of Yellow Fever 
+
+```{r loading data}
+YF <- readRDS("YFlong.rds")
+```
+
+```{r summary stats}
+# initial.pop <- b1 %>%
+#     filter( time==0) %>% #only look at plates that are part of the experiment
+#     group_by(Type) %>% #group populations based on treatment and time
+#     summarise(N=length(Value), Average=mean(Value), StDev=sd(Value)) #run stats on groups
+sum.na=function(data) {sum(data, na.rm = TRUE)}
+ave.na=function(data) {mean(data, na.rm = TRUE)}
+sd.na=function(data) {sd(data, na.rm = TRUE)}
+
+#totals for each month
+YF.seasonal <- YF %>%
+              filter(month.no<169) %>% #remove yearly totals
+              group_by(month.no) %>% #colaspse by month
+              summarise(N=length(na.omit(case)) ,total=sum.na(case), ave=ave.na(case), sd=sd.na(case))
+
+```
+
+
+```{r plots}
+
+plot(YF.seasonal$total ~ YF.seasonal$month.no, xaxt="n", ylab="total cases", xlab="month")
+axis(1, at=seq(12,14*12, by=24))
+
+```

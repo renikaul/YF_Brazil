@@ -49,3 +49,9 @@ for (j in 1:length(years)){
     YF <- YF.long[order(YF.long$month.no),]
     colnames(YF) <- c('year', 'month', 'muni', 'muni.no','case', 'month.no') #clean up names
     
+  # 7. Save the work
+    saveRDS(YF, file="YFlong.rds")
+    
+    
+    
+    
