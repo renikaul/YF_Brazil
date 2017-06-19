@@ -17,7 +17,7 @@ YF <- readRDS("YFlong.rds")
 
 #Data run down
 
-  The spatial data is broken down into 5564 county equivalent municipalities. Cases are reported monthly from 2001 to 2014 (12months X 14 yrs= 168 months). This means that there are a total of `r (5564*168) ` observations. Observations without cases could be considered true absences.    
+  The spatial data is broken down into 5564 county equivalent municipalities. Cases are reported monthly from 2001 to 2014 (12months X 14 yrs= 168 months). This means that there are a total of `r (5564*168) ` observations (5564 X 168). Observations without cases could be considered true absences.    
 
 #Exploring the distribution of Yellow Fever 
  
@@ -124,7 +124,7 @@ YF.ms <- YF.space[which(YF.space$N.months>1),]
 From the 5564 municipalities, `r nrow(YF.space)` municipalities had cases. Of those, `r nrow(YF.os)` muni were only infected once.
 
 ```{r spatial plots, fig.width=5, fig.align="center"}
-hist(YF.space$N.months, ylab="# muni", xlab="# months with reported cases", main="")
+hist(YF.space$N.months, ylab="# muni", xlab="# months with reported cases", main="", breaks=c(0:10))
 ```
 
 ```{r muni infected, fig.width=10}
