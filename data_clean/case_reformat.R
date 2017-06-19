@@ -36,8 +36,12 @@ for (j in 1:length(years)){
   #5. Add year mon
       #build conversion table
     port.mon <- c('Jan','Fev','Mar',	'Abr',	'Mai','Jun', 'Jul', 'Ago', 'Set',	'Out',	'Nov',	'Dez')
+    cal.month <- c(1:12) 
     years <- 2000+c(1:14)
-    cont.mon.conversion <- as.data.frame(cbind(variable=c(rep(port.mon,14), rep('Total',14)),year=c(rep(years, each=12), years)))
+    cont.mon.conversion <- as.data.frame(cbind(variable=c(rep(port.mon,14), rep('Total',14)), 
+                                               cal.month=c(rep(cal.month,14), rep(13,14)), #cal month 13 are totals for that year * muni
+                                               year=c(rep(years, each=12), 
+                                               years)))
     cont.mon.conversion[,2] <- as.numeric(as.character(cont.mon.conversion[,2]))
       #count month 1 to n starting with Jan 2001
     cont.mon.conversion$month.no <- c(1:nrow(cont.mon.conversion))
@@ -47,7 +51,7 @@ for (j in 1:length(years)){
     YF.long <- merge(YF.long, cont.mon.conversion, by=c("year", "variable"))
       #tidy it up by ordering by month.no
     YF <- YF.long[order(YF.long$month.no),]
-    colnames(YF) <- c('year', 'month', 'muni', 'muni.no','case', 'month.no') #clean up names
+    colnames(YF) <- c('year', 'month', 'muni', 'muni.no','case','cal.month', 'month.no') #clean up names
     
   # 7. Save the work
     saveRDS(YF, file="YFlong.rds")

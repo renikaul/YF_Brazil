@@ -25,7 +25,7 @@ sum.na=function(data) {sum(data, na.rm = TRUE)}
 ave.na=function(data) {mean(data, na.rm = TRUE)}
 sd.na=function(data) {sd(data, na.rm = TRUE)}
 
-#totals for each month #
+#totals for each month.no 
 YF.monthly <- YF %>%
               filter(month.no<169) %>% #remove yearly totals
               group_by(month.no) %>% #colaspse by month
@@ -34,7 +34,8 @@ YF.monthly <- YF %>%
 #total for each month in a yr
 YF.seasonal <- YF %>%
               filter(month.no<169) %>% #remove yearly totals
-              group_by(month) %>% #colaspse by month
+              group_by(year, cal.month) %>% #within yr then month
+              #group_by(cal.month) %>% #colaspse by month
               summarise(N=length(na.omit(case)) ,total=sum.na(case), ave=ave.na(case), sd=sd.na(case))
 
 
@@ -44,10 +45,12 @@ YF.seasonal <- YF %>%
 ```{r monthly plots}
 par(mfrow=c(1,2))
 
-plot(YF.monthly$total ~ YF.monthly$month.no, xaxt="n", ylab="total cases", xlab="month")
+plot(YF.monthly$total ~ YF.monthly$month.no, xaxt="n", ylab="total cases", xlab="month", type="b")
 axis(1, at=seq(12,14*12, by=24))
 
 hist(YF.monthly$total)
+
+plot(YF.seasonal$total~YF.seasonal$cal.month)
 ```
 
 
