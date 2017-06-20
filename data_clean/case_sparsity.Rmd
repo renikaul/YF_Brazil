@@ -5,6 +5,40 @@ date: "June 17, 2017"
 output: html_document
 ---
 
+# Rundown for Meeting with John on 2017-06-20
+
+## Background
+
+This year, there have been 758 confirmed cases of yellow fever in Brazil, more than ten times the maximum number of cases per year since 2000. Furthermore, the majority of these cases fall outside the previous geographic area of vaccine recommendation (it has since been updated), suggesting that transmission here was relatively unexpected, and perhaps due in part to the existence of a naive, unvaccinated population (although we do not have vaccination data to support this hypothesis).
+
+## Question: What municipalities in Brazil are most at risk of yellow fever outbreaks? 
+
+We'd like to approach this from a risk map or suitability perspective, resulting in a heatmap by month of risk of YF cases.
+
+## Data
+
+**Epidemiological Data**
+
+  - Number of cases by month per municipality (referred to as muni) from 2001-2014
+  - Positive municipalites (not case number) during 2017 outbreak at three time points (Jan, March, May)
+
+**Environmental Data**
+
+  - Land Cover by year/1km resolution, aggregated to muni
+  - Temperature (min, mean, max) by month/1km resolution, aggregated to muni 
+  - NDVI by month/1km resolution, aggregated to muni
+  - Precipiation by month/4km, aggregated to muni
+  - Tree Cover Loss from 2000-2014 (not yearly) for 30x30m pixels
+
+**Socio-demographic Data**
+
+  - Population by muni/year
+  - income by muni/year
+
+## Why this meeting?
+
+We now have all this data, and want some guidance on where to go from here and how to visualize and interpret our data to choose a model approach. We imagine this will depend on some characteristics of our dataset, particularly sparseness.
+
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = FALSE, warning = FALSE, message = FALSE)
 library(dplyr)
