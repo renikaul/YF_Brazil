@@ -1,3 +1,5 @@
+#This document compiles the single year YF case by muni and month files into a single long format dataframe with muni coded using Brazilian gov coding. 
+
 #Case counts
 
   library(tidyr)
