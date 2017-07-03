@@ -1,0 +1,59 @@
+---
+title: "Mapping YF Cases"
+author: "Michelle Evans"
+date: "7/2/2017"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(ggplot)
+library(rgdal)
+library(dplyr)
+library(leaflet)
+library(RColorBrewer)
+```
+
+
+```{r}
+YF <- readRDS("YFlong.rds")
+brazil <- readOGR("../data_processingScripts/municipios_2010", "municipios_2010")
+
+### correct ibg codes (like FIPS)
+# the ibg codes in the shapefile have an extra digit at the end, so we just subset the first six digits from the shapefile
+
+brazil@data$muni.no <- as.numeric(as.character(substr(brazil@data$codigo_ibg,1,6)))
+```
+
+# Map of Number of Cases per Muni from 2001-2014
+
+```{r}
+# calculate total cases per muni
+totCase <- YF %>%
+  group_by(muni.no) %>%
+  summarise(totalCases=sum(case, na.rm=T))
+
+# add to shapefile
+brazilYF <- merge(brazil, totCase, by="muni.no")
+```
+
+```{r}
+#create color palette
+pal <- colorBin("Reds", domain = c(1,44))
+#create popups
+casePop <- paste0(brazilYF@data$nome, 
+                      "<br><strong>", brazilYF@data$totalCases,
+                  "</strong> Cases from 2001-2014.")
+leaflet(data=brazilYF) %>%
+  addPolygons(color = "#444444", weight = 1, smoothFactor = 0.5,
+    opacity = 1.0, fillOpacity = 0.5,
+    fillColor = ~pal(totalCases),
+    highlightOptions = highlightOptions(color = "white", weight = 2,
+      bringToFront = TRUE),
+    popup=casePop) %>%
+  addProviderTiles(providers$CartoDB.Positron)
+```
+
+#Map of the Spread of YF
+
+This map will have a different color for each year.
