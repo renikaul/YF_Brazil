@@ -13,5 +13,6 @@ MetaData for Environmental Covariates:
 
 *Land Cover*:
 **Downloaded**: From MODIS, following NAME R script
-**Spatial & Temporal REsolution**: Began as 1 km/year, processed into municipality/year via 'extract.R'script
-**Filename**: 'not completed yet'
+**Spatial & Temporal REsolution**: Began as 1 km/year, processed into municipality/year via 'landCoverProcessing.R'script
+**Sub-data?**: Statistics were calculated for each land type in each municiplaity/year. Column headers are from `ClassStat` function in `SDMTools` package
+**Filename**: fragStatsyear.rds (i.e. fragStats2001.rds). Too much info to combine into one object and store on github
