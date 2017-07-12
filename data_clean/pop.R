@@ -3,12 +3,12 @@ library(tidyr)
 library(reshape2)
 
 #read in slightly edited data
-pop<-read.csv("/Users/annakate/Desktop/YF_Brazil/data_raw/demographic/population-edited.csv", sep=";", skip=4,
+pop<-read.csv("../data_raw/demographic/population-edited.csv", sep=";", skip=4,
               header=F, nrows=5570, encoding="UTF-8", colClasses=c(rep("NULL",16), "character", rep("numeric",16)))
 #cut out irrelevant years (2015, 2016)
 pop<-pop[,1:15]
 
-#split municipo # and name from extra pop'n # in column 1
+#split municipio # and name from extra pop'n # in column 1
 col1<-strsplit(pop[,1], ",,,,,,,,,,," )
 #save muni # and name
 name.and.num<-list()
@@ -53,5 +53,5 @@ colnames(pop.new)<-c("muni","muni.no","month",as.character(2001:2014))
 pop.long<-melt(pop.new, id=c("muni", "muni.no","month"))
 colnames(pop.long)<-c("muni","muni.no","month","year","pop")
 #save
-write.csv(pop.long, "/Users/annakate/Desktop/YF_Brazil/data_clean/population-long.csv")
+write.csv(pop.long, "population-long.csv")
 

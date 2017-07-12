@@ -3,10 +3,10 @@ library(tidyr)
 library(reshape2)
 
 #read in slightly edited data
-gdp<-read.csv("/Users/annakate/Desktop/YF_Brazil/data_raw/demographic/gdp2.csv", sep=";", skip=1,
+gdp<-read.csv("../data_raw/demographic/gdp2.csv", sep=";", skip=1,
               header=F, nrows=5570, encoding="UTF-8", colClasses=c(rep("NULL",4), "character", rep("numeric",4)))
 
-#split municipo # and name from extra gdp # in column 1
+#split municipio # and name from extra gdp # in column 1
 col1<-strsplit(gdp[,1], "," )
 #save muni # and name
 name.and.num<-list()
@@ -51,5 +51,5 @@ colnames(gdp.new)<-c("muni","muni.no","month",as.character(2010:2013))
 gdp.long<-melt(gdp.new, id=c("muni", "muni.no","month"))
 colnames(gdp.long)<-c("muni","muni.no","month","year","gdp")
 #save
-write.csv(gdp.long, "/Users/annakate/Desktop/YF_Brazil/data_clean/gdp2-long.csv")
+write.csv(gdp.long, "gdp2-long.csv")
 
