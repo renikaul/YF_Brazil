@@ -1,8 +1,25 @@
+GDP by municipality
+Downloaded from 
+http://www2.datasus.gov.br/DATASUS/index.php?area=0206&id=29610442&VObj=http://tabnet.datasus.gov.br/cgi/deftohtm.exe?ibge/cnv/pibmunb on 12 Jul 2017
+
+Metadata associated with GDP
+Source: IBGE, in partnership with the State Statistical Bodies, State Secretariats of Government and Superintendence of the Manaus Free Zone - SUFRAMA. 
+Grades:
+GDP per capita values ​​are in current reais. The other amounts are in current thousands of reais.
+The values ​​of GDP per capita may differ from those published in other sources, if there is a difference in the estimated values ​​of the population.
+Historical series constructed with reference 2010. For more details on the calculation methodology, consult the IBGE website .
+
+other notes
+-Data downloaded in 2 files, 2001-2012 ref 2002 and 2010-2013 ref 2010. These datasets also included GDP per capita so I am hoping that the reference years are for population. This means that 2010,2011, and 2012 from the two sources should be identical. 
+-Missing 2014 data
+-Liner interpolation of yearly to monthly is TBD
 -----------------------
 Population Size by municipality
 Downloaded from 
 http://tabnet.datasus.gov.br/cgi/tabcgi.exe?ibge/cnv/poptbr.def on 05 June 2017 downloading years 2001-2016
 
+
+Other potential sources
 -----------------------
 Ave household income per capita, (Gini index)
 Downloaded from http://www2.datasus.gov.br/DATASUS/index.php?area=0206&id=8065372&VObj=http://tabnet.datasus.gov.br/cgi/ibge/censo/cnv/gini
