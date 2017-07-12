@@ -1,0 +1,117 @@
+---
+title: "YF Bagged LogReg Model"
+author: "Michelle Evans, Spencer Hall, Reni Kaul, Anna Kate Schatz"
+date: "July 12, 2017"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r load packages}
+
+```
+
+# General Outline of Model
+
+## Load, Combine, and Clean/Format Data
+
+Make sure that there is a row for every muni x year x month, not *only* presences.
+
+Population data is log 10 transformed in Ebola work, after correcting 0 to 1 to avoid NAs with log transformation. Between five year increments were interpolated. Population was then binned.
+
+Original ebola paper used a scaled rainfall value (scaled to maximum of muni, in our case).
+
+EVI and PET were rescaled by subtracting the mean and dividing by sd.
+
+Data was sorted/stratified by rainfall so that the training/test split was not biased by rainfall levels.
+
+2/3 split for training/testing.
+
+## Bagging
+
+Function from Ebola:
+
+```{r}
+bagging<-function(form.x.y,train.pres,train.bg,new.data,iterations=176){
+  #' JP's bagging function
+  #' 
+  #' @param form.x.y the formula for model to use
+  #' @param train.pres dataframe containing training presence data
+  #' @param train.bg dataframe containing training background data
+  #' @param new.data new data for each logreg model to predict onto
+  #' @param iterations number of cores to use. also maybe has something to do with model iterations???
+  #'
+  #' @returns predictions on new data as a combination (sum??) of predictions from each logreg model
+  predictions<-foreach(m=1:9,.combine='+') %dopar% {
+    training_positions.p <- sample(nrow(training.pres),size=10)
+    training_positions.b <- sample(nrow(training.abs),size=100)
+    train_pos.p<-1:nrow(training.pres) %in% training_positions.p #presence
+    train_pos.b<-1:nrow(training.abs) %in% training_positions.b #background
+    glm_fit<-glm(form.x.y,data=rbind(training.pres[train_pos.p,],training.abs[train_pos.b,]),family=binomial(logit))
+    predict(glm_fit,newdata=new.data,type="response")
+  }
+  return(predictions)
+}
+```
+
+Example of using above function:
+
+```{r}
+#write glm formula
+glm.formula<-as.formula("pres~rf.ym+evi+pet+rf.scaled+as.factor(pd.yr.binned)")
+
+#predict on training set
+training<-rbind(train.pres,train.bg)
+output1<-bagging(form.x.y=glm.formula,training.pres=train.pres,training.abs=train.bg,new.data=training,iterations=176)
+
+#predict on testing set
+testing<-rbind(test.pres,test.bg)
+output2<-bagging(form.x.y=glm.formula,training.pres=train.pres,training.abs=train.bg,new.data=testing,iterations=cores.to.use)
+```
+
+After this, they then predicted over all of sub-Saharan Africa:
+
+1. Combined all presence into one df, and all bg into one df
+
+2. did bagged predictions using all p and all bg
+
+3. each iteration was split by year, then run over all the cores, six times each
+
+```{r}
+# for (i in 1:12){
+#   rf.scaled<-fread("rf.scaled.all.csv",select=((i*32)-31):(i*32)) 
+#   rf.ym<-fread("rf.ym.df.csv",select=((i*32)-31):(i*32)) 
+#   for (j in 1:32){
+#     rf.scaled.step<-rf.scaled.all[,j] #Single year of data
+#     rf.ym.step<-rf.ym.all[,j] #Single year of data
+#     all.data.step<-as.data.frame(cbind(evi.pet.pd.binned,rf.scaled.step,log10(rf.ym.step+1)))
+#     colnames(all.data.step)<-c("evi","pet","pd.yr.binned","rf.scaled","rf.ym")
+#     sum<-NULL
+#     chunks<-6
+#     for (k in 1:chunks){
+#       output<-bagging(form.x.y=glm.formula,train.pres=final.p,training.bg=final.b,new.data=all.data.step,iterations=cores.to.use) #what does k do here?? just runs 6 times
+#       sum<-sum+output
+#     }
+#     mean.predict<-sum/(cores.to.use*chunks)
+#     writeRDS(mean.predict,file=paste("Bags/predictionsSet",i*j))
+#     print(i*j)
+#   }
+# }
+```
+
+## Testing Bagging Performance
+
+Created ROC curves for sens-spec when using all presences, prediction on training data, and prediction on testing data.
+
+
+### Questions (as of 2017-07-12)
+
+1. Where does the randomness come in? Is each iteration meant to be a model? Or a group of nine models?
+
+2. Are the predictions summed? And then divided by the total number of logreg models to give the mean?
+
+3. What makes each individual model weak? The use of only 110 points (10p + 100 bg)?
+
+4. Seed is never explicitly set in the iterations, but I get the sense that it is different and this what subsets different groups of training and testing data for each glm

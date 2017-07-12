@@ -759,7 +759,7 @@ Loop to do bagging predictions on all 384 months of rainfall. Do in 12 parts bec
 #     sum<-NULL
 #     chunks<-6
 #     for (k in 1:chunks){
-#       output<-bagging(form.x.y=glm.formula,train.pres=final.p,training.bg=final.b,new.data=all.data.step,iterations=cores.to.use)
+#       output<-bagging(form.x.y=glm.formula,train.pres=final.p,training.bg=final.b,new.data=all.data.step,iterations=cores.to.use) #what does k do here?? just runs 6 times
 #       sum<-sum+output
 #     }
 #     mean.predict<-sum/(cores.to.use*chunks)
