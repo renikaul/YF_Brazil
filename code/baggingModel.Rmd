@@ -21,25 +21,32 @@ Make sure that there is a row for every muni x year x month, not *only* presence
 
 Population data is log 10 transformed in Ebola work, after correcting 0 to 1 to avoid NAs with log transformation. Between five year increments were interpolated. Population was then binned.
 
-Original ebola paper used a scaled rainfall value (scaled to maximum of muni, in our case).
+Original ebola paper used a scaled rainfall value (scaled to maximum of muni, in our case). Also used one that was logged transformed. Looks like they used both at the same time?
 
-EVI and PET were rescaled by subtracting the mean and dividing by sd.
+EVI and PET were rescaled by subtracting the mean and dividing by sd. In the Ebola paper, these were just averages from 2000 - 2014, so there is only one layer/ So this is the mean of the whole layer (in our case all munis at a year x month).
 
 Data was sorted/stratified by rainfall so that the training/test split was not biased by rainfall levels.
 
 2/3 split for training/testing.
+
+### Investigating Scaling of Environmental Covariates
+
+```{r}
+
+```
+
 
 ## Bagging
 
 Function from Ebola:
 
 ```{r}
-bagging<-function(form.x.y,train.pres,train.bg,new.data,iterations=176){
+bagging<-function(form.x.y,training.pres,training.abs,new.data,iterations=176){
   #' JP's bagging function
   #' 
   #' @param form.x.y the formula for model to use
-  #' @param train.pres dataframe containing training presence data
-  #' @param train.bg dataframe containing training background data
+  #' @param training.pres dataframe containing training presence data
+  #' @param training.abs dataframe containing training background data
   #' @param new.data new data for each logreg model to predict onto
   #' @param iterations number of cores to use. also maybe has something to do with model iterations???
   #'
@@ -70,6 +77,31 @@ output1<-bagging(form.x.y=glm.formula,training.pres=train.pres,training.abs=trai
 testing<-rbind(test.pres,test.bg)
 output2<-bagging(form.x.y=glm.formula,training.pres=train.pres,training.abs=train.bg,new.data=testing,iterations=cores.to.use)
 ```
+
+Giving it a test with fake data:
+
+```{r}
+trainTest <- cbind(c(rep(1, 30), rep(0,400)), c(rnorm(30,5,2), rnorm(400,10,4)), c(rnorm(30,100,20), rnorm(400,40,8)), c(rnorm(30,0.5, 0.1), rnorm(400,0.1,0.1)))
+trainTest[trainTest<0] <- 0
+colnames(trainTest) <- c("pres", "v1", "v2", "v3")
+trainTest <- as.data.frame(trainTest)
+
+#split into pres and abs
+train.pres <- trainTest[trainTest$pres==1,]
+train.abs <- trainTest[trainTest$pres==0,]
+
+glm.formula <- as.formula("pres~v1+v2+v3")
+
+cores.to.use <- 1 #bc my macbook sucks
+cl <- makeCluster(cores.to.use)
+registerDoParallel(cl)
+
+output1 <- bagging(form.x.y=glm.formula,training.pres=train.pres,training.abs=train.abs,new.data=trainTest,iterations=1)
+
+stopCluster(cl) #this worked perfectly (all the positives got 9, and 0s got 0)
+
+```
+
 
 After this, they then predicted over all of sub-Saharan Africa:
 

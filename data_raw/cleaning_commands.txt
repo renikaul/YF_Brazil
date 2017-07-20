@@ -1,3 +1,4 @@
+Old file when using UNIX for data cleaning 
 #change csv to txt
 cp YF_2001.csv YF_2001.txt
 cp YF_2002.csv YF_2002.txt
