@@ -7,7 +7,7 @@ output: html_document
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
-library(ggplot)
+library(ggplot2)
 library(rgdal)
 library(dplyr)
 library(leaflet)
@@ -16,7 +16,7 @@ library(RColorBrewer)
 
 
 ```{r}
-YF <- readRDS("../data_clean/YFlong.rds")
+YF <- readRDS("../data_clean/YFcases/YFlong.rds")
 brazil <- readOGR("../data_processingScripts/municipios_2010", "municipios_2010")
 
 ### correct ibg codes (like FIPS)
@@ -30,6 +30,7 @@ brazil@data$muni.no <- as.numeric(as.character(substr(brazil@data$codigo_ibg,1,6
 ```{r}
 # calculate total cases per muni
 totCase <- YF %>%
+  filter(cal.month<13) %>%
   group_by(muni.no) %>%
   summarise(totalCases=sum(case, na.rm=T))
 
@@ -57,3 +58,22 @@ leaflet(data=brazilYF) %>%
 #Map of the Spread of YF
 
 This map will have a different color for each year.
+
+```{r}
+#merge years with cases to shapefile
+yearCase <- YF %>%
+  select(-muni) %>%
+  filter(cal.month<13) %>%
+  filter(case>0) %>%
+  #get the last time they had a case
+  group_by(muni.no) %>%
+  filter(month.no==max(month.no))
+
+brazilYFtime <- merge(brazil, yearCase, by="muni.no", all.y=T)
+
+yearColor <- colorBin(palette= "RdYlBu", domain=c(2001,2014))
+
+
+
+```
+
