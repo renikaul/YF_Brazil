@@ -151,5 +151,37 @@ newTmean <- process_temp(tempDF=tempMean, type="Mean")
 #merge dataframes together into one
 tempAll <- join_all(list(newTmin, newTmax, newTmean), by=c("muni.no", "year", "month"), type="full")
 
+#---thirteen muni x month have NA due to cloud cover
+toFix <- tempAll[is.na(tempAll$tempMean),]
+
+#get these values by spatial permutation of the values of their neighbors
+#load brazil shapefile to find neighbors
+library(rgdal)
+library(rgeos)
+library(spdep)
+library(expp)
+brazil <- readOGR("../data_clean", "BRAZpolygons")
+
+#neighbors for every polygon
+row.names(brazil) <- as.character(brazil@data$muni_no)
+neighbors <- poly2nb(brazil)
+mat <- nb2mat(neighbors, zero.policy=T)
+colnames(mat) <- as.character(brazil@data$muni_no)
+
+#subset out ones to fix
+mat2fix <- mat[rownames(mat) %in% brazilToFix$muni_no,]
+
+#then make a loop that gets the values from this matrix, (column names) and then takes the mean of those values from the temperature table above
+
+test <- mat[rownames(mat)=="312100",]
+test2 <- test[test>0] #list of neighbors
+
+
+neighbors <- gTouches(brazil)
+row.names(neighbors) <- as.character(brazil@data$muni_no)
+
+
+
+
 #save as R object
-saveRDS(tempAll, "../data_clean/environmental/allTemperature.rds") #missing 2001.06 
+saveRDS(tempAll, "../data_clean/environmental/allTemperature.rds") 
