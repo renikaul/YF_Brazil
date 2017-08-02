@@ -31,30 +31,64 @@ Data was sorted/stratified by rainfall so that the training/test split was not b
 
 ### Scaling of Environmental Covariates
 
-Rainfall is of a similar range (0 -1.5), with an exponential distribution. How to rescale (if at all)?
+Rainfall is of a similar range (0 -1.5), with an exponential distribution. We normalized in two ways. First we log transformed it. Second, we rescaled to the maximum value of that municipality. This resulted in two values for each type of rainfall, for a total of six.  
 
 ```{r}
 rf <- readRDS("../data_clean/environmental/allRainfall.rds")
-hist(rf[,5]) #exponential with long tail
+hist(rf[,5]) #min rainfall exponential with long tail
 range(rf[,5])
-hist(rf[,6]) #exponential
+hist(rf[,6]) #max rainfall, xponential
 range(rf[,6])
-hist(rf[,7]) #exponential
+hist(rf[,7]) #mean rainfall, exponential
 range(rf[,7])
+
+#transformed variables
+
+#log transformed
+nonzero<-  min(rf[which(rf[,5]>0),5])#what is smallest non-zero value
+hist(log((rf[,5])+nonzero/10)) #check that handling zeros is ok
+
+rf$log.min.rf  <- log((rf[,5])+nonzero/10)
+rf$log.max.rf  <- log((rf[,6])+nonzero/10)
+rf$log.mean.rf  <- log((rf[,7])+nonzero/10)
+
+#scale to maximum value of muni
+library(dplyr)
+
+rf <- rf %>%
+  group_by(muni.no) %>%
+  mutate(max.max.rf = max(hourlyRainfallMax)) %>%
+  mutate(scale.max.rf= hourlyRainfallMax/max.max.rf) %>%
+  mutate(max.min.rf = max(hourlyRainfallMin)) %>%
+  mutate(scale.min.rf = hourlyRainfallMin/max.min.rf) %>%
+  mutate(max.mean.rf = max(hourlyRainfallMean)) %>%
+  mutate(scale.mean.rf = hourlyRainfallMean/max.mean.rf) %>%
+  select(-max.max.rf, -max.min.rf, -max.mean.rf) %>%
+  ungroup()
+
 ```
 
-NDVI data is ranged 0 - 1 and is normally distributed, probably doesn't need rescaling.
+NDVI data is ranged 0 - 1 and is normally distributed, probably doesn't need rescaling. This doesn't need to be trasformed because it is between 0 - 1 and normally distributed.
 ```{r}
 ndvi <- readRDS("../data_clean/environmental/allNDVI.rds")
 hist(ndvi[,5]) #normal
+
+ndvi.subset <- ndvi %>%
+  group_by(muni.no) %>%
+  summarise_each(funs(mean,sd)) 
+
+ndvi.subset <- ndvi.subset[sample(0:5564,1000),]
+library(gplots)
+plotCI(x=1:999, y=ndvi.subset$NDVI_mean, uiw=ndvi.subset$NDVI_sd, gap=0)
+
 ```
 
 Temperature is normally distributed but has a wide range. Could be rescaled by subtracting the mean and dividing by sd per month layer?
 ```{r}
 temp <- readRDS("../data_clean/environmental/allTemperature.rds")
-hist(temp[,5])
-hist(temp[,6])
-hist(temp[,7])
+hist(temp$tempMax)
+hist(temp$tempMean)
+hist(temp$tempMin)
 
 #rescale each month by subtracting mean and dividing by sd (ie standardizing)
 stdz <- function(x){
@@ -65,11 +99,13 @@ temp.scale <- temp %>%
   group_by(year, month) %>%
   mutate(tempMin.scale=stdz(tempMin))
 
-#13 temperature rows with NAs (likely due to clouds)
-temp[temp$tempMin==Inf,] #how to deal with this? spatial permutation (ie take mean of neighbors)
 ```
 
 
+Population Data
+
+This is where you add in shit. we want to call in population data and log10 transform. and bin!
+created 3 population bins according to x<10^2, 10^2<x<10^3, and x>10^3
 
 ## Bagging
 
