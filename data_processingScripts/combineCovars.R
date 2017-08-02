@@ -1,11 +1,10 @@
 ### This script combines the covariate data into one giant dataframe to use in the bagging model
-## MV Evans July 11 2017
+## MV Evans August 2 2017
 
 ## List of Covariates:
   # Rainfall
   # NDVI
   # Temperature
-  # Land Use (this will be a huge pain)
 
 # All of the Data is wide, but needs to switch to long to match cases
 # Merge columns are muni.no, year(2001), month (7), examples in parentheticals
@@ -165,8 +164,8 @@ newTmean <- process_temp(tempDF=tempMean, type="Mean")
 #merge dataframes together into one
 tempAll <- join_all(list(newTmin, newTmax, newTmean), by=c("muni.no", "year", "cal.month", "month.no"), type="full")
 
-#---thirteen muni x month have NA due to cloud cover
-toFix <- tempAll[is.na(tempAll$tempMean),]
+#---thirteen muni x month have NA/-Inf/Inf due to cloud cover
+toFix <- tempAll[(is.na(tempAll$tempMean) | tempAll$tempMax==-Inf | tempAll$tempMin==Inf),]
 
 #get these values by spatial permutation of the values of their neighbors
 #load brazil shapefile to find neighbors
@@ -183,25 +182,26 @@ neighbors <- poly2nb(brazil)
 mat <- nb2mat(neighbors, zero.policy=T)
 colnames(mat) <- as.character(brazil@data$muni_no)
 
-#subset out ones to fix
-mat2fix <- mat[rownames(mat) %in% toFix$muni.no,]
+#subset out ones to fix 
+# mat2fix <- mat[rownames(mat) %in% toFix$muni.no,] #this threw an error
 
-#then make a loop that gets the values from this matrix, (column names) and then takes the mean of those values from the temperature table above
+#then make a loop that gets the values from this matrix, and then takes the mean of those values from the temperature table above
 
-spatialPermute <- function(missingMuni.no, missingMuni.name, missingMonth, missingYear, missingmonth.no, nbMat=mat2fix){
+spatialPermute <- function(missingMuni.no, missingMuni.name, missingMonth, missingYear, missingmonth.no, nbMat=mat){
   temp <- nbMat[rownames(nbMat)==missingMuni.no,]
   nbs <- names(temp[temp>0]) #get muni.no of neighbors
   nbValues <- tempAll %>%
     dplyr::filter(year==missingYear) %>%
     dplyr::filter(cal.month==missingMonth) %>%
     dplyr::filter(muni.no %in% nbs) %>%
+    dplyr::filter(tempMin!=Inf & tempMax!=-Inf) %>%
     dplyr::summarise(tempMin=mean(tempMin, na.rm=T), tempMax=mean(tempMax, na.rm=T), tempMean=mean(tempMean, na.rm=T))
   newValues <- cbind(muni.no=missingMuni.no, muni.name=missingMuni.name, year=missingYear, cal.month=missingMonth, month.no=missingmonth.no, nbValues[,c('tempMin', 'tempMax', 'tempMean')])
   return(newValues)
 }
 
 #apply spatial permute to the missing rows
-missInds <- which(is.na(tempAll$tempMean))
+missInds <- which(is.na(tempAll$tempMean) | tempAll$tempMax==-Inf | tempAll$tempMin==Inf)
 
 for (i in missInds){
   newVals <- spatialPermute(missingMuni.no=tempAll[i,1], missingMuni.name=tempAll[i,2], missingYear=tempAll[i,3],
