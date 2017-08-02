@@ -4,8 +4,8 @@
 ## List of Covariates:
   # Rainfall
   # NDVI
-  # Land Use (this will be a huge pain)
   # Temperature
+  # Land Use (this will be a huge pain)
 
 # All of the Data is wide, but needs to switch to long to match cases
 # Merge columns are muni.no, year(2001), month (7), examples in parentheticals
@@ -41,7 +41,7 @@ process_rainfall <- function(rainfallDF, type){
     #drop date column
     dplyr::select(-date) %>%
     #reorder columns to keep us sane
-    dplyr::select(muni.no, muni.name=IBGE_Name, year, month, measurement)
+    dplyr::select(muni.no, muni.name=IBGE_Name, year, cal.month=month, measurement)
   
   #rename measurement column
   measureLabel <- paste0("hourlyRainfall", type)
@@ -59,7 +59,17 @@ newRFmax <- process_rainfall(rainfallDF=rainfallMax, type="Max")
 newRFmean <- process_rainfall(rainfallDF = rainfallMean, type="Mean")
 
 #merge dataframes together into one
-RFall <- join_all(list(newRFmin, newRFmax, newRFmean), by=c("muni.no", "year", "month"), type="full")
+RFall <- join_all(list(newRFmin, newRFmax, newRFmean), by=c("muni.no", "year", "cal.month"), type="full")
+
+#add in month.no
+month.noFunc <- function(year, month, startYear, startMonth){
+  yearsPast <- year-startYear
+  monthsPast <- month-startMonth
+  totalMonths <- 12*yearsPast + monthsPast + 1
+  return(totalMonths)
+}
+
+RFall <- mutate(RFall, month.no=month.noFunc(year=year, month=cal.month, startYear=2001, startMonth=1))
 
 #save as R object
 saveRDS(RFall, "../data_clean/environmental/allRainfall.rds")
@@ -91,11 +101,13 @@ ndviNew <- ndvi %>%
   #get date
   mutate(day=substr(date, 14, 16)) %>%
   #convert date to month
-  mutate(posixDate = jtoDate(day, year)) %>%
-  mutate(month=month(posixDate)) %>%
+  plyr::mutate(posixDate = jtoDate(day, year)) %>%
+  plyr::mutate(month=month(posixDate)) %>%
   #reorganize columns
-  dplyr::select(muni.no, muni.name=IBGE_Name, year, month, NDVI)
+  dplyr::select(muni.no, muni.name=IBGE_Name, year, cal.month=month, NDVI) %>%
+  mutate(month.no=month.noFunc(year=as.numeric(year), month=cal.month, startYear=2001, startMonth=1))
 
+  
 #adjust muni name to a character
 ndviNew$muni.name <- as.character(ndviNew$muni.name)
 
@@ -131,7 +143,9 @@ process_temp <- function(tempDF, type){
       #get month
       mutate(month=substr(date,7, length(date))) %>%
       #drop date
-      dplyr::select(muni.no, muni.name, year, month, measurement)
+      mutate(month.no=month.noFunc(year=as.numeric(year), month=as.numeric(month), startYear=2001, startMonth=1)) %>%
+      dplyr::select(muni.no, muni.name, year, cal.month=month, month.no, measurement)
+  
 
     #rename measurement column
     measureLabel <- paste0("temp", type)
@@ -149,7 +163,54 @@ newTmax <- process_temp(tempDF=tempMax, type="Max")
 newTmean <- process_temp(tempDF=tempMean, type="Mean")
 
 #merge dataframes together into one
-tempAll <- join_all(list(newTmin, newTmax, newTmean), by=c("muni.no", "year", "month"), type="full")
+tempAll <- join_all(list(newTmin, newTmax, newTmean), by=c("muni.no", "year", "cal.month", "month.no"), type="full")
+
+#---thirteen muni x month have NA due to cloud cover
+toFix <- tempAll[is.na(tempAll$tempMean),]
+
+#get these values by spatial permutation of the values of their neighbors
+#load brazil shapefile to find neighbors
+library(rgdal)
+library(rgeos)
+library(spdep)
+
+brazil <- readOGR("../data_clean", "BRAZpolygons")
+
+
+#neighbors for every polygon
+row.names(brazil) <- as.character(brazil@data$muni_no)
+neighbors <- poly2nb(brazil)
+mat <- nb2mat(neighbors, zero.policy=T)
+colnames(mat) <- as.character(brazil@data$muni_no)
+
+#subset out ones to fix
+mat2fix <- mat[rownames(mat) %in% toFix$muni.no,]
+
+#then make a loop that gets the values from this matrix, (column names) and then takes the mean of those values from the temperature table above
+
+spatialPermute <- function(missingMuni.no, missingMuni.name, missingMonth, missingYear, missingmonth.no, nbMat=mat2fix){
+  temp <- nbMat[rownames(nbMat)==missingMuni.no,]
+  nbs <- names(temp[temp>0]) #get muni.no of neighbors
+  nbValues <- tempAll %>%
+    dplyr::filter(year==missingYear) %>%
+    dplyr::filter(cal.month==missingMonth) %>%
+    dplyr::filter(muni.no %in% nbs) %>%
+    dplyr::summarise(tempMin=mean(tempMin, na.rm=T), tempMax=mean(tempMax, na.rm=T), tempMean=mean(tempMean, na.rm=T))
+  newValues <- cbind(muni.no=missingMuni.no, muni.name=missingMuni.name, year=missingYear, cal.month=missingMonth, month.no=missingmonth.no, nbValues[,c('tempMin', 'tempMax', 'tempMean')])
+  return(newValues)
+}
+
+#apply spatial permute to the missing rows
+missInds <- which(is.na(tempAll$tempMean))
+
+for (i in missInds){
+  newVals <- spatialPermute(missingMuni.no=tempAll[i,1], missingMuni.name=tempAll[i,2], missingYear=tempAll[i,3],
+                 missingMonth = tempAll[i,4], missingmonth.no = tempAll[i,5])
+  tempAll <- rbind(tempAll, newVals) #append to end
+}
+
+#drop everything that we have fixed and appended
+tempAll <- tempAll[-missInds,]
 
 #save as R object
-saveRDS(tempAll, "../data_clean/environmental/allTemperature.rds") #missing 2001.06 
+saveRDS(tempAll, "../data_clean/environmental/allTemperature.rds") 
