@@ -10,7 +10,9 @@ knitr::opts_chunk$set(echo = TRUE)
 ```
 
 ```{r load packages}
-
+library(dplyr)
+library(gplots)
+library(parallel)
 ```
 
 # General Outline of Model
@@ -37,7 +39,7 @@ Rainfall is of a similar range (0 -1.5), with an exponential distribution. We no
 rf <- readRDS("../data_clean/environmental/allRainfall.rds")
 hist(rf[,5]) #min rainfall exponential with long tail
 range(rf[,5])
-hist(rf[,6]) #max rainfall, xponential
+hist(rf[,6]) #max rainfall, exponential
 range(rf[,6])
 hist(rf[,7]) #mean rainfall, exponential
 range(rf[,7])
@@ -53,8 +55,6 @@ rf$log.max.rf  <- log((rf[,6])+nonzero/10)
 rf$log.mean.rf  <- log((rf[,7])+nonzero/10)
 
 #scale to maximum value of muni
-library(dplyr)
-
 rf <- rf %>%
   group_by(muni.no) %>%
   mutate(max.max.rf = max(hourlyRainfallMax)) %>%
@@ -73,13 +73,13 @@ NDVI data is ranged 0 - 1 and is normally distributed, probably doesn't need res
 ndvi <- readRDS("../data_clean/environmental/allNDVI.rds")
 hist(ndvi[,5]) #normal
 
-ndvi.subset <- ndvi %>%
-  group_by(muni.no) %>%
-  summarise_each(funs(mean,sd)) 
-
-ndvi.subset <- ndvi.subset[sample(0:5564,1000),]
-library(gplots)
-plotCI(x=1:999, y=ndvi.subset$NDVI_mean, uiw=ndvi.subset$NDVI_sd, gap=0)
+# ndvi.subset <- ndvi %>%
+#   group_by(muni.no) %>%
+#   summarise_each(funs(mean,sd)) 
+# 
+# ndvi.subset <- ndvi.subset[sample(0:5564,1000),]
+# 
+# plotCI(x=1:999, y=ndvi.subset$NDVI_mean, uiw=ndvi.subset$NDVI_sd, gap=0)
 
 ```
 
@@ -90,22 +90,107 @@ hist(temp$tempMax)
 hist(temp$tempMean)
 hist(temp$tempMin)
 
-#rescale each month by subtracting mean and dividing by sd (ie standardizing)
-stdz <- function(x){
-  return((x-mean(x))/sd(x))
-}
-
-temp.scale <- temp %>%
-  group_by(year, month) %>%
-  mutate(tempMin.scale=stdz(tempMin))
+# #rescale each month by subtracting mean and dividing by sd (ie standardizing)
+# stdz <- function(x){
+#   return((x-mean(x))/sd(x))
+# }
+# 
+# temp <- temp %>%
+#   group_by(month.no) %>%
+#   mutate(scale.temp.max=stdz(tempMax)) %>%
+#   mutate(scale.temp.mean=stdz(tempMean))
 
 ```
 
 
 Population Data
 
-This is where you add in shit. we want to call in population data and log10 transform. and bin!
-created 3 population bins according to x<10^2, 10^2<x<10^3, and x>10^3
+Because the range is huge, we log10 transformed (population +1) and then binned based on the 25% and 75% quantiles (approximately). We also need to adjust the population data for the muncipalities that recently became emancipated in 2013 (based on `muniCorrection.Rmd`).
+
+```{r}
+pop <- read.csv("../data_clean/demographic/population-long.csv")
+hist(log10(pop$pop))
+
+quantile(log10(pop$pop), 1/4)
+quantile(log10(pop$pop), 3/4)
+
+#add in month.no
+month.noFunc <- function(year, month, startYear, startMonth){
+  yearsPast <- year-startYear
+  monthsPast <- month-startMonth
+  totalMonths <- 12*yearsPast + monthsPast + 1
+  return(totalMonths)
+}
+
+pop <- pop %>%
+  mutate(logpop=log10(pop+1)) %>%
+  mutate(logpopBin=case_when(
+    logpop<3.5 ~ "bin1",
+    logpop>5 ~ "bin3",
+    TRUE ~ "bin2"
+  )) %>%
+  filter(month<=12)%>%
+  mutate(month.no=month.noFunc(year=year, month=month, startYear=2001, startMonth=1)) %>%
+  dplyr::rename(cal.month=month)
+
+```
+
+
+Case Data. There are missing months/munis of cases that need to be created
+
+```{r}
+cases <- readRDS("../data_clean/YFcases/YFlong.rds")
+
+cases <- cases %>%
+  #drop annual totals
+  filter(cal.month<=12) %>%
+  #drop unknown origin totals %>%
+  filter(!grepl("ignorado", muni))
+```
+
+
+
+Combine it all into a giant dataframe!
+
+```{r}
+all.data <- join_all(list(ndvi, pop, rf, temp, cases), by=c("muni.no", "month.no"), type="full")
+
+#clean it up
+all.data <- all.data %>%
+  #drop if doesn't match envCovariates
+  filter(!is.na(muni.name)) %>%
+  #get only columns we need
+  select(muni.no, muni.name, month.no, case, logpopBin, NDVI, log.min.rf:scale.mean.rf, tempMax, tempMean)
+
+#turn NA cases to 'true' zeros
+all.data$case[is.na(all.data$case)] <- 0
+#all positive cases to 1s
+all.data$case[all.data$case>0] <- 1
+```
+
+## Testing & Training Split
+
+Need to split into testing and training. Perhaps stratify by years?
+
+```{r}
+all.data <- all.data[order(-all.data$case, all.data$month.no),] 
+
+all.pres <- filter(all.data, case==1)
+all.bg <- filter(all.data, case==0)
+
+test.pres.inds <- base::sample(nrow(all.pres), ceiling(nrow(all.pres)/3)) #without year stratification
+test.pres.inds <- seq(1,nrow(all.pres), by=3) #with year stratification
+
+test.bg.inds <- base::sample(nrow(all.bg), ceiling(nrow(all.bg)/3))
+
+
+test.pres <- all.pres[test.pres.inds,]
+train.pres <- all.pres[-test.pres.inds,]
+
+test.bg <- all.bg[test.bg.inds,]
+train.bg <- all.bg[-test.bg.inds,]
+```
+
 
 ## Bagging
 
@@ -133,6 +218,19 @@ bagging<-function(form.x.y,training.pres,training.abs,new.data,iterations=176){
   return(predictions)
 }
 ```
+
+Write formula for function (only using means for now)
+
+```{r}
+glm.formula <- as.formula("case~as.factor(logpopBin)+NDVI+log.mean.rf+scale.mean.rf+tempMean")
+```
+
+Predict on training set
+
+```{r}
+training <- rbind(train.pres, train.bg)
+```
+
 
 Example of using above function:
 
@@ -163,11 +261,11 @@ train.abs <- trainTest[trainTest$pres==0,]
 
 glm.formula <- as.formula("pres~v1+v2+v3")
 
-cores.to.use <- 1 #bc my macbook sucks
+cores.to.use <- 5 #bc my macbook sucks
 cl <- makeCluster(cores.to.use)
 registerDoParallel(cl)
 
-output1 <- bagging(form.x.y=glm.formula,training.pres=train.pres,training.abs=train.abs,new.data=trainTest,iterations=1)
+output1 <- bagging(form.x.y=glm.formula,training.pres=train.pres,training.abs=train.abs,new.data=trainTest,iterations=cores.to.use)
 
 stopCluster(cl) #this worked perfectly (all the positives got 9, and 0s got 0)
 
@@ -209,13 +307,3 @@ After this, they then predicted over all of sub-Saharan Africa:
 
 Created ROC curves for sens-spec when using all presences, prediction on training data, and prediction on testing data.
 
-
-### Questions (as of 2017-07-12)
-
-1. Where does the randomness come in? Is each iteration meant to be a model? Or a group of nine models?
-
-2. Are the predictions summed? And then divided by the total number of logreg models to give the mean?
-
-3. What makes each individual model weak? The use of only 110 points (10p + 100 bg)?
-
-4. Seed is never explicitly set in the iterations, but I get the sense that it is different and this what subsets different groups of training and testing data for each glm
