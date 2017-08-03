@@ -13,6 +13,9 @@ knitr::opts_chunk$set(echo = TRUE)
 library(dplyr)
 library(gplots)
 library(parallel)
+library(doParallel)
+library(ROCR)
+library(pROC)
 ```
 
 # General Outline of Model
@@ -197,7 +200,7 @@ train.bg <- all.bg[-test.bg.inds,]
 Function from Ebola:
 
 ```{r}
-bagging<-function(form.x.y,training.pres,training.abs,new.data,iterations=176){
+bagging<-function(form.x.y,training.pres,training.abs,new.data,iterations=32){
   #' JP's bagging function
   #' 
   #' @param form.x.y the formula for model to use
@@ -229,6 +232,26 @@ Predict on training set
 
 ```{r}
 training <- rbind(train.pres, train.bg)
+
+cores.to.use <- 8
+iterations <- 1
+cl <- makeCluster(cores.to.use)
+registerDoParallel(cl)
+
+
+output1 <- bagging(form.x.y=glm.formula,training.pres=train.pres,training.abs=train.bg,new.data=training,iterations=iterations)
+
+stopCluster(cl)
+```
+
+Test Accuracy
+
+```{r}
+
+output.preds<- output1/(iterations*9)
+preds <- prediction(output.preds, training$case)
+perf <- performance(preds, "sens", "spec")
+plot(perf)
 ```
 
 
@@ -261,7 +284,7 @@ train.abs <- trainTest[trainTest$pres==0,]
 
 glm.formula <- as.formula("pres~v1+v2+v3")
 
-cores.to.use <- 5 #bc my macbook sucks
+cores.to.use <- 10 #bc my macbook sucks
 cl <- makeCluster(cores.to.use)
 registerDoParallel(cl)
 
