@@ -95,3 +95,10 @@ missingMuni$old.no[6] <- 500325
 ```
 
 Paraiso das Aguas is in Mato Grosso do Sul. It became a municipality in 2003, from Agua Clara, Costa Rica, and Chapadao do Sul. However,  there was a suit from Agua Clara, so it didn't become independent until 2013. Technically it was a district of Costa Rica (500325), so I think it is safe to say it came from that.
+
+Save our muni correction file to use in the model markdown file.
+
+```{r}
+write.csv(missingMuni, "../data_raw/demographic/muniCorrections.csv", row.names = F)
+```
+

@@ -69,6 +69,7 @@ rf <- rf %>%
   select(-max.max.rf, -max.min.rf, -max.mean.rf) %>%
   ungroup()
 
+rm(nonzero)
 ```
 
 NDVI data is ranged 0 - 1 and is normally distributed, probably doesn't need rescaling. This doesn't need to be trasformed because it is between 0 - 1 and normally distributed.
@@ -86,22 +87,13 @@ hist(ndvi[,5]) #normal
 
 ```
 
-Temperature is normally distributed but has a wide range. Could be rescaled by subtracting the mean and dividing by sd per month layer?
+Temperature is normally distributed.
+
 ```{r}
 temp <- readRDS("../data_clean/environmental/allTemperature.rds")
 hist(temp$tempMax)
 hist(temp$tempMean)
-hist(temp$tempMin)
-
-# #rescale each month by subtracting mean and dividing by sd (ie standardizing)
-# stdz <- function(x){
-#   return((x-mean(x))/sd(x))
-# }
-# 
-# temp <- temp %>%
-#   group_by(month.no) %>%
-#   mutate(scale.temp.max=stdz(tempMax)) %>%
-#   mutate(scale.temp.mean=stdz(tempMean))
+hist(temp$tempMin) #still has errors. Needs to be redone
 
 ```
 
@@ -110,7 +102,7 @@ Population Data
 
 Because the range is huge, we log10 transformed (population +1) and then binned based on the 25% and 75% quantiles (approximately). We also need to adjust the population data for the muncipalities that recently became emancipated in 2013 (based on `muniCorrection.Rmd`).
 
-```{r}
+```{r, eval=F}
 pop <- read.csv("../data_clean/demographic/population-long.csv")
 hist(log10(pop$pop))
 
@@ -125,7 +117,23 @@ month.noFunc <- function(year, month, startYear, startMonth){
   return(totalMonths)
 }
 
+#adjust munis that were emancipated in 2013
+muniCorrections <- read.csv("../data_raw/demographic/muniCorrections.csv")
+
+pop$old.no <- pop$muni.no #old.no is muni.no pre-2010
+
+for (i in 1:nrow(muniCorrections)){
+  pop$old.no[pop$muni.no==muniCorrections$muni.no[i]] <- muniCorrections$old.no[i]
+}
+
 pop <- pop %>%
+  #sum population from missing munis into their "mother" muni
+  group_by(old.no, year, month) %>%
+  mutate(totPop=sum(pop, na.rm=T)) %>%
+  ungroup() %>%
+  #drop newly emancipated
+  filter(!(muni.no %in% muniCorrections$muni.no)) %>%
+  dplyr::select(-muni.no, -X) %>%
   mutate(logpop=log10(pop+1)) %>%
   mutate(logpopBin=case_when(
     logpop<3.5 ~ "bin1",
@@ -134,12 +142,23 @@ pop <- pop %>%
   )) %>%
   filter(month<=12)%>%
   mutate(month.no=month.noFunc(year=year, month=month, startYear=2001, startMonth=1)) %>%
-  dplyr::rename(cal.month=month)
+  dplyr::rename(cal.month=month, muni.name=muni, muni.no=old.no)
+  
+
+#because this took so long to run, we save it and just call it in in the future
+saveRDS(pop, "../data_clean/demographic/populationLong.rds")
 
 ```
 
+Load formatted pop data
 
-Case Data. There are missing months/munis of cases that need to be created
+```{r}
+pop <- readRDS("../data_clean/demographic/populationLong.rds")
+```
+
+
+
+Case Data.
 
 ```{r}
 cases <- readRDS("../data_clean/YFcases/YFlong.rds")
@@ -156,14 +175,14 @@ cases <- cases %>%
 Combine it all into a giant dataframe!
 
 ```{r}
-all.data <- join_all(list(ndvi, pop, rf, temp, cases), by=c("muni.no", "month.no"), type="full")
+all.data <- plyr::join_all(list(ndvi, pop, rf, temp, cases), by=c("muni.no", "month.no"), type="full")
 
 #clean it up
 all.data <- all.data %>%
-  #drop if doesn't match envCovariates
+  #drop if doesn't match envCovariates (these are all the ones that were emancipated in 2013)
   filter(!is.na(muni.name)) %>%
   #get only columns we need
-  select(muni.no, muni.name, month.no, case, logpopBin, NDVI, log.min.rf:scale.mean.rf, tempMax, tempMean)
+  select(muni.no, muni.name, month.no, case, logpopBin, logpop, NDVI, log.min.rf:scale.mean.rf, tempMax, tempMean)
 
 #turn NA cases to 'true' zeros
 all.data$case[is.na(all.data$case)] <- 0
@@ -244,7 +263,7 @@ output1 <- bagging(form.x.y=glm.formula,training.pres=train.pres,training.abs=tr
 stopCluster(cl)
 ```
 
-Test Accuracy
+Test Accuracy on Training
 
 ```{r}
 
@@ -252,7 +271,43 @@ output.preds<- output1/(iterations*9)
 preds <- prediction(output.preds, training$case)
 perf <- performance(preds, "sens", "spec")
 plot(perf)
+
+train.auc <- performance(preds, "auc") #0.836
 ```
+
+Predict on Test Set
+
+```{r}
+testing<-rbind(test.pres,test.bg)
+
+cores.to.use <- 8
+iterations <- 1
+cl <- makeCluster(cores.to.use)
+registerDoParallel(cl)
+
+output2<-bagging(form.x.y=glm.formula,training.pres=train.pres,training.abs=train.bg,new.data=testing,iterations=cores.to.use)
+
+stopCluster(cl)
+```
+
+Test Accuracy on Testing Data
+```{r}
+test.preds<- output2/(iterations*9)
+preds <- prediction(test.preds, testing$case)
+perf <- performance(preds, "sens", "spec")
+plot(perf)
+
+test.auc <- performance(preds, "auc") #0.779
+```
+
+## GBM
+
+JP also recommended we use BRTs to get an idea of the partial dependence plots and such
+
+```{r}
+
+```
+
 
 
 Example of using above function:
@@ -326,7 +381,4 @@ After this, they then predicted over all of sub-Saharan Africa:
 # }
 ```
 
-## Testing Bagging Performance
-
-Created ROC curves for sens-spec when using all presences, prediction on training data, and prediction on testing data.
 
