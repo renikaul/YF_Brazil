@@ -132,18 +132,24 @@ process_temp <- function(tempDF, type){
       #subset IBGE_ID to get muni.no
       mutate(muni.no = as.numeric(as.character(substr(IBGE_ID,1,6)))) %>%
       #reorder columns
-      dplyr::select(muni.no, muni.name=IBGE_Name, X2001.10:X2014.9) %>%
+      dplyr::select(muni.no, muni.name=IBGE_Name, month100:month9) %>%
       #go from wide to long
-      gather(date, measurement, X2001.10:X2014.9) %>%
+      gather(date, measurement, month100:month9) %>%
       #rescale temperature and change to C
       mutate(measurement=(measurement*0.02)-273.15) %>%
+      #get month.no
+      mutate(month.no=as.numeric(gsub("month", "", date))) %>%
       #get year
-      mutate(year=substr(date,2,5)) %>%
-      #get month
-      mutate(month=substr(date,7, length(date))) %>%
+      arrange(month.no) %>%
+      mutate(year=rep(2001:2014, each=66768)) %>%
+      #get month (remainder, then correct for 12)
+      mutate(cal.month=case_when(
+        (month.no %% 12) !=0 ~ month.no %% 12,
+        (month.no %% 12) ==0 ~ 12
+          )
+        ) %>%
       #drop date
-      mutate(month.no=month.noFunc(year=as.numeric(year), month=as.numeric(month), startYear=2001, startMonth=1)) %>%
-      dplyr::select(muni.no, muni.name, year, cal.month=month, month.no, measurement)
+      dplyr::select(muni.no, muni.name, year, cal.month, month.no, measurement)
   
 
     #rename measurement column
@@ -156,7 +162,7 @@ process_temp <- function(tempDF, type){
     return(newDF)
 }      
 
-#apply function to all rainfall dataframes
+#apply function to all temperature dataframes
 newTmin <- process_temp(tempDF=tempMin, type="Min")
 newTmax <- process_temp(tempDF=tempMax, type="Max")
 newTmean <- process_temp(tempDF=tempMean, type="Mean")
@@ -164,8 +170,8 @@ newTmean <- process_temp(tempDF=tempMean, type="Mean")
 #merge dataframes together into one
 tempAll <- join_all(list(newTmin, newTmax, newTmean), by=c("muni.no", "year", "cal.month", "month.no"), type="full")
 
-#---thirteen muni x month have NA/-Inf/Inf due to cloud cover
-toFix <- tempAll[(is.na(tempAll$tempMean) | tempAll$tempMax==-Inf | tempAll$tempMin==Inf),]
+#---three muni x month have NA/-Inf/Inf due to cloud cover
+#toFix <- tempAll[(is.na(tempAll$tempMean) | tempAll$tempMax==-Inf | tempAll$tempMin==Inf),]
 
 #get these values by spatial permutation of the values of their neighbors
 #load brazil shapefile to find neighbors
@@ -181,9 +187,6 @@ row.names(brazil) <- as.character(brazil@data$muni_no)
 neighbors <- poly2nb(brazil)
 mat <- nb2mat(neighbors, zero.policy=T)
 colnames(mat) <- as.character(brazil@data$muni_no)
-
-#subset out ones to fix 
-# mat2fix <- mat[rownames(mat) %in% toFix$muni.no,] #this threw an error
 
 #then make a loop that gets the values from this matrix, and then takes the mean of those values from the temperature table above
 
@@ -201,7 +204,7 @@ spatialPermute <- function(missingMuni.no, missingMuni.name, missingMonth, missi
 }
 
 #apply spatial permute to the missing rows
-missInds <- which(is.na(tempAll$tempMean) | tempAll$tempMax==-Inf | tempAll$tempMin==Inf)
+missInds <- which(is.na(tempAll$tempMean) | tempAll$tempMax==-Inf | tempAll$tempMin==Inf | tempAll$tempMin<0)
 
 for (i in missInds){
   newVals <- spatialPermute(missingMuni.no=tempAll[i,1], missingMuni.name=tempAll[i,2], missingYear=tempAll[i,3],
