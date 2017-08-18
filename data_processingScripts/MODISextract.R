@@ -224,32 +224,3 @@ minTDF$IBGE_ID <- brazil@data$codigo_ibg
 minTDF$IBGE_Name <- brazil@data$nome
 write.csv(minTDF, file="LST/monthly/CSVs/minTall.csv", row.names=F)
 
-###-------Land Cover --- 
-
-#files to loop over
-files <- list.files("landCover/landCoverTIF", full.names = T)
-
-#parallelized for loop
-cl <- makeCluster(13)
-registerDoParallel(cl)
-#getDoParWorkers()==length(cl)
-system.time({ #11 hours
-  landcover <- foreach(i=1:length(files), .combine=cbind, .packages=c('raster', 'rgdal')) %dopar% {
-    rast <- raster(files[i])
-    forest <- rast
-    forest[forest>5] <- 0 #forest is 1:5
-    forest[forest<=5 & forest >0] <- 1
-    monthData <- extract(rast, brazil, fun=mean, na.rm=T) #gives percent forest
-    write.csv(monthData, file=paste0("landCover/CSVs/year", i,".csv"), row.names=F)
-    return(monthData)
-  }
-}) #end system time
-stopCluster(cl)
-#now need to read in individual csvs and combine into one big one
-landCoverDF <- as.data.frame(landcover)
-colnames(landCoverDF) <- substr(list.files("landCover/landCoverTIF"),0,16)
-landCoverDF$IBGE_ID <- brazil@data$codigo_ibg
-landCoverDF$IBGE_Name <- brazil@data$nome
-#landCoverDF2 <- landCoverDF[,c(169,170, 1:168)]
-write.csv(landCoverDF, file="landCover/CSVs/all.csv", row.names=F)
-
