@@ -40,15 +40,15 @@ brazilYF <- merge(brazil, totCase, by="muni.no")
 
 ```{r}
 #create color palette
-pal <- colorBin("Reds", domain = c(1,44))
+colpal <- colorNumeric("Set1", domain = c(1,44))
 #create popups
 casePop <- paste0(brazilYF@data$nome, 
                       "<br><strong>", brazilYF@data$totalCases,
                   "</strong> Cases from 2001-2014.")
 leaflet(data=brazilYF) %>%
   addPolygons(color = "#444444", weight = 1, smoothFactor = 0.5,
-    opacity = 1.0, fillOpacity = 0.5,
-    fillColor = ~pal(totalCases),
+    opacity = 1.0, fillOpacity = 0.75,
+    fillColor = ~colpal(totalCases),
     highlightOptions = highlightOptions(color = "white", weight = 2,
       bringToFront = TRUE),
     popup=casePop) %>%
