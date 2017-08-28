@@ -1,12 +1,15 @@
 ---
 title: "YF Bagged LogReg Model"
 author: "Michelle Evans, Spencer Hall, Reni Kaul, Anna Kate Schatz"
-date: "July 12, 2017"
+date: 
+header-includes:
+    - \usepackage{gensymb}
 output: html_document
+    
 ---
 
 ```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE)
+knitr::opts_chunk$set(echo = TRUE, message = FALSE, warning = FALSE, cache = TRUE)
 ```
 
 ```{r load packages}
@@ -18,66 +21,53 @@ library(ROCR)
 library(pROC)
 ```
 
+
 # General Outline of Model
 
-## Load, Combine, and Clean/Format Data
+## Data
 
-Make sure that there is a row for every muni x year x month, not *only* presences.
+Monthly confirmed cases of yellow fever for each Brazilian Munic\'{i}pio (sub-state administrative units) from 2001 to 2014 were downloaded from the Brazilian government's portal da sa\'{u}de website,\href{http://tabnet.datasus.gov.br}{tabnet} on 05 June 2017. Confirmed cases were reported by the Ministry of Health Notification of Injury Information System (Sianan Net) after positive XYZ test. 
 
-Population data is log 10 transformed in Ebola work, after correcting 0 to 1 to avoid NAs with log transformation. Between five year increments were interpolated. Population was then binned.
+The annual population for each Munic\'{i}pio from 2001 to 2014 was also downloaded from the Brazilian government's portal da sa\'{u}de website,\href{http://tabnet.datasus.gov.br}{tabnet} on 05 June 2017. The estimated population was calculated by the Instituto Brasileiro de Geografia e Estat\'{i}stica (Brazialian Institure of Geography and Statistics)   The annual populations from 2001 to 2010 were intercensorial estimates. Post 2010 used slightly different methods ( methods are in Portuguese and pdf form; working on translation).
 
-Original ebola paper used a scaled rainfall value (scaled to maximum of muni, in our case). Also used one that was logged transformed. Looks like they used both at the same time?
+Monthly land surface temperature and normalized difference vegetation index (NDVI) data from 2001 through 2014 were downloaded from the NASA Land Processes Distributed Active Archive Center (LPDAAC. The MODIS MOD11C3 product contains monthly temperature data at a 0.05$^{\circ}$ resolution. THE MODIS MOD13A3 product contains monthly NDVI data at a 1 km resolution. Both gridded data products were then aggregated to the municipality level to obtain a monthly spatially averaged temperature and NDVI value for each municipality. Rainfall data was obtained from the NASA GESDISC data archive in the form of data from the Tropical Rainfall Monitoring Mission from 2001 through 2014. The 3B43 product contains an average rainfall rate for each month at a 0.25$^{\circ}$ resolution. We aggregated the gridded data to the municipality level by taking the spatial mean.
 
-EVI and PET were rescaled by subtracting the mean and dividing by sd. In the Ebola paper, these were just averages from 2000 - 2014, so there is only one layer/ So this is the mean of the whole layer (in our case all munis at a year x month).
+Both rainfall and NDVI data were further transformed to create fine-scale environmental variables to better characterize environmental anomalies. Rainfall data were scaled to the maximum value of the municipality for the whole period of 2001 to 2014 and NDVI data were scaled to the maximum value for that specific calendar month for each municipality (i.e. June was scaled with all June values from 2001 - 2014).  
 
-Data was sorted/stratified by rainfall so that the training/test split was not biased by rainfall levels.
+### Processing Environmental Covariates
 
-2/3 split for training/testing.
+#### Rainfall
 
-### Scaling of Environmental Covariates
-
-Rainfall is of a similar range (0 -1.5), with an exponential distribution. We normalized in two ways. First we log transformed it. Second, we rescaled to the maximum value of that municipality. This resulted in two values for each type of rainfall, for a total of six.  
 
 ```{r rainfall}
 rf <- readRDS("../data_clean/environmental/allRainfall.rds")
-hist(rf[,5]) #min rainfall exponential with long tail
-range(rf[,5])
-hist(rf[,6]) #max rainfall, exponential
-range(rf[,6])
-hist(rf[,7]) #mean rainfall, exponential
-range(rf[,7])
+
+#distribution of raw rainfall rate
+hist(rf$hourlyRainfallMean, main="hourly rainfall") #mean rainfall, exponential
 
 #transformed variables
 
-#log transformed
-nonzero<-  min(rf[which(rf[,5]>0),5])#what is smallest non-zero value
-hist(log((rf[,5])+nonzero/10)) #check that handling zeros is ok
-
-rf$log.min.rf  <- log((rf[,5])+nonzero/10)
-rf$log.max.rf  <- log((rf[,6])+nonzero/10)
-rf$log.mean.rf  <- log((rf[,7])+nonzero/10) #use this 
+# create log transformed variable with a correction for zero values
+nonzero<-  min(rf$hourlyRainfallMean[which(rf$hourlyRainfallMean>0)])#what is smallest non-zero value
+hist(log((rf[,7])+nonzero/10), main="Log transformed mean hourly rainfall") #log tranform data after adding an value an order of magnitude smaller than the smallest recorded value
+rf$log.mean.rf  <- log((rf$hourlyRainfallMean)+nonzero/10) #use this 
 
 #scale to maximum value of muni
 rf <- rf %>%
   group_by(muni.no) %>%
-  mutate(max.max.rf = max(hourlyRainfallMax)) %>%
-  mutate(scale.max.rf= hourlyRainfallMax/max.max.rf) %>%
-  mutate(max.min.rf = max(hourlyRainfallMin)) %>%
-  mutate(scale.min.rf = hourlyRainfallMin/max.min.rf) %>%
-  mutate(max.mean.rf = max(hourlyRainfallMean)) %>%
-  mutate(scale.mean.rf = hourlyRainfallMean/max.mean.rf) %>%
-  select(-max.max.rf, -max.min.rf, -max.mean.rf) %>%
+  mutate(scale.mean.rf = hourlyRainfallMean/max(hourlyRainfallMean)) %>% #scale rainfall to muni
   ungroup()
 
 rm(nonzero)
 ```
 
-We will only use anomalous mean rainfall (scale.mean.rf) and mean rainfall (hourlyRainfallMean) for each municipality. 
+Rainfall ranges from (`r signif(range(rf$hourlyRainfallMean), digits=2)`), and is exponentially distribution. The mean rainfall was ln transformed. A second covariate, scaled mean rainfall, was created by scalling rainfall to the maximum value of that municipality. We will only use anomalous mean rainfall (scale.mean.rf) and mean rainfall (log.mean.rf) for each municipality. 
 
-NDVI data is ranged 0 - 1 and is normally distributed, probably doesn't need rescaling. This doesn't need to be trasformed because it is between 0 - 1 and normally distributed.
+#### NDVI
+
 ```{r ndvi}
 ndvi <- readRDS("../data_clean/environmental/allNDVI.rds")
-hist(ndvi[,5]) #normal
+hist(ndvi$NDVI) #normal
 
 # ndvi.subset <- ndvi %>%
 #   group_by(muni.no) %>%
@@ -87,92 +77,89 @@ hist(ndvi[,5]) #normal
 # 
 # plotCI(x=1:999, y=ndvi.subset$NDVI_mean, uiw=ndvi.subset$NDVI_sd, gap=0)
 
-
-ndvi[which(is.na(ndvi$NDVI)),] #missing values for some of muni.no 291992 Madre de Deus
+#ndvi[which(is.na(ndvi$NDVI)),] #missing values for some of muni.no 291992 Madre de Deus
 
 ndvi <- ndvi %>%
         group_by(muni.no, cal.month) %>%
-        mutate(scale.ndvi = NDVI/max(NDVI)) %>%
-        mutate(range.ndvi= max(NDVI) - min(NDVI)) %>%
+        mutate(scale.ndvi = NDVI/max(NDVI)) %>% #scale NDVI to muni and month
+        mutate(range.ndvi = max(NDVI)- min(NDVI)) %>%
         ungroup()
 ```
 
 
-Data was manipulated to capture anomalous mean rainfall (scale.mean.rf) and NDVI (scale.NDVI) for a municipality. Anomalous rainfall was calculated for the entire dataset (168 months). Given NDVI should change with season, we scaled NDVI for values within a given month (14 months). The overall range in NDVI for a municipality and calendar month is right skewed with a mean of `r signif(mean(ndvi$range.ndvi, na.rm = TRUE), digits=2)`. 
+NDVI data ranges from 0 - 1 and is normally distributed. This covariate will be used "as-is", and re-scaled to the maximium observed value for that municipality and month. Given NDVI should change with season, we scaled NDVI for values within a given month (14 months). The overall range in NDVI for a municipality and calendar month is right skewed with a mean of `r signif(mean(ndvi$range.ndvi, na.rm = TRUE), digits=2)`.  There is currently an issue with Madre de Deus (291992) municipality returning NA values. This manicupality was never infected, and has been dropped for now.  
 
-
-Temperature is normally distributed.
+#### Temperature
+Temperature is normally distributed, and was used "as-is".
 
 ```{r temperature}
 temp <- readRDS("../data_clean/environmental/allTemperature.rds")
-hist(temp$tempMax)
 hist(temp$tempMean)
-hist(temp$tempMin) #still has errors. Needs to be redone
-
 ```
 
 
-Population Data
+#### Population Data
 
-Because the range is huge, we log10 transformed (population +1) and then binned based on the 25% and 75% quantiles (approximately). We also need to adjust the population data for the muncipalities that recently became emancipated in 2013 (based on `muniCorrection.Rmd`).
+Because the range is huge, we log10 transformed (population +1). We also need to adjust the population data for the muncipalities that recently became emancipated in 2013 (based on `muniCorrection.Rmd`).
 
-```{r population, eval=F}
-# pop <- read.csv("../data_clean/demographic/population-long.csv")
-# hist(log10(pop$pop))
-# 
-# quantile(log10(pop$pop), 1/4)
-# quantile(log10(pop$pop), 3/4)
-# 
-# #add in month.no
-# month.noFunc <- function(year, month, startYear, startMonth){
-#   yearsPast <- year-startYear
-#   monthsPast <- month-startMonth
-#   totalMonths <- 12*yearsPast + monthsPast + 1
-#   return(totalMonths)
-# }
-# 
-# #adjust munis that were emancipated in 2013
-# muniCorrections <- read.csv("../data_raw/demographic/muniCorrections.csv")
-# 
-# pop$old.no <- pop$muni.no #old.no is muni.no pre-2010
-# 
-# for (i in 1:nrow(muniCorrections)){
-#   pop$old.no[pop$muni.no==muniCorrections$muni.no[i]] <- muniCorrections$old.no[i]
-# }
-# 
-# pop <- pop %>%
-#   #sum population from missing munis into their "mother" muni
-#   group_by(old.no, year, month) %>%
-#   mutate(totPop=sum(pop, na.rm=T)) %>%
-#   ungroup() %>%
-#   #drop newly emancipated
-#   filter(!(muni.no %in% muniCorrections$muni.no)) %>%
-#   dplyr::select(-muni.no, -X) %>%
-#   mutate(logpop=log10(pop+1)) %>%
-#   mutate(logpopBin=case_when(
-#     logpop<3.5 ~ "bin1",
-#     logpop>5 ~ "bin3",
-#     TRUE ~ "bin2"
-#   )) %>%
-#   filter(month<=12)%>%
-#   mutate(month.no=month.noFunc(year=year, month=month, startYear=2001, startMonth=1)) %>%
-#   dplyr::rename(cal.month=month, muni.name=muni, muni.no=old.no)
-#   
-# 
-# #because this took so long to run, we save it and just call it in in the future
-# saveRDS(pop, "../data_clean/demographic/populationLong.rds")
+```{r binned population, eval=FALSE}
+pop <- read.csv("../data_clean/demographic/population-long.csv")
+hist(log10(pop$pop))
+
+quantile(log10(pop$pop), 1/4)
+quantile(log10(pop$pop), 3/4)
+
+#add in month.no
+month.noFunc <- function(year, month, startYear, startMonth){
+  yearsPast <- year-startYear
+  monthsPast <- month-startMonth
+  totalMonths <- 12*yearsPast + monthsPast + 1
+  return(totalMonths)
+}
+
+#adjust munis that were emancipated in 2013
+muniCorrections <- read.csv("../data_raw/demographic/muniCorrections.csv")
+
+pop$old.no <- pop$muni.no #old.no is muni.no pre-2010
+
+for (i in 1:nrow(muniCorrections)){
+  pop$old.no[pop$muni.no==muniCorrections$muni.no[i]] <- muniCorrections$old.no[i]
+}
+
+pop <- pop %>%
+  #sum population from missing munis into their "mother" muni
+  group_by(old.no, year, month) %>%
+  mutate(totPop=sum(pop, na.rm=T)) %>%
+  ungroup() %>%
+  #drop newly emancipated
+  filter(!(muni.no %in% muniCorrections$muni.no)) %>%
+  dplyr::select(-muni.no, -X) %>%
+  mutate(logpop=log10(pop+1)) %>% #need to account for zero sized muni
+  mutate(logpopBin=case_when(
+    logpop<3.5 ~ "bin1",
+    logpop>5 ~ "bin3",
+    TRUE ~ "bin2"
+  )) %>%
+  filter(month<=12)%>%
+  mutate(month.no=month.noFunc(year=year, month=month, startYear=2001, startMonth=1)) %>%
+  dplyr::rename(cal.month=month, muni.name=muni, muni.no=old.no)
+
+
+#because this took so long to run, we save it and just call it in in the future
+saveRDS(pop, "../data_clean/demographic/populationLong.rds")
 
 ```
 
-Load formatted pop data
 
 ```{r load pop data}
 pop <- readRDS("../data_clean/demographic/populationLong.rds")
+hist(pop$totPop, main="Total population size")
+hist(pop$logpop, main="Log10(Total population size + 1)")
 ```
 
 
-
-Case Data.
+#### Case Data
+  There are a total of 117 **infected** municipalities in the entire dataset 
 
 ```{r cases}
 cases <- readRDS("../data_clean/YFcases/YFlong.rds")
@@ -185,7 +172,6 @@ cases <- cases %>%
 ```
 
 
-
 Combine it all into a giant dataframe!
 
 ```{r build df}
@@ -196,15 +182,20 @@ all.data <- all.data %>%
   #drop if doesn't match envCovariates (these are all the ones that were emancipated in 2013)
   filter(!is.na(muni.name)) %>%
   #get only columns we need
-  select(muni.no, muni.name, month.no, case, logpopBin, logpop, NDVI,scale.ndvi, log.min.rf:scale.mean.rf, tempMax, tempMean)
+  select(muni.no, muni.name, month.no, case, logpop, NDVI,scale.ndvi, log.mean.rf,scale.mean.rf, tempMax, tempMean)
 
 #turn NA cases to 'true' zeros
 all.data$case[is.na(all.data$case)] <- 0
 #all positive cases to 1s
 all.data$case[all.data$case>0] <- 1
+
+#remove 291992 Madre de Deus; issues with NA in NDVI
+all.data <- all.data[complete.cases(all.data),]
 ```
 
-## Testing & Training Split
+## Model
+
+### Testing & Training Split
 
 Need to split into testing and training. Perhaps stratify by years?
 
@@ -228,13 +219,13 @@ train.bg <- all.bg[-test.bg.inds,]
 ```
 
 
-## Bagging
+### Bagging
 
 Function from Ebola:
 
 ```{r bagging function}
-bagging<-function(form.x.y,training.pres,training.abs,new.data,iterations=32){
-  #' JP's bagging function
+bagging<-function(form.x.y,training.pres,training.abs,new.data){
+  #' modified JP's bagging function
   #' 
   #' @param form.x.y the formula for model to use
   #' @param training.pres dataframe containing training presence data
@@ -243,22 +234,27 @@ bagging<-function(form.x.y,training.pres,training.abs,new.data,iterations=32){
   #' @param iterations number of cores to use. also maybe has something to do with model iterations???
   #'
   #' @returns predictions on new data as a combination (sum??) of predictions from each logreg model
-  predictions<-foreach(m=1:9,.combine='+') %dopar% {
     training_positions.p <- sample(nrow(training.pres),size=10)
     training_positions.b <- sample(nrow(training.abs),size=100)
     train_pos.p<-1:nrow(training.pres) %in% training_positions.p #presence
     train_pos.b<-1:nrow(training.abs) %in% training_positions.b #background
     glm_fit<-glm(form.x.y,data=rbind(training.pres[train_pos.p,],training.abs[train_pos.b,]),family=binomial(logit))
-    predict(glm_fit,newdata=new.data,type="response")
-  }
-  return(predictions)
+    glm.coef <- coef(glm_fit)
+    predictions <- predict(glm_fit,newdata=new.data,type="response")
+  return(list(predictions, glm.coef))
 }
 ```
 
-Write formula for function (only using means for now)
- **change formula to appropriate colnames**
+Write formula for function: 
+
+  - log population size for year
+  - monthly NDVI
+  - monthly NDVI scaled to max value at that location
+  - log transformed monthly rainfall (ave rate of rainfall per day)
+  - monthly mean temperature 
+
 ```{r train model}
-glm.formula <- as.formula("case~logpop+NDVI+scale.ndvi+log.mean.rf+scale.mean.rf+tempMean") #use cont pop
+glm.formula <- as.formula("case~logpop+NDVI+scale.ndvi+log.mean.rf+scale.mean.rf+tempMean") 
 ```
 
 Predict on training set
@@ -266,31 +262,67 @@ Predict on training set
 ```{r predict on training}
 training <- rbind(train.pres, train.bg)
 
+#Set up parallel cores to return 2 lists: 1) predictions, 2) coef of model
+
 cores.to.use <- 3 #change dep on computer
-iterations <- 1
+iterations <- 100 #number of low bias models to make
+
+#create class to combine multiple results
+multiResultClass <- function(predictions=NULL,coefs=NULL)
+{
+  me <- list(
+    predictions = predictions,
+    coefs = coefs
+  )
+
+  ## Set the name for the class
+  class(me) <- append(class(me),"multiResultClass")
+  return(me)
+}
+
+
 cl <- makeCluster(cores.to.use)
 registerDoParallel(cl)
 
-
-output1 <- bagging(form.x.y=glm.formula,training.pres=train.pres,training.abs=train.bg,new.data=training,iterations=iterations)
+trainModel <- foreach(i=1:iterations) %dopar% {
+    result <- multiResultClass()
+    output1 <- bagging(form.x.y=glm.formula,training.pres=train.pres,training.abs=train.bg,new.data=training)
+    result$predictions <-output1[[1]]
+    result$coefs <- output1[[2]]
+    return(result)
+}
 
 stopCluster(cl)
+
+#pull out data in usable fashion
+trainingPreds <- do.call(cbind,(lapply(trainModel, '[[', 1)))
+trainingCoefs <- do.call(cbind,(lapply(trainModel, '[[', 2)))
+
 ```
 
 Test Accuracy on Training
 
-```{r}
+```{r training AUC}
 
-output.preds<- output1/(iterations*9)
+output.preds<- apply(trainingPreds, 1, mean)
 preds <- prediction(output.preds, training$case)
 perf <- performance(preds, "sens", "spec")
 plot(perf)
 
-train.auc <- performance(preds, "auc") #0.836
+train.auc <- performance(preds, "auc") #~0.91
 ```
 
 Changed the binned population size to cont population size. This increases the training AUC to `r signif(train.auc@y.values[[1]], digits=2)`. Dropping scaled NDVI makes a minor difference. Really, dropping any of the abiotic variables has minimal impact on the AUC. Removing population from the model reduces the AUC to approx. 0.7. I think the model is mostly being driven by the population.  
 
+##Variable Importance: TBD
+
+```{r training variable importance, echo=FALSE, eval=FALSE}
+trainingCoefs<- t(trainingCoefs)
+
+boxplot(trainingCoefs[,c(2:6)], ylim=c(-50,50))
+meanCoefs <- apply(trainingCoefs,1, mean)
+
+```
 #Opening the testing data
 
 Predict on Test Set
@@ -318,6 +350,8 @@ plot(perf)
 test.auc <- performance(preds, "auc") #0.779
 ```
 
+
+***
 
 ##Snippets from Ebola code
 
@@ -357,6 +391,11 @@ registerDoParallel(cl)
 output1 <- bagging(form.x.y=glm.formula,training.pres=train.pres,training.abs=train.abs,new.data=trainTest,iterations=cores.to.use)
 
 stopCluster(cl) #this worked perfectly (all the positives got 9, and 0s got 0)
+
+
+
+
+
 
 ```
 
