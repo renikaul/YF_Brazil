@@ -1,6 +1,6 @@
 # YF_Brazil
 
-##8/29 Reni meeting with John
+## 8/29 Reni meeting with John
 This is a good start. We should grow our list of covariates, then explore how they relate to eachother and vary over the landscape. Once we have a good feel for their behavior we can start adding them to the model. Throughout this process leave the 30% testing data alone. 
 
 ### Additional covariates
