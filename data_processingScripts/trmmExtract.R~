@@ -1,6 +1,6 @@
 ## TRMM Download and Extract
 
-#Data is downloaded via command line, using the trmmDownloadscript.txt 
+#Data is downloaded via command line, using the trmmDownloadscript.txt (TODO, make a .sh file that can then be read/loaded in R)
 #We want 3B43: monthly estimates at 0.25x0.25 degree
 
 library(raster)
@@ -11,7 +11,7 @@ library(doParallel)
 library(foreach)
 
 #load Brazil data
-brazil <- readOGR(dsn="../data_clean", layer="BRAZpolygons")
+brazil <- readOGR(dsn=".", layer="municipios_2010")
 
 ####-------Min, Mean, and Max Rainfall-------###
 #I do all of these at once because the time consuming part is also the reading and transposing of the raster

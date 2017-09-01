@@ -9,14 +9,14 @@ library(MODIS) #ignore these warnings
 
 #load Brazil shapefile from IBGE site with municipality codes
 
-brazil <- readOGR(dsn=".", layer="municipios_2010")
+brazil <- readOGR(dsn="../data_clean", layer="BRAZpolygons")
 #brazTest <- brazil[brazil@data$uf=="AC",]
 #####Extract for loop for foreach
 
 ##---------------------------NDVI 
 
 #files to loop over
-files <- list.files("NDVI/tifBrazil", full.names = T)
+files <- list.files("../../NDVI/tifBrazil", full.names = T)
 
 #parallelized for loop
 cl <- makeCluster(18)
@@ -26,18 +26,17 @@ system.time({ #11 hours
   NDVI <- foreach(i=1:length(files), .combine=cbind, .packages=c('raster', 'rgdal')) %dopar% {
     rast <- raster(files[i])
     monthData <- extract(rast, brazil, fun=mean, na.rm=T)
-    write.csv(monthData, file=paste0("NDVI/CSVs/month", i,".csv"), row.names=F)
+    write.csv(monthData, file=paste0("../../NDVI/CSVs/month", i,".csv"), row.names=F)
     return(monthData)
 }
 }) #end system time
 stopCluster(cl)
 #now need to read in individual csvs and combine into one big one
 NDVIdf <- as.data.frame(NDVI)
-colnames(NDVIdf) <- substr(list.files("NDVI/tifBrazil"),0,16)
-NDVIdf$IBGE_ID <- brazil@data$codigo_ibg
-NDVIdf$IBGE_Name <- brazil@data$nome
-NDVIdf2 <- NDVIdf[,c(169,170, 1:168)]
-write.csv(NDVIdf2, file="NDVI/CSVs/all.csv", row.names=F)
+colnames(NDVIdf) <- substr(list.files("../../NDVI/tifBrazil"),0,16)
+NDVIdf$IBGE_ID <- brazil@data$muni_no
+NDVIdf2 <- NDVIdf[,c(169, 1:168)]
+write.csv(NDVIdf2, file="../data_raw/environmental/NDVIall.csv", row.names=F)
 
 #
 #
@@ -172,10 +171,10 @@ write.csv(maxTDF, file="LST/max/CSVs/maxTall.csv", row.names=F)
 
 ###-------Land Surface Temperature (monthly data, MOD11C3)
 
-brazil <- readOGR(dsn=".", layer="municipios_2010") #this must be loaded
+brazil <- readOGR(dsn="../data_clean", layer="BRAZpolygons")#this must be loaded
 
 #files to loop over
-files <- list.files("LST/monthly/LSTtifBrazil", full.names = T)
+files <- list.files("../../LST/monthly/LSTtifBrazil", full.names = T)
 
 #parallelized for loop
 cl <- makeCluster(18)
@@ -188,9 +187,9 @@ foreach(i=1:length(files), .combine=cbind, .packages=c('raster', 'rgdal')) %dopa
     meanT <- extract(rast, brazil, fun=mean, na.rm=T)
     minT <- extract(rast, brazil, fun=min, na.rm=T)
     maxT <- extract(rast, brazil, fun=max, na.rm=T)
-    write.csv(meanT, file=paste0("LST/monthly/CSVs/mean/month", i,".csv"), row.names=F)
-    write.csv(minT, file=paste0("LST/monthly/CSVs/min/month", i,".csv"), row.names=F)
-    write.csv(maxT, file=paste0("LST/monthly/CSVs/max/month", i,".csv"), row.names=F)
+    write.csv(meanT, file=paste0("../../LST/monthly/CSVs/mean/month", i,".csv"), row.names=F)
+    write.csv(minT, file=paste0("../../LST/monthly/CSVs/min/month", i,".csv"), row.names=F)
+    write.csv(maxT, file=paste0("../../LST/monthly/CSVs/max/month", i,".csv"), row.names=F)
   }
 }) #end system time
 stopCluster(cl)
@@ -198,29 +197,26 @@ stopCluster(cl)
 #now need to read in individual csvs and combine
 
 #Mean Temperature
-files <- list.files("LST/monthly/CSVs/mean", full.names=T)
+files <- list.files("../../LST/monthly/CSVs/mean", full.names=T)
 meanTDF <- do.call("cbind", lapply(files, read.csv, header=T))
-fileNames <- gsub(".csv","", list.files("LST/monthly/CSVs/mean", full.names=F, pattern=".csv")) #csv read-in only
+fileNames <- gsub(".csv","", list.files("../../LST/monthly/CSVs/mean", full.names=F, pattern=".csv")) #csv read-in only
 colnames(meanTDF) <- fileNames
-meanTDF$IBGE_ID <- brazil@data$codigo_ibg
-meanTDF$IBGE_Name <- brazil@data$nome
-write.csv(meanTDF, file="LST/monthly/CSVs/meanTall.csv", row.names=F)
+meanTDF$IBGE_ID <- brazil@data$muni_no
+write.csv(meanTDF, file="../data_raw/environmental/meanTall.csv", row.names=F)
 
 #Max Temperature
-files <- list.files("LST/monthly/CSVs/max", full.names=T)
+files <- list.files("../../LST/monthly/CSVs/max", full.names=T)
 maxTDF <- do.call("cbind", lapply(files, read.csv, header=T))
-fileNames <- gsub(".csv","", list.files("LST/monthly/CSVs/max", full.names=F, pattern=".csv")) #csv read-in only
+fileNames <- gsub(".csv","", list.files("../../LST/monthly/CSVs/max", full.names=F, pattern=".csv")) #csv read-in only
 colnames(maxTDF) <- fileNames
-maxTDF$IBGE_ID <- brazil@data$codigo_ibg
-maxTDF$IBGE_Name <- brazil@data$nome
-write.csv(maxTDF, file="LST/monthly/CSVs/maxTall.csv", row.names=F)
+maxTDF$IBGE_ID <- brazil@data$muni_no
+write.csv(maxTDF, file="../data_raw/environmental/maxTall.csv", row.names=F)
 
 #Min Temperature
-files <- list.files("LST/monthly/CSVs/min", full.names=T)
+files <- list.files("../../LST/monthly/CSVs/min", full.names=T)
 minTDF <- do.call("cbind", lapply(files, read.csv, header=T))
-fileNames <- gsub(".csv","", list.files("LST/monthly/CSVs/min", full.names=F, pattern=".csv")) #csv read-in only
+fileNames <- gsub(".csv","", list.files("../../LST/monthly/CSVs/min", full.names=F, pattern=".csv")) #csv read-in only
 colnames(minTDF) <- fileNames
-minTDF$IBGE_ID <- brazil@data$codigo_ibg
-minTDF$IBGE_Name <- brazil@data$nome
-write.csv(minTDF, file="LST/monthly/CSVs/minTall.csv", row.names=F)
+minTDF$IBGE_ID <- brazil@data$muni_no
+write.csv(minTDF, file="../data_raw/environmental/minTall.csv", row.names=F)
 
