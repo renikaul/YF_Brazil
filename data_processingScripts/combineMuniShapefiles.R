@@ -40,4 +40,10 @@ newBrazil@data <- brazilData
 #set projection (SIRGAS 2000, also known as WGS84)
 proj4string(newBrazil) <- CRS('+proj=longlat +ellps=GRS80 +towgs84=0,0,0 +no_defs')
 
-writeOGR(newBrazil, dsn="../data_clean", layer="BRAZpolygon", driver="ESRI Shapefile")
+#adjust codes to match pop data
+newBrazil@data$newCode <- substr(newBrazil@data$newCode,1,6)
+newBrazil@data$muni.no <- as.numeric(newBrazil@data$newCode)
+newBrazil <- newBrazil[,'muni.no']
+
+
+writeOGR(newBrazil, dsn="../data_clean", layer="BRAZpolygons", driver="ESRI Shapefile")
