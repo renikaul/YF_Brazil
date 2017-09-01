@@ -4,7 +4,11 @@ author: "Michelle Evans, Spencer Hall, Reni Kaul, Anna Kate Schatz"
 date: 
 header-includes:
     - \usepackage{gensymb}
-output: html_document
+output: 
+  html_document:
+      toc: true
+      toc_depth: 3
+      toc_float: true
     
 ---
 
@@ -24,7 +28,9 @@ library(pROC)
 
 # General Outline of Model
 
-## Data
+Goal: Create a map 
+
+## Data Summary
 
 Monthly confirmed cases of yellow fever for each Brazilian Munic\'{i}pio (sub-state administrative units) from 2001 to 2014 were downloaded from the Brazilian government's portal da sa\'{u}de website,\href{http://tabnet.datasus.gov.br}{tabnet} on 05 June 2017. Confirmed cases were reported by the Ministry of Health Notification of Injury Information System (Sianan Net) after positive XYZ test. 
 
@@ -34,9 +40,9 @@ Monthly land surface temperature and normalized difference vegetation index (NDV
 
 Both rainfall and NDVI data were further transformed to create fine-scale environmental variables to better characterize environmental anomalies. Rainfall data were scaled to the maximum value of the municipality for the whole period of 2001 to 2014 and NDVI data were scaled to the maximum value for that specific calendar month for each municipality (i.e. June was scaled with all June values from 2001 - 2014).  
 
-### Processing Environmental Covariates
+## Processing Environmental Covariates
 
-#### Rainfall
+### Rainfall
 
 
 ```{r rainfall}
@@ -63,7 +69,7 @@ rm(nonzero)
 
 Rainfall ranges from (`r signif(range(rf$hourlyRainfallMean), digits=2)`), and is exponentially distribution. The mean rainfall was ln transformed. A second covariate, scaled mean rainfall, was created by scalling rainfall to the maximum value of that municipality. We will only use anomalous mean rainfall (scale.mean.rf) and mean rainfall (log.mean.rf) for each municipality. 
 
-#### NDVI
+### NDVI
 
 ```{r ndvi}
 ndvi <- readRDS("../data_clean/environmental/allNDVI.rds")
@@ -87,9 +93,9 @@ ndvi <- ndvi %>%
 ```
 
 
-NDVI data ranges from 0 - 1 and is normally distributed. This covariate will be used "as-is", and re-scaled to the maximium observed value for that municipality and month. Given NDVI should change with season, we scaled NDVI for values within a given month (14 months). The overall range in NDVI for a municipality and calendar month is right skewed with a mean of `r signif(mean(ndvi$range.ndvi, na.rm = TRUE), digits=2)`.  There is currently an issue with Madre de Deus (291992) municipality returning NA values. This manicupality was never infected, and has been dropped for now.  
+NDVI data ranges from 0 - 1 and is normally distributed. This covariate will be used "as-is", and re-scaled to the maximium observed value for that municipality and month. Given NDVI should change with season, we scaled NDVI for values within a given month (14 months). The overall range in NDVI for a municipality and calendar month is right skewed with a mean of `r signif(mean(ndvi$range.ndvi, na.rm = TRUE), digits=2)`.  There is currently an issue with Madre de Deus (291992) municipality returning NA values. This municipality was never infected, and has been dropped for now.  
 
-#### Temperature
+### Temperature
 Temperature is normally distributed, and was used "as-is".
 
 ```{r temperature}
@@ -158,8 +164,8 @@ hist(pop$logpop, main="Log10(Total population size + 1)")
 ```
 
 
-#### Case Data
-  There are a total of 117 **infected** municipalities in the entire dataset 
+### Case Data
+  There are a total of 117 *infected* municipalities in the entire dataset. See `data_clean/case_sparsity.html` for more details. 
 
 ```{r cases}
 cases <- readRDS("../data_clean/YFcases/YFlong.rds")
@@ -197,7 +203,7 @@ all.data <- all.data[complete.cases(all.data),]
 
 ### Testing & Training Split
 
-Need to split into testing and training. Perhaps stratify by years?
+Infected municipalities were 70/30 split into training and testing data, stratified by year. Background data was also split 70/30.  
 
 ```{r splitting}
 all.data <- all.data[order(-all.data$case, all.data$month.no),] 
@@ -205,23 +211,25 @@ all.data <- all.data[order(-all.data$case, all.data$month.no),]
 all.pres <- filter(all.data, case==1)
 all.bg <- filter(all.data, case==0)
 
-test.pres.inds <- base::sample(nrow(all.pres), ceiling(nrow(all.pres)/3)) #without year stratification
+#Split infected municipalities
+#test.pres.inds <- base::sample(nrow(all.pres), ceiling(nrow(all.pres)/3)) #without year stratification
 test.pres.inds <- seq(1,nrow(all.pres), by=3) #with year stratification
-
-test.bg.inds <- base::sample(nrow(all.bg), ceiling(nrow(all.bg)/3))
-
-
 test.pres <- all.pres[test.pres.inds,]
 train.pres <- all.pres[-test.pres.inds,]
 
+#Split background data
+test.bg.inds <- base::sample(nrow(all.bg), ceiling(nrow(all.bg)/3))
 test.bg <- all.bg[test.bg.inds,]
 train.bg <- all.bg[-test.bg.inds,]
+
+training <- rbind(train.pres, train.bg)
+testing <- rbind(test.pres, test.bg)
 ```
 
 
 ### Bagging
 
-Function from Ebola:
+Modified function from Ebola work:
 
 ```{r bagging function}
 bagging<-function(form.x.y,training.pres,training.abs,new.data){
@@ -245,11 +253,11 @@ bagging<-function(form.x.y,training.pres,training.abs,new.data){
 }
 ```
 
-Write formula for function: 
+Write formula for model. The infected municipality is a function of: 
 
   - log population size for year
   - monthly NDVI
-  - monthly NDVI scaled to max value at that location
+  - monthly NDVI scaled to max value at that location and month
   - log transformed monthly rainfall (ave rate of rainfall per day)
   - monthly mean temperature 
 
@@ -257,14 +265,13 @@ Write formula for function:
 glm.formula <- as.formula("case~logpop+NDVI+scale.ndvi+log.mean.rf+scale.mean.rf+tempMean") 
 ```
 
-Predict on training set
+The model is ran for 100 iterations with a subset of the cases. The subset consists of 10 presences (of the 39 training) and 100 background (of the ~300,000) observations.Each iteration of the model is used to predict on the whole training dataset. This is used to calculate AUC. 
 
 ```{r predict on training}
-training <- rbind(train.pres, train.bg)
 
 #Set up parallel cores to return 2 lists: 1) predictions, 2) coef of model
 
-cores.to.use <- 3 #change dep on computer
+cores.to.use <- 1 #change dep on computer
 iterations <- 100 #number of low bias models to make
 
 #create class to combine multiple results
@@ -300,7 +307,8 @@ trainingCoefs <- do.call(cbind,(lapply(trainModel, '[[', 2)))
 
 ```
 
-Test Accuracy on Training
+#### Model preformance on whole training set
+   The bagged model returned 100 values for each municipality by month. These values are averaged then compared to the known values.  
 
 ```{r training AUC}
 
@@ -312,10 +320,12 @@ plot(perf)
 train.auc <- performance(preds, "auc") #~0.91
 ```
 
-Changed the binned population size to cont population size. This increases the training AUC to `r signif(train.auc@y.values[[1]], digits=2)`. Dropping scaled NDVI makes a minor difference. Really, dropping any of the abiotic variables has minimal impact on the AUC. Removing population from the model reduces the AUC to approx. 0.7. I think the model is mostly being driven by the population.  
+Originally the model was ran with binned populations sized, but have since changed to population size log10 transformed. This increases the training AUC to `r signif(train.auc@y.values[[1]], digits=2)` from ~0.8. Dropping any of the abiotic variables has minimal impact on the AUC. Removing any population variable from the model reduces the AUC to approx. 0.7.
 
-##Variable Importance: TBD
-
+##Variable Importance: Needs development
+ 
+   It seems like municipality population size is driving much of the model preformance, but I would like to explore some of the ways that the covariables interact or are more important in given situations. Generally, what intuition can be learned from this model.  
+   
 ```{r training variable importance, echo=FALSE, eval=FALSE}
 trainingCoefs<- t(trainingCoefs)
 
@@ -323,37 +333,67 @@ boxplot(trainingCoefs[,c(2:6)], ylim=c(-50,50))
 meanCoefs <- apply(trainingCoefs,1, mean)
 
 ```
-#Opening the testing data
 
-Predict on Test Set
+## Model prediction of testing data
 
-```{r, eval=FALSE}
-testing<-rbind(test.pres,test.bg)
+The predictions for the testing data were made by building a similar bagged model (100 iterations using 10 presences and 100 background), but predicted on the testing data instead of the training data. 
 
-cores.to.use <- 3
-iterations <- 1
+```{r testModel}
+
+cores.to.use <- 1
+iterations <- 100
+
+#create class to combine multiple results
+multiResultClass <- function(predictions=NULL,coefs=NULL)
+{
+  me <- list(
+    predictions = predictions,
+    coefs = coefs
+  )
+
+  ## Set the name for the class
+  class(me) <- append(class(me),"multiResultClass")
+  return(me)
+}
+
+
 cl <- makeCluster(cores.to.use)
 registerDoParallel(cl)
 
-output2<-bagging(form.x.y=glm.formula,training.pres=train.pres,training.abs=train.bg,new.data=testing,iterations=cores.to.use)
+testModel <- foreach(i=1:iterations) %dopar% {
+    result <- multiResultClass()
+    output1 <- bagging(form.x.y=glm.formula,training.pres=train.pres,training.abs=train.bg,new.data=testing)
+    result$predictions <-output1[[1]]
+    result$coefs <- output1[[2]]
+    return(result)
+}
 
 stopCluster(cl)
+
+#pull out data in usable fashion
+testingPreds <- do.call(cbind,(lapply(testModel, '[[', 1)))
+testingCoefs <- do.call(cbind,(lapply(testModel, '[[', 2)))
+
 ```
 
-Test Accuracy on Testing Data
-```{r, eval=FALSE}
-test.preds<- output2/(iterations*9)
+```{r test AUC}
+test.preds<- apply(testingPreds, 1, mean)
 preds <- prediction(test.preds, testing$case)
 perf <- performance(preds, "sens", "spec")
 plot(perf)
 
-test.auc <- performance(preds, "auc") #0.779
+test.auc <- performance(preds, "auc") 
 ```
 
+The model has an AUC of `r signif(test.auc@y.values[[1]], digits=2)` when predicting the testing data. 
 
-***
+# Visualizing model
 
-##Snippets from Ebola code
+This section is TBD. 
+
+----
+
+#Snippets from Ebola code
 
 Example of using above function:
 
