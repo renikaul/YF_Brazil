@@ -17,8 +17,8 @@ brazil <- readOGR(dsn="../data_clean", layer="BRAZpolygons")
 #I do all of these at once because the time consuming part is also the reading and transposing of the raster
 #parallel function
 #read in files
-files <- list.files("TRMM/rawData/past", full.names = T, pattern=".nc")
-fileNames <- substr(list.files("TRMM/rawData/past", pattern=".nc"), 6, 13)
+files <- list.files("../../TRMM/rawData/past", full.names = T, pattern=".nc")
+fileNames <- substr(list.files("../../TRMM/rawData/past", pattern=".nc"), 6, 13)
 
 #set up workers
 cl <- makeCluster(18)
@@ -33,14 +33,14 @@ system.time({
     rast <- flip(rast, direction="y") #flip around a bunch
     rast <- flip(rast, direction="x")
     #spatial minimum
-    minData <- extract(rast, brazil, fun=min, na.rm=T)
-    write.csv(minData, file=paste0("TRMM/CSVs/min/", fileNames[i],".csv"), row.names=F)
+    # minData <- extract(rast, brazil, fun=min, na.rm=T)
+    # write.csv(minData, file=paste0("TRMM/CSVs/min/", fileNames[i],".csv"), row.names=F)
     #spatial mean
     meanData <- extract(rast, brazil, fun=mean, na.rm=T)
-    write.csv(meanData, file=paste0("TRMM/CSVs/mean/", fileNames[i],".csv"), row.names=F)
+    write.csv(meanData, file=paste0("../../TRMM/CSVs/mean/", fileNames[i],".csv"), row.names=F)
     #spatial max
-    maxData <- extract(rast, brazil, fun=max, na.rm=T)
-    write.csv(maxData, file=paste0("TRMM/CSVs/max/", fileNames[i],".csv"), row.names=F)
+    # maxData <- extract(rast, brazil, fun=max, na.rm=T)
+    # write.csv(maxData, file=paste0("TRMM/CSVs/max/", fileNames[i],".csv"), row.names=F)
   }
   stopCluster(cl)
 }) 
