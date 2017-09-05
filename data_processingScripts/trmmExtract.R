@@ -48,31 +48,30 @@ system.time({
 
 #now read in CSVs and write to one large csv file
 #minimum rainfall
-files <- list.files("TRMM/CSVs/min", full.names=T)
-minRF <- do.call("cbind", lapply(files, read.csv, header=T))
-fileNames <- gsub(".csv","", list.files("TRMM/CSVs/min", full.names=F, pattern=".csv")) #csv read-in only
-colnames(minRF) <- fileNames
-minRF$IBGE_ID <- brazil@data$codigo_ibg
-minRF$IBGE_Name <- brazil@data$nome
-minRF <- minRF[,c(169,170, 1:168)]
-write.csv(minRF, file="TRMM/CSVs/minRFall.csv", row.names=F)
+# files <- list.files("TRMM/CSVs/min", full.names=T)
+# minRF <- do.call("cbind", lapply(files, read.csv, header=T))
+# fileNames <- gsub(".csv","", list.files("TRMM/CSVs/min", full.names=F, pattern=".csv")) #csv read-in only
+# colnames(minRF) <- fileNames
+# minRF$IBGE_ID <- brazil@data$codigo_ibg
+# minRF$IBGE_Name <- brazil@data$nome
+# minRF <- minRF[,c(169,170, 1:168)]
+# write.csv(minRF, file="TRMM/CSVs/minRFall.csv", row.names=F)
 
 #mean rainfall
-files <- list.files("TRMM/CSVs/mean", full.names=T)
+files <- list.files("../../TRMM/CSVs/mean", full.names=T)
 meanRF <- do.call("cbind", lapply(files, read.csv, header=T))
-fileNames <- gsub(".csv","", list.files("TRMM/CSVs/mean", full.names=F, pattern=".csv")) #csv read-in only
+fileNames <- gsub(".csv","", list.files("../../TRMM/CSVs/mean", full.names=F, pattern=".csv")) #csv read-in only
 colnames(meanRF) <- fileNames
-meanRF$IBGE_ID <- brazil@data$codigo_ibg
-meanRF$IBGE_Name <- brazil@data$nome
-meanRF <- meanRF[,c(169,170, 1:168)]
-write.csv(meanRF, file="TRMM/CSVs/meanRFall.csv", row.names=F)
+meanRF$muni.no <- brazil@data$muni_no
+meanRF <- meanRF[,c(169, 1:168)]
+write.csv(meanRF, file="../data_raw/environmental/meanRFall.csv", row.names=F)
 
 #maximum rainfall
-files <- list.files("TRMM/CSVs/max", full.names=T)
-maxRF <- do.call("cbind", lapply(files, read.csv, header=T))
-fileNames <- gsub(".csv","", list.files("TRMM/CSVs/max", full.names=F, pattern=".csv")) #csv read-in only
-colnames(maxRF) <- fileNames
-maxRF$IBGE_ID <- brazil@data$codigo_ibg
-maxRF$IBGE_Name <- brazil@data$nome
-maxRF <- maxRF[,c(169,170, 1:168)]
-write.csv(maxRF, file="TRMM/CSVs/maxRFall.csv", row.names=F)
+# files <- list.files("TRMM/CSVs/max", full.names=T)
+# maxRF <- do.call("cbind", lapply(files, read.csv, header=T))
+# fileNames <- gsub(".csv","", list.files("TRMM/CSVs/max", full.names=F, pattern=".csv")) #csv read-in only
+# colnames(maxRF) <- fileNames
+# maxRF$IBGE_ID <- brazil@data$codigo_ibg
+# maxRF$IBGE_Name <- brazil@data$nome
+# maxRF <- maxRF[,c(169,170, 1:168)]
+# write.csv(maxRF, file="TRMM/CSVs/maxRFall.csv", row.names=F)
