@@ -10,8 +10,8 @@ library(MODIS) #ignore these warnings
 #load Brazil shapefile from IBGE site with municipality codes
 
 brazil <- readOGR(dsn="../data_clean", layer="BRAZpolygons")
-#brazTest <- brazil[brazil@data$uf=="AC",]
-#####Extract for loop for foreach
+#reproject so it doesn't throw a strange error
+brazil <- spTransform(brazil, CRS("+proj=longlat +datum=WGS84 +no_defs +ellps=WGS84 +towgs84=0,0,0"))
 
 ##---------------------------NDVI 
 
@@ -34,7 +34,7 @@ stopCluster(cl)
 #now need to read in individual csvs and combine into one big one
 NDVIdf <- as.data.frame(NDVI)
 colnames(NDVIdf) <- substr(list.files("../../NDVI/tifBrazil"),0,16)
-NDVIdf$IBGE_ID <- brazil@data$muni_no
+NDVIdf$muni.no <- brazil@data$muni_no
 NDVIdf2 <- NDVIdf[,c(169, 1:168)]
 write.csv(NDVIdf2, file="../data_raw/environmental/NDVIall.csv", row.names=F)
 
@@ -169,7 +169,7 @@ maxTDF$IBGE_ID <- brazil@data$codigo_ibg
 maxTDF$IBGE_Name <- brazil@data$nome
 write.csv(maxTDF, file="LST/max/CSVs/maxTall.csv", row.names=F)
 
-###-------Land Surface Temperature (monthly data, MOD11C3)
+###-------Land Surface Temperature (monthly data, MOD11C3)----------------------------------#####
 
 brazil <- readOGR(dsn="../data_clean", layer="BRAZpolygons")#this must be loaded
 
@@ -201,7 +201,7 @@ files <- list.files("../../LST/monthly/CSVs/mean", full.names=T)
 meanTDF <- do.call("cbind", lapply(files, read.csv, header=T))
 fileNames <- gsub(".csv","", list.files("../../LST/monthly/CSVs/mean", full.names=F, pattern=".csv")) #csv read-in only
 colnames(meanTDF) <- fileNames
-meanTDF$IBGE_ID <- brazil@data$muni_no
+meanTDF$muni.no <- brazil@data$muni_no
 write.csv(meanTDF, file="../data_raw/environmental/meanTall.csv", row.names=F)
 
 #Max Temperature
