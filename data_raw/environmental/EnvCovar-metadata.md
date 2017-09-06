@@ -2,7 +2,7 @@
 
 ## NDVI
 
-**Downloaded**: From MODIS, following `ModisDownload.R` script
+**Downloaded**: From MODIS, following `ModisDownload.R` script. Dataset is MOD13A3
 
 **Spatial & Temporal Resolution**: Began as 1 km/month, processed into municipality/month via 'extract.R' script
 
@@ -10,15 +10,15 @@
 
 ## Land Surface Temperature (LST)
 
-**Downloaded**: From MODIS, following `ModisDownload.R` script
+**Downloaded**: From MODIS, following `ModisDownload.R` script. Dataset is MOD11C3
 
 **Spatial & Temporal Resolution**: Began as 5 km/month days, processed into mean Temperature/municipality/month via 'extract.R' script
 
 **Filename**: meanTall.csv
 
-## Land Cover
+## Land Cover (no longer using)
 
-**Downloaded**: From MODIS, following `ModisDownload.R` script
+**Downloaded**: From MODIS, following `ModisDownload.R` script. Dataset is MCD12Q1.
 
 **Spatial & Temporal Resolution**: Began as 1 km/year, processed into municipality/year via `landCoverProcessing.R` script
 
@@ -30,14 +30,14 @@
 
 **Downloaded**: From Tropical Rainfall Measuring Mission, downloaded via command line using `trmmDownload.sh` script (can run through R). Pay attention to notes in comments at top of script or it will not work.
 
-**Spatial & Temporal Resolution**: Began as 4 km/month (recorded as average hourly rainfall in mm), recorded into spatial min. mean, and maximums per municipality/month
+**Spatial & Temporal Resolution**: Began as 4 km/month (recorded as average hourly rainfall in mm), recorded into spatial mean per municipality/month
 
 **Filename**: meanRFall.csv
 
 ## Fire
 
-**Downloaded**:
+**Downloaded**: Data is the LANCE Activive Fire Dataset (MCD14ML). It is point data on fires (detected at the 1 km resolution), with date and time attributes. It was downloaded for 2001 - 2014 via https://earthdata.nasa.gov/earth-observation-data/near-real-time/firms/active-fire-data.
 
 **Spatial and Temporal Resolution**: Vector data (i.e. points) by date and time. Combined into number of fires per municipality per month via `fireProcess.R`
 
-**Filename**:
+**Filename**: fires.csv
