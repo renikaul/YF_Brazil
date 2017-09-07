@@ -3,47 +3,42 @@
 library(rgdal)
 library(raster)
 library(rgeos)
-
-## Important Note: This are municipalities as they were in 2001!
+library(maptools)
 
 #get files
-# files were downloaded from ftp://geoftp.ibge.gov.br/organizacao_do_territorio/malhas_territoriais/malhas_municipais/municipio_2001/
-# files with mu code are municipalities
 filesToMerge <- list.files("municipio_2001/", pattern=".shp")
 layersMerge <- gsub(".shp", "", filesToMerge)
 
+#set crs for the shapefiles
+crs <- CRS("+init=epsg:4326")
+
 first <- readOGR(dsn="municipio_2001", layersMerge[1])
 colnames(first@data) <- toupper(colnames(first@data))
-first <- first[,'GEOCODIGO']
-
+first <- first[,c('GEOCODIGO','NOME')]
+proj4string(first) <- crs
 
 for (i in 2:length(layersMerge)){
   toAdd <- readOGR(dsn="municipio_2001", layersMerge[i])
   colnames(toAdd@data) <- toupper(colnames(toAdd@data))
-  toAdd <- toAdd[,'GEOCODIGO']
-  colnames(toAdd@data)[1] <- paste0("GEOCODIGO.",i)
-  first <- union(first, toAdd)
+  toAdd <- toAdd[,c('GEOCODIGO','NOME')]
+  proj4string(toAdd) <- crs
+  first <- rbind(first, toAdd, makeUniqueIDs=T)
 }
+rm(toAdd,i)
 
-plot(first)
+#dissolve on GEOCODIGO to add islands to multipart polygons
+brazDissolve <- unionSpatialPolygons(first, IDs=first$GEOCODIGO)
+#add data back to this
+brazData <- unique(first@data)
+rownames(brazData) <- brazData$GEOCODIGO
+newBrazil <- SpatialPolygonsDataFrame(brazDissolve, brazData)
 
-newBrazil <- first
-library(tidyr)
-#combine all the columns into one
-brazilData <- newBrazil@data
-brazilData <- unite(brazilData, newCode, GEOCODIGO:GEOCODIGO.27, sep='')
-brazilData$newCode <- gsub("NA", "", brazilData$newCode)
+#adjust small municode error (Pinto Bandeira is listed incorrectly as 431453, not 431454). See http://cidades.ibge.gov.br/xtras/perfil.php?codmun=431454
+newBrazil@data$muni.no <- as.numeric(substr(as.character(newBrazil$GEOCODIGO),1,6))
+newBrazil@data$muni.no[newBrazil@data$muni.no==431453] <- 431454
 
-length(newBrazil)
-newBrazil@data <- brazilData
-
-#set projection (SIRGAS 2000, also known as WGS84)
-proj4string(newBrazil) <- CRS('+proj=longlat +ellps=GRS80 +towgs84=0,0,0 +no_defs')
-
-#adjust codes to match pop data
-newBrazil@data$newCode <- substr(newBrazil@data$newCode,1,6)
-newBrazil@data$muni.no <- as.numeric(newBrazil@data$newCode)
-newBrazil <- newBrazil[,'muni.no']
+brazShapefile <- newBrazil[,c('muni.no', 'NOME')]
+colnames(brazShapefile@data)[2] <- "muni.name"
 
 
-writeOGR(newBrazil, dsn="../data_clean", layer="BRAZpolygons", driver="ESRI Shapefile")
+writeOGR(brazShapefile, dsn=".", layer="BRAZpolygons", driver="ESRI Shapefile")

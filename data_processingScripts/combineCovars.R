@@ -15,8 +15,8 @@ library(dplyr)
 library(lubridate)
 
 ###--------Rainfall
-rainfallMax <- read.csv("../data_raw/environmental/maxRFall.csv")
-rainfallMin <- read.csv("../data_raw/environmental/minRFall.csv")
+#rainfallMax <- read.csv("../data_raw/environmental/maxRFall.csv")
+#rainfallMin <- read.csv("../data_raw/environmental/minRFall.csv")
 rainfallMean <- read.csv("../data_raw/environmental/meanRFall.csv")
 
 process_rainfall <- function(rainfallDF, type){
@@ -27,12 +27,8 @@ process_rainfall <- function(rainfallDF, type){
   require(dplyr)
   require(tidyr)
   newDF <- rainfallDF %>%
-    #subset IBGE_ID to get muni.no
-    mutate(muni.no = as.numeric(as.character(substr(IBGE_ID,1,6)))) %>%
     #go from wide to long
     gather(date, measurement, X20010101:X20141201) %>%
-    #drop old muni code
-    dplyr::select(-IBGE_ID) %>%
     #get year column
     mutate(year= as.numeric(substr(date, 2,5))) %>%
     # get month column
@@ -40,26 +36,27 @@ process_rainfall <- function(rainfallDF, type){
     #drop date column
     dplyr::select(-date) %>%
     #reorder columns to keep us sane
-    dplyr::select(muni.no, muni.name=IBGE_Name, year, cal.month=month, measurement)
+    dplyr::select(muni.no, year, cal.month=month, measurement)
   
   #rename measurement column
   measureLabel <- paste0("hourlyRainfall", type)
   colnames(newDF)[colnames(newDF)=="measurement"] <- measureLabel
   
   #switch muni name to character to avoid weird factors while merging
-  newDF$muni.name <- as.character(newDF$muni.name)
+  # newDF$muni.name <- as.character(newDF$muni.name)
   
   return(newDF)
 }
 
 #apply function to all rainfall dataframes
-newRFmin <- process_rainfall(rainfallDF=rainfallMin, type="Min")
-newRFmax <- process_rainfall(rainfallDF=rainfallMax, type="Max")
+# newRFmin <- process_rainfall(rainfallDF=rainfallMin, type="Min")
+# newRFmax <- process_rainfall(rainfallDF=rainfallMax, type="Max")
 newRFmean <- process_rainfall(rainfallDF = rainfallMean, type="Mean")
 
-#merge dataframes together into one
-RFall <- join_all(list(newRFmin, newRFmax, newRFmean), by=c("muni.no", "year", "cal.month"), type="full")
+# merge dataframes together into one
+# RFall <- join_all(list(newRFmin, newRFmax, newRFmean), by=c("muni.no", "year", "cal.month"), type="full")
 
+RFall <- newRFmean
 #add in month.no
 month.noFunc <- function(year, month, startYear, startMonth){
   yearsPast <- year-startYear
@@ -88,13 +85,10 @@ jtoDate <- function(day, year){
 }
 
 ndviNew <- ndvi %>%
-  mutate(muni.no = as.numeric(as.character(substr(IBGE_ID,1,6)))) %>%
   #go from wide to long
   gather(date, NDVI, MOD13A3.A2001001:MOD13A3.A2014335) %>%
   #rescale NDVI
   mutate(NDVI=NDVI*0.0001) %>%
-  #drop old muni code
-  dplyr::select(-IBGE_ID) %>%
   #get year
   mutate(year=substr(date, 10,13)) %>%
   #get date
@@ -103,12 +97,12 @@ ndviNew <- ndvi %>%
   plyr::mutate(posixDate = jtoDate(day, year)) %>%
   plyr::mutate(month=month(posixDate)) %>%
   #reorganize columns
-  dplyr::select(muni.no, muni.name=IBGE_Name, year, cal.month=month, NDVI) %>%
+  dplyr::select(muni.no, year, cal.month=month, NDVI) %>%
   mutate(month.no=month.noFunc(year=as.numeric(year), month=cal.month, startYear=2001, startMonth=1))
 
   
 #adjust muni name to a character
-ndviNew$muni.name <- as.character(ndviNew$muni.name)
+# ndviNew$muni.name <- as.character(ndviNew$muni.name)
 
 #make year numeric
 ndviNew$year <- as.numeric(ndviNew$year)
@@ -117,8 +111,8 @@ ndviNew$year <- as.numeric(ndviNew$year)
 saveRDS(ndviNew, "../data_clean/environmental/allNDVI.rds")
   
 #####----------Temperature
-tempMax <- read.csv("../data_raw/environmental/maxTall.csv")
-tempMin <- read.csv("../data_raw/environmental/minTall.csv")
+# tempMax <- read.csv("../data_raw/environmental/maxTall.csv")
+# tempMin <- read.csv("../data_raw/environmental/minTall.csv")
 tempMean <- read.csv("../data_raw/environmental/meanTall.csv")
 
 process_temp <- function(tempDF, type){
@@ -129,10 +123,8 @@ process_temp <- function(tempDF, type){
   require(dplyr)
   require(tidyr)
   newDF <- tempDF %>%
-      #subset IBGE_ID to get muni.no
-      mutate(muni.no = as.numeric(as.character(substr(IBGE_ID,1,6)))) %>%
       #reorder columns
-      dplyr::select(muni.no, muni.name=IBGE_Name, month100:month9) %>%
+      dplyr::select(muni.no, month100:month9) %>% #double check columns match when running
       #go from wide to long
       gather(date, measurement, month100:month9) %>%
       #rescale temperature and change to C
@@ -141,7 +133,7 @@ process_temp <- function(tempDF, type){
       mutate(month.no=as.numeric(gsub("month", "", date))) %>%
       #get year
       arrange(month.no) %>%
-      mutate(year=rep(2001:2014, each=66768)) %>%
+      mutate(year=rep(2001:2014, each=length(unique(tempDF$muni.no))*12)) %>% #repeat each year number of munis *12
       #get month (remainder, then correct for 12)
       mutate(cal.month=case_when(
         (month.no %% 12) !=0 ~ month.no %% 12,
@@ -149,26 +141,25 @@ process_temp <- function(tempDF, type){
           )
         ) %>%
       #drop date
-      dplyr::select(muni.no, muni.name, year, cal.month, month.no, measurement)
+      dplyr::select(muni.no, year, cal.month, month.no, measurement)
   
 
     #rename measurement column
     measureLabel <- paste0("temp", type)
     colnames(newDF)[colnames(newDF)=="measurement"] <- measureLabel
       
-    #switch muni name to character to avoid weird factors while merging
-    newDF$muni.name <- as.character(newDF$muni.name)
-      
     return(newDF)
 }      
 
 #apply function to all temperature dataframes
-newTmin <- process_temp(tempDF=tempMin, type="Min")
-newTmax <- process_temp(tempDF=tempMax, type="Max")
+# newTmin <- process_temp(tempDF=tempMin, type="Min")
+# newTmax <- process_temp(tempDF=tempMax, type="Max")
 newTmean <- process_temp(tempDF=tempMean, type="Mean")
 
 #merge dataframes together into one
-tempAll <- join_all(list(newTmin, newTmax, newTmean), by=c("muni.no", "year", "cal.month", "month.no"), type="full")
+# tempAll <- join_all(list(newTmin, newTmax, newTmean), by=c("muni.no", "year", "cal.month", "month.no"), type="full")
+
+tempAll <- newTmean
 
 #---three muni x month have NA/-Inf/Inf due to cloud cover
 #toFix <- tempAll[(is.na(tempAll$tempMean) | tempAll$tempMax==-Inf | tempAll$tempMin==Inf),]
