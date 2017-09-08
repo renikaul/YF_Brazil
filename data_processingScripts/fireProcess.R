@@ -57,5 +57,6 @@ system.time({
 #turn into big dataframe
 firesDF <- as.data.frame(fires)
 firesDF$muni.no <- brazil@data$muni_no
+firesDF$muni.name <- brazil@data$muni_name
 firesDF2 <- firesDF[,c(169, 1:168)]
 write.csv(firesDF2, file="../data_raw/environmental/fires.csv")
