@@ -35,7 +35,8 @@ stopCluster(cl)
 NDVIdf <- as.data.frame(NDVI)
 colnames(NDVIdf) <- substr(list.files("../../NDVI/tifBrazil"),0,16)
 NDVIdf$muni.no <- brazil@data$muni_no
-NDVIdf2 <- NDVIdf[,c(169, 1:168)]
+NDVIdf$muni.name <- brazil@data$muni_name
+NDVIdf2 <- NDVIdf[,c(169, 170, 1:168)]
 write.csv(NDVIdf2, file="../data_raw/environmental/NDVIall.csv", row.names=F)
 
 #

@@ -108,7 +108,7 @@ ndviNew <- ndvi %>%
 ndviNew$year <- as.numeric(ndviNew$year)
 
 #save as RDS object
-saveRDS(ndviNew, "../data_clean/environmental/allNDVI.rds")
+saveRDS(ndviNew, "../data_clean/environmental/allNDVI.rds") #note that muni.no 291992 has an NA in 2011305 (need to spatially permute this)
   
 #####----------Temperature
 # tempMax <- read.csv("../data_raw/environmental/maxTall.csv")
