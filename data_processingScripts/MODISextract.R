@@ -186,11 +186,11 @@ foreach(i=1:length(files), .combine=cbind, .packages=c('raster', 'rgdal')) %dopa
     rast <- raster(files[i])
     rast[rast<12000] <- NA #fix cloud errors and fill
     meanT <- extract(rast, brazil, fun=mean, na.rm=T)
-    minT <- extract(rast, brazil, fun=min, na.rm=T)
-    maxT <- extract(rast, brazil, fun=max, na.rm=T)
+    #minT <- extract(rast, brazil, fun=min, na.rm=T)
+    #maxT <- extract(rast, brazil, fun=max, na.rm=T)
     write.csv(meanT, file=paste0("../../LST/monthly/CSVs/mean/month", i,".csv"), row.names=F)
-    write.csv(minT, file=paste0("../../LST/monthly/CSVs/min/month", i,".csv"), row.names=F)
-    write.csv(maxT, file=paste0("../../LST/monthly/CSVs/max/month", i,".csv"), row.names=F)
+    #write.csv(minT, file=paste0("../../LST/monthly/CSVs/min/month", i,".csv"), row.names=F)
+    #write.csv(maxT, file=paste0("../../LST/monthly/CSVs/max/month", i,".csv"), row.names=F)
   }
 }) #end system time
 stopCluster(cl)
@@ -203,6 +203,8 @@ meanTDF <- do.call("cbind", lapply(files, read.csv, header=T))
 fileNames <- gsub(".csv","", list.files("../../LST/monthly/CSVs/mean", full.names=F, pattern=".csv")) #csv read-in only
 colnames(meanTDF) <- fileNames
 meanTDF$muni.no <- brazil@data$muni_no
+meanTDF$muni.name <- brazil@data$muni_name
+meanTDF2 <- meanTDF[,c(169,170, 1:168)]
 write.csv(meanTDF, file="../data_raw/environmental/meanTall.csv", row.names=F)
 
 #Max Temperature
