@@ -1,5 +1,29 @@
 # YF_Brazil
 
+# What are the areas most at risk of YF sylvatic spillover in Brazil and does this location change with season?
+
+# Outcome: probability of a YF sylvatic spillover/case per municipality and month (of 12, ie Jan- Dec)
+
+## Hypotheses for 2016 Outbreak (why so may cases/munis?):
+
+**H1:** environmental anomaly (super rainy/hot/whateves)
+
+**H2:** a shift in the mechanistic relationship between the environmental drivers and YF spillover
+
+If H1, a well-performing model should be able to predict 2016 outbreak, if it is only a sylvatic spillover thing (doubtful).
+
+## Methods
+
+**Input**: yes/no case and environmental covariates by muni and month (168).
+
+**Model**: bagged logistic regression on binary yes/no of case by muni and month (168). Bagging means models fit to a subset of positive and background data, in order to create low bias models that are then ensembled together via mean of the raw model predictions.
+
+**Output**: risk by muni and month (168)
+
+**How to go from 168 to 12 months**: Following Schmidt et al. (2017), we will average across months (ie. all the January's) to get a map of the risk per calendar month (12).
+
+**Result**: risk by muni and month (12).
+
 ## 8/29 Reni meeting with John
 This is a good start. We should grow our list of covariates, then explore how they relate to eachother and vary over the landscape. Once we have a good feel for their behavior we can start adding them to the model. Throughout this process leave the 30% testing data alone. 
 
