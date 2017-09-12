@@ -63,7 +63,8 @@ meanRF <- do.call("cbind", lapply(files, read.csv, header=T))
 fileNames <- gsub(".csv","", list.files("../../TRMM/CSVs/mean", full.names=F, pattern=".csv")) #csv read-in only
 colnames(meanRF) <- fileNames
 meanRF$muni.no <- brazil@data$muni_no
-meanRF <- meanRF[,c(169, 1:168)]
+meanRF$muni.name <- brazil@data$muni_name
+meanRF <- meanRF[,c(169, 170, 1:168)]
 write.csv(meanRF, file="../data_raw/environmental/meanRFall.csv", row.names=F)
 
 #maximum rainfall
