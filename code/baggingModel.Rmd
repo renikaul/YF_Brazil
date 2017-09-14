@@ -40,6 +40,15 @@ Monthly land surface temperature and normalized difference vegetation index (NDV
 
 Both rainfall and NDVI data were further transformed to create fine-scale environmental variables to better characterize environmental anomalies. Rainfall data were scaled to the maximum value of the municipality for the whole period of 2001 to 2014 and NDVI data were scaled to the maximum value for that specific calendar month for each municipality (i.e. June was scaled with all June values from 2001 - 2014).  
 
+##Covariates and rationale (what they should be)
+
+1. Rainfall (ave rate of rainfall per day)
+  -sqrt transformed
+2. log population density updated annually
+3. Monthly NDVI
+4. Monthly NDVI scaled to max value at that location and month
+5. Monthly mean temperature 
+  
 ## Processing Environmental Covariates
 
 ### Rainfall
