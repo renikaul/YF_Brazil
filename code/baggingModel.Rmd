@@ -55,7 +55,8 @@ hist(rf$hourlyRainfallMean, main="hourly rainfall") #mean rainfall, exponential
 
 # create log transformed variable with a correction for zero values
 nonzero<-  min(rf$hourlyRainfallMean[which(rf$hourlyRainfallMean>0)])#what is smallest non-zero value
-hist(log((rf[,7])+nonzero/10), main="Log transformed mean hourly rainfall") #log tranform data after adding an value an order of magnitude smaller than the smallest recorded value
+hist(log((rf$hourlyRainfallMean)+nonzero/10), main="Log transformed mean hourly rainfall") #log tranform data after adding an value an order of magnitude smaller than the smallest recorded value
+
 rf$log.mean.rf  <- log((rf$hourlyRainfallMean)+nonzero/10) #use this 
 
 #scale to maximum value of muni
@@ -314,8 +315,11 @@ trainingCoefs <- do.call(cbind,(lapply(trainModel, '[[', 2)))
 
 output.preds<- apply(trainingPreds, 1, mean)
 preds <- prediction(output.preds, training$case)
-perf <- performance(preds, "sens", "spec")
-plot(perf)
+#perf <- performance(preds, "sens", "spec")
+#plot(perf)
+
+perf2 <- performance(preds, "tpr", "fpr")
+plot(perf2)
 
 train.auc <- performance(preds, "auc") #~0.91
 ```
@@ -334,11 +338,19 @@ meanCoefs <- apply(trainingCoefs,1, mean)
 
 ```
 
+# Visualizing model
+
+This section is TBD. 
+
+***
+
 ## Model prediction of testing data
+
+*DON'T TOUCH UNTIL DONE WITH MODEL DEVELOPMENT*
 
 The predictions for the testing data were made by building a similar bagged model (100 iterations using 10 presences and 100 background), but predicted on the testing data instead of the training data. 
 
-```{r testModel}
+```{r testModel, eval=FALSE}
 
 cores.to.use <- 1
 iterations <- 100
@@ -376,20 +388,21 @@ testingCoefs <- do.call(cbind,(lapply(testModel, '[[', 2)))
 
 ```
 
-```{r test AUC}
+```{r test AUC, eval=FALSE}
 test.preds<- apply(testingPreds, 1, mean)
 preds <- prediction(test.preds, testing$case)
-perf <- performance(preds, "sens", "spec")
-plot(perf)
+# perf <- performance(preds, "sens", "spec")
+# plot(perf)
+
+perf2 <- performance(preds, "tpr", "fpr")
+plot(perf2)
 
 test.auc <- performance(preds, "auc") 
 ```
 
-The model has an AUC of `r signif(test.auc@y.values[[1]], digits=2)` when predicting the testing data. 
+The model has an AUC of  when predicting the testing data. 
 
-# Visualizing model
 
-This section is TBD. 
 
 ----
 
