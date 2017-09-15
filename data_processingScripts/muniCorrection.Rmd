@@ -27,11 +27,11 @@ yfData <- readRDS("../data_clean/YFcases/YFlong.rds")
 yfMuni <- unique(yfData$muni.no)
 shapeMuni <- as.character(unique(brazShape@data$muni_no))
 
-missingMuni <- unique(yfData[!(yfMuni %in% shapeMuni), 3:4]) #33 total (this includes the nearly unknown and imported)
+missingMuni <- unique(yfData[!(yfMuni %in% shapeMuni), 3:4]) #36 total (this includes the nearly unknown and imported)
 
 #drop unknowns (codes for state unknowns end with 4 zeros)
 #some with 5 zeros aren't caught, and neither is one that is just 0
-missingMuni <- missingMuni[!((substr(missingMuni$muni.no, 3,6) == "0000")| (substr(missingMuni$muni.no, 3,6) == "+05") | missingMuni$muni.no==0),] #results in 11 total
+missingMuni <- missingMuni[!((substr(missingMuni$muni.no, 3,6) == "0000")| (substr(missingMuni$muni.no, 3,6) == "+05") | missingMuni$muni.no==0),] #results in 9 total
 
 #several of these are just misspellings becuase of accents
 unique(missingMuni$muni.no) 
@@ -49,13 +49,16 @@ sum(yfData$case[yfData$muni.no %in% missingMuni$muni.no], na.rm=T) #no cases
 # One by One Explanation and Reasoning
 
 ```{r}
-missingMuni$old.no <- NA
+missingMuni$mother <- NA
+missingMuni$emancipationYear <- NA
+
 ```
 
 
 ```{r}
 missingMuni[1,]
-missingMuni$old.no[1] <- 150680
+missingMuni$mother[1] <- 150680
+missingMuni$emancipationYear[1] <- 2013
 ```
 
 Mojui dos Campos is in Para and became a municipality in 2013. It was originally part of Santarem (150680).
@@ -63,38 +66,70 @@ Mojui dos Campos is in Para and became a municipality in 2013. It was originally
 
 ```{r}
 missingMuni[2,]
-missingMuni$old.no[2] <- 221100
+missingMuni$mother[2] <- 221100
+missingMuni$emancipationYear[2] <- 2013
 ```
 
 Nazaria is in Piaui, Teresina. It was created from Teresina (221100) in 2013.
 
 ```{r}
 missingMuni[3,]
-missingMuni$old.no[3] <- 420460
+missingMuni$mother[3] <- 420460
+missingMuni$emancipationYear[3] <- 2013
 ```
 
 Balneario Rincao is in Santa Catarina. It became a municipality in 2013. It was in the sub-municipality of Icara, which was in Criciuma (420460).
 
 ```{r}
 missingMuni[4,]
-missingMuni$old.no[4] <- 420940
+missingMuni$mother[4] <- 420940
+missingMuni$emancipationYear[4] <- 2009
 ```
 
 Pexcaria Brava is also in Santa Catarina. It became a municipality in 2009 from Laguna (420940).
 
 ```{r}
 missingMuni[5,]
-missingMuni$old.no[5] <- 430210
+missingMuni$mother[5] <- 430210
+missingMuni$emancipationYear[5] <- 2013
 ```
 
 Pinto Bandeira is Rio Grande do Sul. It became a municipality in 2001, but then in 2003 lost its municipality status. It then became a municipality again in 2013, from Bento Goncalves (430210). The IBGE website claims its territory rested within Pinto Bandeira until 2013, so I don't think we need to worry about it in those early years.
 
 ```{r}
 missingMuni[6,]
-missingMuni$old.no[6] <- 500325
+missingMuni$mother[6] <- 500325
+missingMuni$emancipationYear[6] <- 2013
 ```
 
 Paraiso das Aguas is in Mato Grosso do Sul. It became a municipality in 2003, from Agua Clara, Costa Rica, and Chapadao do Sul. However,  there was a suit from Agua Clara, so it didn't become independent until 2013. Technically it was a district of Costa Rica (500325), so I think it is safe to say it came from that.
+
+```{r}
+missingMuni[7,]
+missingMuni$mother[7] <- 500295
+missingMuni$emancipationYear[7] <- 2009 
+```
+
+Paraiso das Aguas was emancipated from Chapadao do Sul (500295) in 2009. It was potentially annexed from 3 different municipalities (Água Clara, Costa Rica and Chapadão do Sul). The mother muni was based on a judgement call using a map. 
+
+```{r}
+missingMuni[8,]
+missingMuni$mother[8] <- 510800
+missingMuni$emancipationYear[8] <- 2000 
+```
+
+Ipiranga do Norte was emancipated from Tapurah (510800) in 2000.
+
+
+```{r}
+missingMuni[9,]
+missingMuni$mother[9] <- 510800
+missingMuni$emancipationYear[9] <- 2000 
+```
+
+Itanhanga was emancipated from Tapurah (510800) in 2000
+
+
 
 Save our muni correction file to use in the model markdown file.
 
