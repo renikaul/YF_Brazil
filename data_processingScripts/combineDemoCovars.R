@@ -69,7 +69,7 @@ tmp3 <- rbind(tmp, tmp2)
   #group by muni and add together
 tmp4 <- tmp3[,-1] %>%
         group_by(muni.no) %>%
-        summarise_each(funs(sum))
+        summarise_all(funs(sum))
   #add the muni name back in
 orderedMuni <- correctedMuni[order(correctedMuni$mother),]
 muni2001 <- cbind(orderedMuni[-9,c(1)], tmp4)
@@ -85,7 +85,7 @@ pop <- rbind(popLess, muni2001)
 pop <- reshape2::melt(pop, id=c("muni", "muni.no"),variable.name = "year", value.name = "pop")
 pop$year <- as.numeric(as.character(pop$year))
   #rep each year 12 times
-pop <- rep(pop, each=12)
+pop <- rep(pop, each=12) #MUST HAVE MEFA lib loaded
   #add in cal.month
 cal.month <- c(1:12)
 pop <- cbind(pop, cal.month)
@@ -111,5 +111,6 @@ muniAreaKey<- cbind(muni.no=as.numeric(as.character(muniPoly@data$muni_no)), mun
 #add area into pop 
 pop<- pop %>%
   merge(muniAreaKey,by="muni.no")  %>%
-  mutate(densitypop = totPop/muniArea)
+  mutate(densitypop = pop/muniArea)
 
+saveRDS(pop, "../data_clean/demographic/pop.rds")
