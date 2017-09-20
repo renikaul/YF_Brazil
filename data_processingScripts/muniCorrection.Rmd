@@ -5,7 +5,7 @@ date: "8/2/2017"
 output: html_document
 ---
 
-```{r setup, include=FALSE}
+```{r setup, include=FALSE, eval=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
 library(rgdal)
 library(dplyr)
@@ -129,7 +129,8 @@ missingMuni$emancipationYear[9] <- 2000
 
 Itanhanga was emancipated from Tapurah (510800) in 2000
 
-
+##Additional muni
+Pinto Banderia (431454) was absorbed and then emancipated from Bento Goncalves (430210). The first in 2001 and then emancipated in 2012.  
 
 Save our muni correction file to use in the model markdown file.
 

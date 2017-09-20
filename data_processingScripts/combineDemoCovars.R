@@ -71,8 +71,7 @@ tmp4 <- tmp3[,-1] %>%
         group_by(muni.no) %>%
         summarise_all(funs(sum))
   #add the muni name back in
-orderedMuni <- correctedMuni[order(correctedMuni$mother),]
-muni2001 <- cbind(orderedMuni[-9,c(1)], tmp4)
+muni2001 <- cbind(tmp2[,1], tmp4)
 colnames(muni2001) <- c("muni","muni.no",as.character(2001:2014))
 
 #remove those replaced in pop
