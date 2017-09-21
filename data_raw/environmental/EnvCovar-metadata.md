@@ -36,8 +36,14 @@
 
 ## Fire
 
-**Downloaded**: Data is the LANCE Activive Fire Dataset (MCD14ML). It is point data on fires (detected at the 1 km resolution), with date and time attributes. It was downloaded for 2001 - 2014 via https://earthdata.nasa.gov/earth-observation-data/near-real-time/firms/active-fire-data.
+**Downloaded**: Data is the LANCE Active Fire Dataset (MCD14ML). It is point data on fires (detected at the 1 km resolution), with date and time attributes. It was downloaded for 2001 - 2014 via https://earthdata.nasa.gov/earth-observation-data/near-real-time/firms/active-fire-data.
 
 **Spatial and Temporal Resolution**: Vector data (i.e. points) by date and time. Combined into number of fires per municipality per month via `fireProcess.R`
 
 **Filename**: fires.csv
+
+## Primate Maps
+
+**Downloaded**: Data is the IUCN Redlist of Terrestrial Mammal Shapefiles (http://www.iucnredlist.org/technical-documents/spatial-data).
+
+**Spatial and Temporal Resolution**:
