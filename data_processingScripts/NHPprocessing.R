@@ -13,6 +13,8 @@ library(sp)
 library(raster)
 library(rgeos)
 library(maptools)
+library(doParallel)
+library(foreach)
 
 # #load IUCN shapefile
 # iucn <- readOGR("../../TERRESTRIAL_MAMMALS", "TERRESTRIAL_MAMMALS")
@@ -36,25 +38,35 @@ primData <- data.frame(genus=unique(primates$genus_name))
 rownames(primData) <- primData$genus
 primateGenus <- SpatialPolygonsDataFrame(primateDissolve, primData) #note strange holes due to rivers
 
+
 # stack all of the rasters and reclassify, then loop over the genera
-files <- c("../../envCovariates/2001landcoverTest.tif", "../../envCovariates/2002landcoverTest.tif")
+#files <- c("../../envCovariates/2001landcoverTest.tif", "../../envCovariates/2002landcoverTest.tif")
+files <- list.files("../../landCover/landCoverTIF", full.names=T)
+# rasterTemplate <- raster(files[1])
+# primateRaster <- rasterize(primateDissolve, rasterTemplate, fun='count') #values of 1 - 9
+# writeRaster(primateRaster, "../data_raw/environmental/NHPdata/primateRaster.tif")
+primateRaster <- raster("../data_raw/environmental/NHPdata/primateRaster.tif")
 
-landcoverStack <- stack(files)
-
-
-#mask to Brazil first to save time
-humanBrazilStack <- crop(humanStack, brazil)
-rasterTemplate <- humanBrazilStack[[1]]
-#reclassify so human modified=1
-humanStack <- landcoverStack
-humanStack[humanStack<11.5] <- 0
-humanStack[humanStack>14.5] <- 0
-humanStack[humanStack!=0] <- 1
-
-    #create raster whose values is sum of all genera present there
-    primateRaster <- rasterize(primateGenus, rasterTemplate, fun=sum) 
-    #multiply so 1-9 is primate and human, 0 is the rest
-    primateHuman <- primateRaster * humanStack
-    #extract mean per municipality (giving proportion)
-    primateProp <- extract(primateHuman, brazil, fun=mean, na.rm=T)
-
+system.time({ #12 ish hours
+  cl <- makeCluster(13)
+  registerDoParallel(cl)
+primateAll <- foreach(i=1:length(files), .combine=cbind, .packages=c("raster", "rgdal", "rgeos", "maptools", "sp")) %dopar% {
+  landCover <- raster(files[i])
+  #reclassify
+  landCover[landCover<11.5] <- 0
+  landCover[landCover>14.5] <- 0
+  landCover[landCover!=0] <- 1
+  primateHuman <- primateRaster * landCover
+  #extract mean per municipality (giving proportion)
+  primateProp <- extract(primateHuman, brazil, fun=mean, na.rm=T)
+  write.csv(primateProp, paste0("../../landCover/primate/primateProp", (2000+i), ".csv"),
+            row.names = F)
+  return(primateProp)
+  } #end foreach
+stopCluster(cl)
+})
+primateDF <- as.data.frame(primateAll)
+colnames(primateDF) <- seq(2001,2013)
+primateDF$muni.no <- brazil@data$muni_no
+primateDF$muni.name <- brazil@data$muni_name
+write.csv(primateDF, "../data_raw/environmental/primateProp.csv", row.names = F)
