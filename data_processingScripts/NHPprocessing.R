@@ -65,8 +65,11 @@ primateAll <- foreach(i=1:length(files), .combine=cbind, .packages=c("raster", "
   } #end foreach
 stopCluster(cl)
 })
+#adjust for NaNs (which were not within any primate habitat and so are 0)
+primateAll[is.na(primateAll)] <- 0
 primateDF <- as.data.frame(primateAll)
 colnames(primateDF) <- seq(2001,2013)
 primateDF$muni.no <- brazil@data$muni_no
 primateDF$muni.name <- brazil@data$muni_name
+
 write.csv(primateDF, "../data_raw/environmental/primateProp.csv", row.names = F)
