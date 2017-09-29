@@ -24,30 +24,28 @@ library(foreach)
 # genera <- c("Ateles", "Aotus", "Alouatta", "Saimiri", "Cebus", "Callicebus", "Callithrix", "Saguinus", "Lagothrix")
 # 
 # primates <- iucn[iucn@data$genus_name %in% genera,]
-# writeOGR(primates, "../data_raw/environmental/NHPdata", "primatePolygons", "ESRI Shapefile")
 
-#now can just load this without reading in 900mb file above
-primates <- readOGR("../data_raw/environmental/NHPdata", "primatePolygons")
+# group primates by genus
+# primateDissolve <- unionSpatialPolygons(primates, IDs=primates$genus_name)
+# primData <- data.frame(genus=unique(primates$genus_name))
+# rownames(primData) <- primData$genus
+# primateGenus <- SpatialPolygonsDataFrame(primateDissolve, primData) #note strange holes due to rivers
+
+# primateGenus was then exported to ArcGIS to rasterize the polygons (r doesn't deal with holes properly)
+# the rasterized polygons were then run through 'Cell Statistics' in Arc to get the sum per cell (ie number of species whose range inclues that cell)
+# this was done with the landcover data as a template, so it all matches up
+# results in primateRaster.tif
+
 
 #load brazil shapefile
 brazil <- readOGR("../data_clean","BRAZpolygons")
 
-#group primates by genus
-primateDissolve <- unionSpatialPolygons(primates, IDs=primates$genus_name)
-primData <- data.frame(genus=unique(primates$genus_name))
-rownames(primData) <- primData$genus
-primateGenus <- SpatialPolygonsDataFrame(primateDissolve, primData) #note strange holes due to rivers
-
-
 # stack all of the rasters and reclassify, then loop over the genera
 #files <- c("../../envCovariates/2001landcoverTest.tif", "../../envCovariates/2002landcoverTest.tif")
 files <- list.files("../../landCover/landCoverTIF", full.names=T)
-# rasterTemplate <- raster(files[1])
-# primateRaster <- rasterize(primateDissolve, rasterTemplate, fun='count') #values of 1 - 9
-# writeRaster(primateRaster, "../data_raw/environmental/NHPdata/primateRaster.tif")
-primateRaster <- raster("../data_raw/environmental/NHPdata/primateRaster.tif")
+primateRaster <- raster("../../landCover/primate/primateRaster.tif")
 
-system.time({ #12 ish hours
+system.time({ #2 hours
   cl <- makeCluster(13)
   registerDoParallel(cl)
 primateAll <- foreach(i=1:length(files), .combine=cbind, .packages=c("raster", "rgdal", "rgeos", "maptools", "sp")) %dopar% {
