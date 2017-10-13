@@ -7,12 +7,11 @@
 # sum these values up over all nine genera, resulting in value of 0 - 9
 
 # seperate value: number of species that have a range within the municipality (static over time)
-
+library(maptools)
 library(rgdal)
 library(sp)
 library(raster)
 library(rgeos)
-library(maptools)
 library(doParallel)
 library(foreach)
 
@@ -38,13 +37,34 @@ primData <- data.frame(genus=unique(primates$genus_name))
 rownames(primData) <- primData$genus
 primateGenus <- SpatialPolygonsDataFrame(primateDissolve, primData) #note strange holes due to rivers
 
+## Fix holes
+fix.holes<-function(poly.dat){
+  n.poly.all<-numeric()
+  for (k in 1:nrow(poly.dat@data)){
+    n.poly.all[k]<-length(poly.dat@polygons[[k]]@Polygons)
+  }
+  has.hole<-which(n.poly.all>1)
+  n.poly<-n.poly.all[has.hole]
+  
+  for (k in 1:length(has.hole)){
+    for (m in 2:n.poly[k]){
+      poly.dat@polygons[[has.hole[k]]]@Polygons[[m]]@hole<-T
+    }
+  }
+  return(poly.dat)
+}
+
+primHole <- fix.holes(primateGenus)
+primHole <- SpatialPolygons(primHole@polygons, proj4string = primHole@proj4string)
+
 
 # stack all of the rasters and reclassify, then loop over the genera
 #files <- c("../../envCovariates/2001landcoverTest.tif", "../../envCovariates/2002landcoverTest.tif")
 files <- list.files("../../landCover/landCoverTIF", full.names=T)
-# rasterTemplate <- raster(files[1])
-# primateRaster <- rasterize(primateDissolve, rasterTemplate, fun='count') #values of 1 - 9
-# writeRaster(primateRaster, "../data_raw/environmental/NHPdata/primateRaster.tif")
+#rasterTemplate <- raster(files[1]) #high mem
+rasterTemplate <- raster("../../envCovariates/2001landcoverTest.tif") #desktop
+primateRaster <- rasterize(primHole, rasterTemplate, fun='count') #values of 1 - 9
+writeRaster(primateRaster, "../data_raw/environmental/NHPdata/primateRaster2.tif")
 primateRaster <- raster("../data_raw/environmental/NHPdata/primateRaster.tif")
 
 system.time({ #12 ish hours
