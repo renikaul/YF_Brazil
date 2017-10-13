@@ -44,6 +44,14 @@
 
 ## Primate Maps
 
-**Downloaded**: Data is the IUCN Redlist of Terrestrial Mammal Shapefiles (http://www.iucnredlist.org/technical-documents/spatial-data).
+**Downloaded**: Data is the IUCN Redlist of Terrestrial Mammal Shapefiles (http://www.iucnredlist.org/technical-documents/spatial-data). This was processed via 'primateProcessing.R'. 
 
-**Spatial and Temporal Resolution**:
+**Spatial and Temporal Resolution**: 
+
+*Primate Proportions:* 1km/year. 
+
+This data is the sum of each municipalities relative area that is both agricultural and falls within a primate genus range. It is summed over all 9 genuses. For example, if a municipality was 50% agricultural land, but fell within the range of all 9 genera, its value would be 4.5. If a municipality was 10% agricultural land, with all of that 10% falling within the range of one genus, and then half of that (5%) falling within the range of another, its value would be 0.15. 
+
+Filename: primateProp.csv
+
+*Primate Richness*: This is equal to the original resolution of the shapefiles and is not temporal. It is the total number of NHP species found in that municipality 
