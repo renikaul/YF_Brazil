@@ -1,11 +1,12 @@
-### This script combines the covariate data into one giant dataframe to use in the bagging model
-## MV Evans September 13 2017
+### This script combines the covariate data from the raw to clean folders
+## MV Evans October 14 2017
 
 ## List of Covariates:
   # Rainfall (mean)
   # NDVI
   # Temperature (mean)
-  # Fire
+  # Fire (density)
+  # Non-Human Primate (proportion overlapping with agricultural land, total species richness per muni)
 
 # All of the Data is wide, but needs to switch to long to match cases
 # Merge columns are muni.no, muni.name, year(2001), cal.month (7), month.no (168)examples in parentheticals
@@ -14,6 +15,7 @@ library(tidyr)
 library(plyr)
 library(dplyr)
 library(lubridate)
+library(raster)
 
 #Random functions
 month.noFunc <- function(year, month, startYear, startMonth){
@@ -31,6 +33,9 @@ jtoDate <- function(day, year){
   posixDate <- as.Date(paste(year, day), format="%Y %j", tz="")
   return(posixDate)
 }
+
+pintoArea <- 105.82 #km2, muni.no 431454
+bentoArea <- 276.6845 #km2, muni.no 430210
 
 #for spatial permutation
 library(rgdal)
@@ -91,9 +96,35 @@ newRFmean <- process_rainfall(rainfallDF = rainfallMean, type="Mean")
 # merge dataframes together into one
 # RFall <- join_all(list(newRFmin, newRFmax, newRFmean), by=c("muni.no", "year", "cal.month"), type="full")
 
-#save as R object
-saveRDS(newRFmean, "../data_clean/environmental/allRainfall.rds")
+#adjust for muni corrections
+inds2fix <- which(newRFmean$muni.no %in% c(431454,430210))
+toAppend <- newRFmean[inds2fix,]
+toAppend <- toAppend %>%
+  #scale by area
+  mutate(scaled=case_when(
+    muni.no==431454 ~ hourlyRainfallMean*pintoArea,
+    muni.no==430210 ~ hourlyRainfallMean*bentoArea
+  )) %>%
+  dplyr::select(-hourlyRainfallMean) %>%
+  group_by(cal.month, year, month.no) %>%
+  #take average of scaled values
+  summarise(hourlyRainfallMean=sum(scaled)/(pintoArea+bentoArea)) %>%
+  #add in appropriate muni name and number
+  mutate(muni.no=430210) %>%
+  mutate(muni.name="Bento Gonçalves") %>%
+  #order columns appropriately to join
+  dplyr::select(muni.no, muni.name, year, cal.month, month.no, hourlyRainfallMean) %>%
+  ungroup()
 
+#drop ones we needed to fix
+RFmean <- newRFmean[-inds2fix,]
+#add new ones
+RFmean <- as.data.frame(rbind(RFmean, toAppend))
+
+#save as R object
+saveRDS(RFmean, "../data_clean/environmental/allRainfall.rds")
+
+rm(toAppend)
 ####--------NDVI
 
 ndvi <- read.csv("../data_raw/environmental/NDVIall.csv") #dates are julian (1-365)
@@ -153,8 +184,33 @@ for (i in missInds){
 #drop everything that we have fixed and is now appended to the end
 ndviAll <- ndviAll[-missInds,]
 
+#adjust for muni corrections
+inds2fix <- which(ndviAll$muni.no %in% c(431454,430210))
+toAppend <- ndviAll[inds2fix,]
+toAppend <- toAppend %>%
+  #scale by area
+  mutate(scaled=case_when(
+    muni.no==431454 ~ NDVI*pintoArea,
+    muni.no==430210 ~ NDVI*bentoArea
+  )) %>%
+  dplyr::select(-NDVI) %>%
+  group_by(cal.month, year, month.no) %>%
+  #take average of scaled values
+  summarise(NDVI=sum(scaled)/(pintoArea+bentoArea)) %>%
+  #add in appropriate muni name and number
+  mutate(muni.no=430210) %>%
+  mutate(muni.name="Bento Gonçalves") %>%
+  #order columns appropriately to join
+  dplyr::select(muni.no, muni.name, year, cal.month, month.no, NDVI) %>%
+  ungroup()
+
+#drop ones we needed to fix
+ndviAll <- ndviAll[-inds2fix,]
+#add new ones
+ndviAll <- as.data.frame(rbind(ndviAll, toAppend))
+
 #save as RDS object
-saveRDS(ndviAll, "../data_clean/environmental/allNDVI.rds") #note that muni.no 291992 has an NA in 2011305 (need to spatially permute this)
+saveRDS(ndviAll, "../data_clean/environmental/allNDVI.rds") 
   
 #####----------Temperature
 # tempMax <- read.csv("../data_raw/environmental/maxTall.csv")
@@ -239,6 +295,31 @@ for (i in missInds){
 #drop everything that we have fixed and appended
 tempAll <- tempAll[-missInds,]
 
+#adjust for muni corrections
+inds2fix <- which(tempAll$muni.no %in% c(431454,430210))
+toAppend <- tempAll[inds2fix,]
+toAppend <- toAppend %>%
+  #scale by area
+  mutate(scaled=case_when(
+    muni.no==431454 ~ tempMean*pintoArea,
+    muni.no==430210 ~ tempMean*bentoArea
+  )) %>%
+  dplyr::select(-tempMean) %>%
+  group_by(cal.month, year, month.no) %>%
+  #take average of scaled values
+  summarise(tempMean=sum(scaled)/(pintoArea+bentoArea)) %>%
+  #add in appropriate muni name and number
+  mutate(muni.no=430210) %>%
+  mutate(muni.name="Bento Gonçalves") %>%
+  #order columns appropriately to join
+  dplyr::select(muni.no, muni.name, year, cal.month, month.no, tempMean) %>%
+  ungroup()
+
+#drop ones we needed to fix
+tempAll <- tempAll[-inds2fix,]
+#add new ones
+tempAll <- as.data.frame(rbind(tempAll, toAppend))
+
 #save as R object
 saveRDS(tempAll, "../data_clean/environmental/meanTemperature.rds") 
 
@@ -261,5 +342,27 @@ fireNew <- fire %>%
   #reorganize columns
   dplyr::select(muni.no, muni.name, year, cal.month, month.no, numFire)
 
+#fix muni issue by summing fires across 431454 and 430210 (no fires in either so not super important, but still)
+fireNew$fixID <- fireNew$muni.no
+fireNew$fixID[fireNew$muni.no==431454] <- 430210
+fireNew$muni.name[fireNew$muni.no==431454] <- unique(fireNew$muni.name[fireNew$muni.no==430210])
+  
+fireNew2 <- fireNew %>%
+  group_by(fixID, muni.name, year, cal.month, month.no) %>%
+  summarise_at(c("numFire"), sum) %>%
+  ungroup() %>%
+  rename(muni.no=fixID)
+
+#add in area and fire density
+brazilProj <- spTransform(brazil, CRS("+proj=aea +lat_1=-5 +lat_2=-42 +lat_0=-32 +lon_0=-60 +x_0=0 +y_0=0 +ellps=aust_SA +units=km")) #change projection to special SAmerican thing, Albers Conic
+brazilArea <- data.frame(cbind(muni.no=brazil@data$muni_no, area=gArea(brazilProj, byid=T)))
+#bento area is actually pento + bento
+brazilArea$area[brazilArea$muni.no==430210] <- sum(brazilArea$area[brazilArea$muni.no==430210], brazilArea$area[brazilArea$muni.no==431454])
+
+#add to fire dataframe and get density
+fireDens <- fireNew2 %>%
+  left_join(brazilArea, by="muni.no") %>%
+  mutate(fireDens=numFire/area)
+
 #save as R object
-saveRDS(fireNew, "../data_clean/environmental/numFires.rds") 
+saveRDS(fireNew, "../data_clean/environmental/numFires.rds")
