@@ -366,3 +366,5 @@ fireDens <- fireNew2 %>%
 
 #save as R object
 saveRDS(fireNew, "../data_clean/environmental/numFires.rds")
+
+###--------Primate
