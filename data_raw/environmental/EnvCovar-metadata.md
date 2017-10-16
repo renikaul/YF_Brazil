@@ -48,10 +48,10 @@
 
 **Spatial and Temporal Resolution**: 
 
-*Primate Proportions:* 1km/year. 
+*Primate Proportions:* km^2/year. 
 
 This data is the sum of each municipalities relative area that is both agricultural and falls within a primate genus range. It is summed over all 9 genuses. For example, if a municipality was 50% agricultural land, but fell within the range of all 9 genera, its value would be 4.5. If a municipality was 10% agricultural land, with all of that 10% falling within the range of one genus, and then half of that (5%) falling within the range of another, its value would be 0.15. 
 
 Filename: primateProp.csv
 
-*Primate Richness*: This is equal to the original resolution of the shapefiles and is not temporal. It is the total number of NHP species found in that municipality 
+*Primate Richness*: This is equal to the original resolution of the shapefiles and is not temporal. It is the total number of NHP species (of the 9 genera) found in that municipality.

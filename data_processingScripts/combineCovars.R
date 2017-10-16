@@ -50,7 +50,7 @@ neighbors <- poly2nb(brazil)
 mat <- nb2mat(neighbors, zero.policy=T)
 colnames(mat) <- as.character(brazil@data$muni_no)
 
-###--------Rainfall
+####--------Rainfall ####
 #rainfallMax <- read.csv("../data_raw/environmental/maxRFall.csv")
 #rainfallMin <- read.csv("../data_raw/environmental/minRFall.csv")
 rainfallMean <- read.csv("../data_raw/environmental/meanRFall.csv")
@@ -125,7 +125,7 @@ RFmean <- as.data.frame(rbind(RFmean, toAppend))
 saveRDS(RFmean, "../data_clean/environmental/allRainfall.rds")
 
 rm(toAppend)
-####--------NDVI
+####--------NDVI ####
 
 ndvi <- read.csv("../data_raw/environmental/NDVIall.csv") #dates are julian (1-365)
 
@@ -212,7 +212,7 @@ ndviAll <- as.data.frame(rbind(ndviAll, toAppend))
 #save as RDS object
 saveRDS(ndviAll, "../data_clean/environmental/allNDVI.rds") 
   
-#####----------Temperature
+#####----------Temperature ####
 # tempMax <- read.csv("../data_raw/environmental/maxTall.csv")
 # tempMin <- read.csv("../data_raw/environmental/minTall.csv")
 tempMean <- read.csv("../data_raw/environmental/meanTall.csv")
@@ -324,7 +324,7 @@ tempAll <- as.data.frame(rbind(tempAll, toAppend))
 saveRDS(tempAll, "../data_clean/environmental/meanTemperature.rds") 
 
 
-####--------fire
+####--------fire####
 
 fire <- read.csv("../data_raw/environmental/fires.csv")[,-1] #drop extra row names
 
@@ -367,4 +367,43 @@ fireDens <- fireNew2 %>%
 #save as R object
 saveRDS(fireNew, "../data_clean/environmental/numFires.rds")
 
-###--------Primate
+####--------Primate####
+primate <- read.csv("../data_raw/environmental/primateProp.csv")
+
+primNew <- primate %>%
+  #drop lagoons because no one lives there
+  filter(muni.no!=430000) %>%
+  #go from wide to long
+  gather(date, primProp, X2001:X2013) %>%
+  #get year
+  mutate(year=as.numeric(substr(date, 2,5))) %>%
+  #reorganize columns
+  dplyr::select(muni.no, muni.name, year, primProp)
+
+#adjust for muni corrections
+inds2fix <- which(primNew$muni.no %in% c(431454,430210))
+toAppend <- primNew[inds2fix,]
+toAppend <- toAppend %>%
+  #scale by area
+  mutate(scaled=case_when(
+    muni.no==431454 ~ primProp*pintoArea,
+    muni.no==430210 ~ primProp*bentoArea
+  )) %>%
+  dplyr::select(-primProp) %>%
+  group_by(year) %>%
+  #take average of scaled values
+  summarise(primProp=sum(scaled)/(pintoArea+bentoArea)) %>%
+  #add in appropriate muni name and number
+  mutate(muni.no=430210) %>%
+  mutate(muni.name="Bento Gonçalves") %>%
+  #order columns appropriately to join
+  dplyr::select(muni.no, muni.name, year, primProp) %>%
+  ungroup()
+
+#drop ones we needed to fix
+primateFix<- primNew[-inds2fix,]
+#add new ones
+primateFix <- as.data.frame(rbind(primateFix, toAppend))
+
+#save as R object
+saveRDS(primateFix, "../data_clean/environmental/primProp.rds")
