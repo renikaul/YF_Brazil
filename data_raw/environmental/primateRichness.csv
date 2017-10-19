@@ -1,0 +1,5561 @@
+"spRich","muni.name","muni.no"
+8,"Alta Floresta d'Oeste",110001
+7,"Ariquemes",110002
+4,"Cabixi",110003
+7,"Cacoal",110004
+5,"Cerejeiras",110005
+5,"Colorado do Oeste",110006
+5,"Corumbiara",110007
+9,"Costa Marques",110008
+7,"Espigão d'Oeste",110009
+10,"Guajará-Mirim",110010
+6,"Jaru",110011
+8,"Ji-Paraná",110012
+8,"Machadinho d'Oeste",110013
+5,"Nova Brasilândia d'Oeste",110014
+8,"Ouro Preto do Oeste",110015
+7,"Pimenta Bueno",110018
+16,"Porto Velho",110020
+7,"Presidente Médici",110025
+7,"Rio Crespo",110026
+5,"Rolim de Moura",110028
+4,"Santa Luzia d'Oeste",110029
+7,"Vilhena",110030
+6,"São Miguel do Guaporé",110032
+10,"Nova Mamoré",110033
+6,"Alvorada d'Oeste",110034
+7,"Alto Alegre dos Parecis",110037
+7,"Alto Paraíso",110040
+7,"Buritis",110045
+5,"Novo Horizonte do Oeste",110050
+7,"Cacaulândia",110060
+7,"Campo Novo de Rondônia",110070
+7,"Candeias do Jamari",110080
+6,"Castanheiras",110090
+6,"Chupinguaia",110092
+7,"Cujubim",110094
+6,"Governador Jorge Teixeira",110100
+7,"Itapuã do Oeste",110110
+6,"Ministro Andreazza",110120
+6,"Mirante da Serra",110130
+7,"Monte Negro",110140
+5,"Nova União",110143
+4,"Parecis",110145
+7,"Pimenteiras do Oeste",110146
+4,"Primavera de Rondônia",110147
+4,"São Felipe d'Oeste",110148
+6,"São Francisco do Guaporé",110149
+5,"Seringueiras",110150
+5,"Teixeirópolis",110155
+8,"Theobroma",110160
+5,"Urupá",110170
+8,"Vale do Anari",110175
+8,"Vale do Paraíso",110180
+11,"Acrelândia",120001
+14,"Assis Brasil",120005
+12,"Brasiléia",120010
+9,"Bujari",120013
+13,"Capixaba",120017
+15,"Cruzeiro do Sul",120020
+14,"Epitaciolândia",120025
+13,"Feijó",120030
+11,"Jordão",120032
+13,"Mâncio Lima",120033
+11,"Manoel Urbano",120034
+16,"Marechal Thaumaturgo",120035
+11,"Plácido de Castro",120038
+16,"Porto Walter",120039
+11,"Rio Branco",120040
+15,"Rodrigues Alves",120042
+11,"Santa Rosa do Purus",120043
+10,"Senador Guiomard",120045
+11,"Sena Madureira",120050
+9,"Tarauacá",120060
+12,"Xapuri",120070
+11,"Porto Acre",120080
+14,"Alvarães",130002
+14,"Amaturá",130006
+10,"Anamã",130008
+16,"Anori",130010
+14,"Apuí",130014
+16,"Atalaia do Norte",130020
+16,"Autazes",130030
+12,"Barcelos",130040
+9,"Barreirinha",130050
+15,"Benjamin Constant",130060
+16,"Beruri",130063
+9,"Boa Vista do Ramos",130068
+13,"Boca do Acre",130070
+15,"Borba",130080
+6,"Caapiranga",130083
+16,"Canutama",130090
+17,"Carauari",130100
+12,"Careiro",130110
+18,"Careiro da Várzea",130115
+17,"Coari",130120
+16,"Codajás",130130
+18,"Eirunepé",130140
+12,"Envira",130150
+21,"Fonte Boa",130160
+15,"Guajará",130165
+13,"Humaitá",130170
+15,"Ipixuna",130180
+16,"Iranduba",130185
+16,"Itacoatiara",130190
+17,"Itamarati",130195
+5,"Itapiranga",130200
+13,"Japurá",130210
+22,"Juruá",130220
+16,"Jutaí",130230
+13,"Lábrea",130240
+15,"Manacapuru",130250
+13,"Manaquiri",130255
+13,"Manaus",130260
+11,"Manicoré",130270
+20,"Maraã",130280
+14,"Maués",130290
+12,"Nhamundá",130300
+15,"Nova Olinda do Norte",130310
+11,"Novo Airão",130320
+13,"Novo Aripuanã",130330
+14,"Parintins",130340
+13,"Pauini",130350
+5,"Presidente Figueiredo",130353
+6,"Rio Preto da Eva",130356
+10,"Santa Isabel do Rio Negro",130360
+16,"Santo Antônio do Içá",130370
+14,"São Gabriel da Cachoeira",130380
+14,"São Paulo de Olivença",130390
+6,"São Sebastião do Uatumã",130395
+10,"Silves",130400
+15,"Tabatinga",130406
+19,"Tapauá",130410
+14,"Tefé",130420
+15,"Tonantins",130423
+20,"Uarini",130426
+13,"Urucará",130430
+11,"Urucurituba",130440
+8,"Amajari",140002
+7,"Alto Alegre",140005
+9,"Boa Vista",140010
+6,"Bonfim",140015
+8,"Cantá",140017
+12,"Caracaraí",140020
+5,"Caroebe",140023
+9,"Iracema",140028
+8,"Mucajaí",140030
+5,"Normandia",140040
+4,"Pacaraima",140045
+11,"Rorainópolis",140047
+5,"São João da Baliza",140050
+5,"São Luiz",140060
+4,"Uiramutã",140070
+5,"Abaetetuba",150010
+4,"Abel Figueiredo",150013
+5,"Acará",150020
+7,"Afuá",150030
+5,"Água Azul do Norte",150034
+7,"Alenquer",150040
+8,"Almeirim",150050
+7,"Altamira",150060
+4,"Anajás",150070
+5,"Ananindeua",150080
+7,"Anapu",150085
+5,"Augusto Corrêa",150090
+5,"Aurora do Pará",150095
+13,"Aveiro",150100
+5,"Bagre",150110
+6,"Baião",150120
+5,"Bannach",150125
+5,"Barcarena",150130
+5,"Belém",150140
+9,"Belterra",150145
+5,"Benevides",150150
+4,"Bom Jesus do Tocantins",150157
+5,"Bonito",150160
+5,"Bragança",150170
+5,"Brasil Novo",150172
+5,"Brejo Grande do Araguaia",150175
+5,"Breu Branco",150178
+5,"Breves",150180
+5,"Bujaru",150190
+5,"Cachoeira do Piriá",150195
+3,"Cachoeira do Arari",150200
+6,"Cametá",150210
+5,"Canaã dos Carajás",150215
+5,"Capanema",150220
+5,"Capitão Poço",150230
+5,"Castanhal",150240
+4,"Chaves",150250
+5,"Colares",150260
+6,"Conceição do Araguaia",150270
+5,"Concórdia do Pará",150275
+5,"Cumaru do Norte",150276
+5,"Curionópolis",150277
+4,"Curralinho",150280
+10,"Curuá",150285
+5,"Curuçá",150290
+5,"Dom Eliseu",150293
+5,"Eldorado dos Carajás",150295
+7,"Faro",150300
+5,"Floresta do Araguaia",150304
+5,"Garrafão do Norte",150307
+5,"Goianésia do Pará",150309
+8,"Gurupá",150310
+5,"Igarapé-Açu",150320
+5,"Igarapé-Miri",150330
+5,"Inhangapi",150340
+5,"Ipixuna do Pará",150345
+5,"Irituia",150350
+13,"Itaituba",150360
+5,"Itupiranga",150370
+13,"Jacareacanga",150375
+4,"Jacundá",150380
+13,"Juruti",150390
+5,"Limoeiro do Ajuru",150400
+5,"Mãe do Rio",150405
+5,"Magalhães Barata",150410
+5,"Marabá",150420
+5,"Maracanã",150430
+5,"Marapanim",150440
+5,"Marituba",150442
+5,"Medicilândia",150445
+6,"Melgaço",150450
+6,"Mocajuba",150460
+5,"Moju",150470
+8,"Monte Alegre",150480
+4,"Muaná",150490
+5,"Nova Esperança do Piriá",150495
+5,"Nova Ipixuna",150497
+5,"Nova Timboteua",150500
+5,"Novo Progresso",150503
+5,"Novo Repartimento",150506
+14,"Óbidos",150510
+5,"Oeiras do Pará",150520
+10,"Oriximiná",150530
+5,"Ourém",150540
+5,"Ourilândia do Norte",150543
+5,"Pacajá",150548
+5,"Palestina do Pará",150549
+5,"Paragominas",150550
+5,"Parauapebas",150553
+5,"Pau d'Arco",150555
+5,"Peixe-Boi",150560
+5,"Piçarra",150563
+5,"Placas",150565
+4,"Ponta de Pedras",150570
+6,"Portel",150580
+7,"Porto de Moz",150590
+8,"Prainha",150600
+5,"Primavera",150610
+5,"Quatipuru",150611
+5,"Redenção",150613
+5,"Rio Maria",150616
+5,"Rondon do Pará",150618
+7,"Rurópolis",150619
+5,"Salinópolis",150620
+3,"Salvaterra",150630
+5,"Santa Bárbara do Pará",150635
+4,"Santa Cruz do Arari",150640
+5,"Santa Isabel do Pará",150650
+5,"Santa Luzia do Pará",150655
+7,"Santa Maria das Barreiras",150658
+5,"Santa Maria do Pará",150660
+7,"Santana do Araguaia",150670
+14,"Santarém",150680
+5,"Santarém Novo",150690
+5,"Santo Antônio do Tauá",150700
+5,"São Caetano de Odivelas",150710
+5,"São Domingos do Araguaia",150715
+5,"São Domingos do Capim",150720
+6,"São Félix do Xingu",150730
+5,"São Francisco do Pará",150740
+5,"São Geraldo do Araguaia",150745
+5,"São João da Ponta",150746
+5,"São João de Pirabas",150747
+5,"São João do Araguaia",150750
+5,"São Miguel do Guamá",150760
+4,"São Sebastião da Boa Vista",150770
+5,"Sapucaia",150775
+7,"Senador José Porfírio",150780
+3,"Soure",150790
+5,"Tailândia",150795
+5,"Terra Alta",150796
+6,"Terra Santa",150797
+5,"Tomé-Açu",150800
+5,"Tracuateua",150803
+8,"Trairão",150805
+5,"Tucumã",150808
+5,"Tucuruí",150810
+5,"Ulianópolis",150812
+5,"Uruará",150815
+5,"Vigia",150820
+5,"Viseu",150830
+7,"Vitória do Xingu",150835
+5,"Xinguara",150840
+4,"Serra do Navio",160005
+5,"Amapá",160010
+4,"Pedra Branca do Amaparí",160015
+4,"Calçoene",160020
+5,"Cutias",160021
+5,"Ferreira Gomes",160023
+5,"Itaubal",160025
+5,"Laranjal do Jari",160027
+5,"Macapá",160030
+5,"Mazagão",160040
+4,"Oiapoque",160050
+5,"Porto Grande",160053
+4,"Pracuúba",160055
+5,"Santana",160060
+5,"Tartarugalzinho",160070
+6,"Vitória do Jari",160080
+3,"Abreulândia",170025
+3,"Aguiarnópolis",170030
+3,"Aliança do Tocantins",170035
+2,"Almas",170040
+2,"Alvorada",170070
+5,"Ananás",170100
+3,"Angico",170105
+2,"Aparecida do Rio Negro",170110
+4,"Aragominas",170130
+6,"Araguacema",170190
+3,"Araguaçu",170200
+5,"Araguaína",170210
+4,"Araguanã",170215
+5,"Araguatins",170220
+5,"Arapoema",170230
+2,"Arraias",170240
+3,"Augustinópolis",170255
+3,"Aurora do Tocantins",170270
+3,"Axixá do Tocantins",170290
+4,"Babaçulândia",170300
+4,"Bandeirantes do Tocantins",170305
+5,"Barra do Ouro",170307
+3,"Barrolândia",170310
+4,"Bernardo Sayão",170320
+3,"Bom Jesus do Tocantins",170330
+3,"Brasilândia do Tocantins",170360
+2,"Brejinho de Nazaré",170370
+3,"Buriti do Tocantins",170380
+3,"Cachoeirinha",170382
+4,"Campos Lindos",170384
+2,"Cariri do Tocantins",170386
+3,"Carmolândia",170388
+4,"Carrasco Bonito",170389
+5,"Caseara",170390
+2,"Centenário",170410
+3,"Chapada de Areia",170460
+2,"Chapada da Natividade",170510
+4,"Colinas do Tocantins",170550
+2,"Combinado",170555
+2,"Conceição do Tocantins",170560
+5,"Couto de Magalhães",170600
+3,"Cristalândia",170610
+3,"Crixás do Tocantins",170625
+3,"Darcinópolis",170650
+3,"Dianópolis",170700
+3,"Divinópolis do Tocantins",170710
+4,"Dois Irmãos do Tocantins",170720
+3,"Dueré",170730
+5,"Esperantina",170740
+3,"Fátima",170755
+2,"Figueirópolis",170765
+5,"Filadélfia",170770
+3,"Formoso do Araguaia",170820
+3,"Fortaleza do Tabocão",170825
+4,"Goianorte",170830
+6,"Goiatins",170900
+4,"Guaraí",170930
+2,"Gurupi",170950
+2,"Ipueiras",170980
+4,"Itacajá",171050
+3,"Itaguatins",171070
+5,"Itapiratins",171090
+5,"Itaporã do Tocantins",171110
+2,"Jaú do Tocantins",171150
+4,"Juarina",171180
+3,"Lagoa da Confusão",171190
+2,"Lagoa do Tocantins",171195
+3,"Lajeado",171200
+3,"Lavandeira",171215
+4,"Lizarda",171240
+3,"Luzinópolis",171245
+3,"Marianópolis do Tocantins",171250
+4,"Mateiros",171270
+3,"Maurilândia do Tocantins",171280
+3,"Miracema do Tocantins",171320
+3,"Miranorte",171330
+2,"Monte do Carmo",171360
+3,"Monte Santo do Tocantins",171370
+3,"Palmeiras do Tocantins",171380
+5,"Muricilândia",171395
+2,"Natividade",171420
+3,"Nazaré",171430
+4,"Nova Olinda",171488
+3,"Nova Rosalândia",171500
+2,"Novo Acordo",171510
+2,"Novo Alegre",171515
+3,"Novo Jardim",171525
+3,"Oliveira de Fátima",171550
+4,"Palmeirante",171570
+2,"Palmeirópolis",171575
+3,"Paraíso do Tocantins",171610
+2,"Paranã",171620
+5,"Pau d'Arco",171630
+3,"Pedro Afonso",171650
+2,"Peixe",171660
+5,"Pequizeiro",171665
+4,"Colméia",171670
+2,"Pindorama do Tocantins",171700
+3,"Piraquê",171720
+5,"Pium",171750
+3,"Ponte Alta do Bom Jesus",171780
+2,"Ponte Alta do Tocantins",171790
+2,"Porto Alegre do Tocantins",171800
+3,"Porto Nacional",171820
+4,"Praia Norte",171830
+4,"Presidente Kennedy",171840
+3,"Pugmil",171845
+5,"Recursolândia",171850
+3,"Riachinho",171855
+3,"Rio da Conceição",171865
+3,"Rio dos Bois",171870
+2,"Rio Sono",171875
+4,"Sampaio",171880
+3,"Sandolândia",171884
+4,"Santa Fé do Araguaia",171886
+4,"Santa Maria do Tocantins",171888
+3,"Santa Rita do Tocantins",171889
+2,"Santa Rosa do Tocantins",171890
+2,"Santa Tereza do Tocantins",171900
+3,"Santa Terezinha do Tocantins",172000
+3,"São Bento do Tocantins",172010
+4,"São Félix do Tocantins",172015
+4,"São Miguel do Tocantins",172020
+2,"São Salvador do Tocantins",172025
+4,"São Sebastião do Tocantins",172030
+2,"São Valério da Natividade",172049
+2,"Silvanópolis",172065
+3,"Sítio Novo do Tocantins",172080
+2,"Sucupira",172085
+3,"Taguatinga",172090
+2,"Taipas do Tocantins",172093
+2,"Talismã",172097
+3,"Palmas",172100
+3,"Tocantínia",172110
+3,"Tocantinópolis",172120
+3,"Tupirama",172125
+4,"Tupiratins",172130
+3,"Wanderlândia",172208
+4,"Xambioá",172210
+5,"Açailândia",210005
+2,"Afonso Cunha",210010
+2,"Água Doce do Maranhão",210015
+5,"Alcântara",210020
+3,"Aldeias Altas",210030
+5,"Altamira do Maranhão",210040
+4,"Alto Alegre do Maranhão",210043
+5,"Alto Alegre do Pindaré",210047
+3,"Alto Parnaíba",210050
+5,"Amapá do Maranhão",210055
+5,"Amarante do Maranhão",210060
+5,"Anajatuba",210070
+2,"Anapurus",210080
+5,"Apicum-Açu",210083
+5,"Araguanã",210087
+2,"Araioses",210090
+5,"Arame",210095
+6,"Arari",210100
+3,"Axixá",210110
+5,"Bacabal",210120
+4,"Bacabeira",210125
+5,"Bacuri",210130
+6,"Bacurituba",210135
+5,"Balsas",210140
+1,"Barão de Grajaú",210150
+5,"Barra do Corda",210160
+2,"Barreirinhas",210170
+3,"Belágua",210173
+6,"Bela Vista do Maranhão",210177
+2,"Benedito Leite",210180
+5,"Bequimão",210190
+5,"Bernardo do Mearim",210193
+5,"Boa Vista do Gurupi",210197
+5,"Bom Jardim",210200
+5,"Bom Jesus das Selvas",210203
+5,"Bom Lugar",210207
+2,"Brejo",210210
+4,"Brejo de Areia",210215
+3,"Buriti",210220
+2,"Buriti Bravo",210230
+5,"Buriticupu",210232
+4,"Buritirana",210235
+3,"Cachoeira Grande",210237
+6,"Cajapió",210240
+5,"Cajari",210250
+3,"Campestre do Maranhão",210255
+5,"Cândido Mendes",210260
+4,"Cantanhede",210270
+4,"Capinzal do Norte",210275
+5,"Carolina",210280
+5,"Carutapera",210290
+4,"Caxias",210300
+5,"Cedral",210310
+5,"Central do Maranhão",210312
+5,"Centro do Guilherme",210315
+5,"Centro Novo do Maranhão",210317
+3,"Chapadinha",210320
+4,"Cidelândia",210325
+4,"Codó",210330
+2,"Coelho Neto",210340
+4,"Colinas",210350
+5,"Conceição do Lago-Açu",210355
+4,"Coroatá",210360
+5,"Cururupu",210370
+4,"Davinópolis",210375
+4,"Dom Pedro",210380
+2,"Duque Bacelar",210390
+5,"Esperantinópolis",210400
+3,"Estreito",210405
+4,"Feira Nova do Maranhão",210407
+4,"Fernando Falcão",210408
+5,"Formosa da Serra Negra",210409
+5,"Fortaleza dos Nogueiras",210410
+3,"Fortuna",210420
+5,"Godofredo Viana",210430
+4,"Gonçalves Dias",210440
+4,"Governador Archer",210450
+4,"Governador Edison Lobão",210455
+4,"Governador Eugênio Barros",210460
+3,"Governador Luiz Rocha",210462
+5,"Governador Newton Bello",210465
+5,"Governador Nunes Freire",210467
+4,"Graça Aranha",210470
+5,"Grajaú",210480
+5,"Guimarães",210490
+3,"Humberto de Campos",210500
+3,"Icatu",210510
+6,"Igarapé do Meio",210515
+5,"Igarapé Grande",210520
+4,"Imperatriz",210530
+5,"Itaipava do Grajaú",210535
+4,"Itapecuru Mirim",210540
+5,"Itinga do Maranhão",210542
+3,"Jatobá",210545
+5,"Jenipapo dos Vieiras",210547
+4,"João Lisboa",210550
+5,"Joselândia",210560
+5,"Junco do Maranhão",210565
+5,"Lago da Pedra",210570
+5,"Lago do Junco",210580
+5,"Lago Verde",210590
+1,"Lagoa do Mato",210592
+5,"Lago dos Rodrigues",210594
+5,"Lagoa Grande do Maranhão",210596
+4,"Lajeado Novo",210598
+4,"Lima Campos",210600
+2,"Loreto",210610
+5,"Luís Domingues",210620
+2,"Magalhães de Almeida",210630
+5,"Maracaçumé",210632
+5,"Marajá do Sena",210635
+5,"Maranhãozinho",210637
+3,"Mata Roma",210640
+6,"Matinha",210650
+1,"Matões",210660
+4,"Matões do Norte",210663
+2,"Milagres do Maranhão",210667
+4,"Mirador",210670
+4,"Miranda do Norte",210675
+5,"Mirinzal",210680
+5,"Monção",210690
+4,"Montes Altos",210700
+3,"Morros",210710
+3,"Nina Rodrigues",210720
+4,"Nova Colinas",210725
+1,"Nova Iorque",210730
+5,"Nova Olinda do Maranhão",210735
+5,"Olho d'Água das Cunhãs",210740
+5,"Olinda Nova do Maranhão",210745
+3,"Paço do Lumiar",210750
+5,"Palmeirândia",210760
+1,"Paraibano",210770
+3,"Parnarama",210780
+1,"Passagem Franca",210790
+2,"Pastos Bons",210800
+2,"Paulino Neves",210805
+5,"Paulo Ramos",210810
+5,"Pedreiras",210820
+5,"Pedro do Rosário",210825
+5,"Penalva",210830
+5,"Peri Mirim",210840
+4,"Peritoró",210845
+5,"Pindaré-Mirim",210850
+5,"Pinheiro",210860
+6,"Pio XII",210870
+4,"Pirapemas",210880
+5,"Poção de Pedras",210890
+4,"Porto Franco",210900
+5,"Porto Rico do Maranhão",210905
+4,"Presidente Dutra",210910
+3,"Presidente Juscelino",210920
+5,"Presidente Médici",210923
+5,"Presidente Sarney",210927
+3,"Presidente Vargas",210930
+3,"Primeira Cruz",210940
+3,"Raposa",210945
+4,"Riachão",210950
+4,"Ribamar Fiquene",210955
+4,"Rosário",210960
+3,"Sambaíba",210970
+4,"Santa Filomena do Maranhão",210975
+5,"Santa Helena",210980
+5,"Santa Inês",210990
+5,"Santa Luzia",211000
+5,"Santa Luzia do Paruá",211003
+2,"Santa Quitéria do Maranhão",211010
+4,"Santa Rita",211020
+2,"Santana do Maranhão",211023
+3,"Santo Amaro do Maranhão",211027
+4,"Santo Antônio dos Lopes",211030
+3,"São Benedito do Rio Preto",211040
+5,"São Bento",211050
+2,"São Bernardo",211060
+3,"São Domingos do Azeitão",211065
+4,"São Domingos do Maranhão",211070
+3,"São Félix de Balsas",211080
+5,"São Francisco do Brejão",211085
+1,"São Francisco do Maranhão",211090
+6,"São João Batista",211100
+5,"São João do Carú",211102
+4,"São João do Paraíso",211105
+3,"São João do Soter",211107
+1,"São João dos Patos",211110
+3,"São José de Ribamar",211120
+4,"São José dos Basílios",211125
+4,"São Luís",211130
+5,"São Luís Gonzaga do Maranhão",211140
+5,"São Mateus do Maranhão",211150
+4,"São Pedro da Água Branca",211153
+4,"São Pedro dos Crentes",211157
+4,"São Raimundo das Mangabeiras",211160
+5,"São Raimundo do Doca Bezerra",211163
+5,"São Roberto",211167
+5,"São Vicente Ferrer",211170
+6,"Satubinha",211172
+3,"Senador Alexandre Costa",211174
+4,"Senador La Rocque",211176
+5,"Serrano do Maranhão",211178
+5,"Sítio Novo",211180
+3,"Sucupira do Norte",211190
+1,"Sucupira do Riachão",211195
+2,"Tasso Fragoso",211200
+4,"Timbiras",211210
+1,"Timon",211220
+5,"Trizidela do Vale",211223
+5,"Tufilândia",211227
+4,"Tuntum",211230
+5,"Turiaçu",211240
+5,"Turilândia",211245
+2,"Tutóia",211250
+3,"Urbano Santos",211260
+3,"Vargem Grande",211270
+6,"Viana",211280
+4,"Vila Nova dos Martírios",211285
+6,"Vitória do Mearim",211290
+6,"Vitorino Freire",211300
+5,"Zé Doca",211400
+1,"Acauã",220005
+1,"Agricolândia",220010
+1,"Água Branca",220020
+1,"Alagoinha do Piauí",220025
+1,"Alegrete do Piauí",220027
+2,"Alto Longá",220030
+2,"Altos",220040
+1,"Alvorada do Gurguéia",220045
+1,"Amarante",220050
+1,"Angical do Piauí",220060
+1,"Anísio de Abreu",220070
+1,"Antônio Almeida",220080
+1,"Aroazes",220090
+1,"Arraial",220100
+1,"Assunção do Piauí",220105
+2,"Avelino Lopes",220110
+2,"Baixa Grande do Ribeiro",220115
+1,"Barra d'Alcântara",220117
+2,"Barras",220120
+3,"Barreiras do Piauí",220130
+1,"Barro Duro",220140
+2,"Batalha",220150
+1,"Bela Vista do Piauí",220155
+1,"Belém do Piauí",220157
+1,"Beneditinos",220160
+1,"Bertolínia",220170
+1,"Betânia do Piauí",220173
+2,"Boa Hora",220177
+1,"Bocaina",220180
+2,"Bom Jesus",220190
+2,"Bom Princípio do Piauí",220191
+1,"Bonfim do Piauí",220192
+2,"Boqueirão do Piauí",220194
+2,"Brasileira",220196
+1,"Brejo do Piauí",220198
+2,"Buriti dos Lopes",220200
+2,"Buriti dos Montes",220202
+2,"Cabeceiras do Piauí",220205
+1,"Cajazeiras do Piauí",220207
+2,"Cajueiro da Praia",220208
+1,"Caldeirão Grande do Piauí",220209
+1,"Campinas do Piauí",220210
+1,"Campo Alegre do Fidalgo",220211
+1,"Campo Grande do Piauí",220213
+2,"Campo Largo do Piauí",220217
+2,"Campo Maior",220220
+1,"Canavieira",220225
+1,"Canto do Buriti",220230
+2,"Capitão de Campos",220240
+1,"Capitão Gervásio Oliveira",220245
+1,"Caracol",220250
+2,"Caraúbas do Piauí",220253
+1,"Caridade do Piauí",220255
+2,"Castelo do Piauí",220260
+2,"Caxingó",220265
+2,"Cocal",220270
+2,"Cocal de Telha",220271
+2,"Cocal dos Alves",220272
+2,"Coivaras",220273
+1,"Colônia do Gurguéia",220275
+1,"Colônia do Piauí",220277
+1,"Conceição do Canindé",220280
+1,"Coronel José Dias",220285
+2,"Corrente",220290
+2,"Cristalândia do Piauí",220300
+1,"Cristino Castro",220310
+2,"Curimatá",220320
+1,"Currais",220323
+1,"Curralinhos",220325
+1,"Curral Novo do Piauí",220327
+1,"Demerval Lobão",220330
+1,"Dirceu Arcoverde",220335
+1,"Dom Expedito Lopes",220340
+2,"Domingos Mourão",220342
+1,"Dom Inocêncio",220345
+1,"Elesbão Veloso",220350
+1,"Eliseu Martins",220360
+2,"Esperantina",220370
+1,"Fartura do Piauí",220375
+1,"Flores do Piauí",220380
+1,"Floresta do Piauí",220385
+1,"Floriano",220390
+1,"Francinópolis",220400
+1,"Francisco Ayres",220410
+1,"Francisco Macedo",220415
+1,"Francisco Santos",220420
+1,"Fronteiras",220430
+1,"Geminiano",220435
+3,"Gilbués",220440
+1,"Guadalupe",220450
+2,"Guaribas",220455
+1,"Hugo Napoleão",220460
+2,"Ilha Grande",220465
+1,"Inhuma",220470
+1,"Ipiranga do Piauí",220480
+1,"Isaías Coelho",220490
+1,"Itainópolis",220500
+1,"Itaueira",220510
+1,"Jacobina do Piauí",220515
+1,"Jaicós",220520
+1,"Jardim do Mulato",220525
+2,"Jatobá do Piauí",220527
+1,"Jerumenha",220530
+1,"João Costa",220535
+2,"Joaquim Pires",220540
+2,"Joca Marques",220545
+2,"José de Freitas",220550
+2,"Juazeiro do Piauí",220551
+2,"Júlio Borges",220552
+1,"Jurema",220553
+1,"Lagoinha do Piauí",220554
+2,"Lagoa Alegre",220555
+1,"Lagoa do Barro do Piauí",220556
+2,"Lagoa de São Francisco",220557
+1,"Lagoa do Piauí",220558
+1,"Lagoa do Sítio",220559
+1,"Landri Sales",220560
+2,"Luís Correia",220570
+2,"Luzilândia",220580
+2,"Madeiro",220585
+1,"Manoel Emídio",220590
+1,"Marcolândia",220595
+1,"Marcos Parente",220600
+1,"Massapê do Piauí",220605
+2,"Matias Olímpio",220610
+2,"Miguel Alves",220620
+1,"Miguel Leão",220630
+2,"Milton Brandão",220635
+1,"Monsenhor Gil",220640
+1,"Monsenhor Hipólito",220650
+2,"Monte Alegre do Piauí",220660
+2,"Morro Cabeça no Tempo",220665
+2,"Morro do Chapéu do Piauí",220667
+2,"Murici dos Portelas",220669
+1,"Nazaré do Piauí",220670
+2,"Nossa Senhora de Nazaré",220675
+2,"Nossa Senhora dos Remédios",220680
+1,"Novo Oriente do Piauí",220690
+2,"Novo Santo Antônio",220695
+1,"Oeiras",220700
+1,"Olho d'Água do Piauí",220710
+1,"Padre Marcos",220720
+1,"Paes Landim",220730
+1,"Pajeú do Piauí",220735
+1,"Palmeira do Piauí",220740
+1,"Palmeirais",220750
+1,"Paquetá",220755
+2,"Parnaguá",220760
+2,"Parnaíba",220770
+1,"Passagem Franca do Piauí",220775
+1,"Patos do Piauí",220777
+2,"Pau D'arco do Piauí",220779
+1,"Paulistana",220780
+1,"Pavussu",220785
+2,"Pedro II",220790
+1,"Pedro Laurentino",220793
+1,"Nova Santa Rita",220795
+1,"Picos",220800
+1,"Pimenteiras",220810
+1,"Pio IX",220820
+2,"Piracuruca",220830
+2,"Piripiri",220840
+2,"Porto",220850
+1,"Porto Alegre do Piauí",220855
+1,"Prata do Piauí",220860
+1,"Queimada Nova",220865
+2,"Redenção do Gurguéia",220870
+1,"Regeneração",220880
+2,"Riacho Frio",220885
+1,"Ribeira do Piauí",220887
+1,"Ribeiro Gonçalves",220890
+1,"Rio Grande do Piauí",220900
+1,"Santa Cruz do Piauí",220910
+1,"Santa Cruz dos Milagres",220915
+3,"Santa Filomena",220920
+1,"Santa Luz",220930
+1,"Santana do Piauí",220935
+1,"Santa Rosa do Piauí",220937
+1,"Santo Antônio de Lisboa",220940
+1,"Santo Antônio dos Milagres",220945
+1,"Santo Inácio do Piauí",220950
+1,"São Braz do Piauí",220955
+1,"São Félix do Piauí",220960
+1,"São Francisco de Assis do Piauí",220965
+1,"São Francisco do Piauí",220970
+2,"São Gonçalo do Gurguéia",220975
+1,"São Gonçalo do Piauí",220980
+1,"São João da Canabrava",220985
+2,"São João da Fronteira",220987
+1,"São João da Serra",220990
+1,"São João da Varjota",220995
+2,"São João do Arraial",220997
+1,"São João do Piauí",221000
+2,"São José do Divino",221005
+1,"São José do Peixe",221010
+1,"São José do Piauí",221020
+1,"São Julião",221030
+1,"São Lourenço do Piauí",221035
+1,"São Luis do Piauí",221037
+1,"São Miguel da Baixa Grande",221038
+1,"São Miguel do Fidalgo",221039
+1,"São Miguel do Tapuio",221040
+1,"São Pedro do Piauí",221050
+1,"São Raimundo Nonato",221060
+2,"Sebastião Barros",221062
+1,"Sebastião Leal",221063
+2,"Sigefredo Pacheco",221065
+1,"Simões",221070
+1,"Simplício Mendes",221080
+1,"Socorro do Piauí",221090
+1,"Sussuapara",221093
+1,"Tamboril do Piauí",221095
+1,"Tanque do Piauí",221097
+2,"Teresina",221100
+2,"União",221110
+2,"Uruçuí",221120
+1,"Valença do Piauí",221130
+1,"Várzea Branca",221135
+1,"Várzea Grande",221140
+1,"Vera Mendes",221150
+1,"Vila Nova do Piauí",221160
+1,"Wall Ferraz",221170
+1,"Abaiara",230010
+1,"Acarapé",230015
+2,"Acaraú",230020
+1,"Acopiara",230030
+1,"Aiuaba",230040
+2,"Alcântaras",230050
+1,"Altaneira",230060
+1,"Alto Santo",230070
+2,"Amontada",230075
+1,"Antonina do Norte",230080
+1,"Apuiarés",230090
+1,"Aquiraz",230100
+1,"Aracati",230110
+1,"Aracoiaba",230120
+2,"Ararendá",230125
+1,"Araripe",230130
+1,"Aratuba",230140
+1,"Arneiroz",230150
+1,"Assaré",230160
+1,"Aurora",230170
+1,"Baixio",230180
+1,"Banabuiú",230185
+1,"Barbalha",230190
+1,"Barreira",230195
+1,"Barro",230200
+2,"Barroquinha",230205
+1,"Baturité",230210
+1,"Beberibe",230220
+2,"Bela Cruz",230230
+1,"Boa Viagem",230240
+1,"Brejo Santo",230250
+2,"Camocim",230260
+1,"Campos Sales",230270
+1,"Canindé",230280
+1,"Capistrano",230290
+1,"Caridade",230300
+2,"Cariré",230310
+1,"Caririaçu",230320
+1,"Cariús",230330
+2,"Carnaubal",230340
+1,"Cascavel",230350
+1,"Catarina",230360
+2,"Catunda",230365
+1,"Caucaia",230370
+1,"Cedro",230380
+2,"Chaval",230390
+1,"Choró",230393
+1,"Chorozinho",230395
+2,"Coreaú",230400
+1,"Crateús",230410
+1,"Crato",230420
+2,"Croatá",230423
+2,"Cruz",230425
+1,"Deputado Irapuan Pinheiro",230426
+1,"Ererê",230427
+1,"Eusébio",230428
+1,"Farias Brito",230430
+2,"Forquilha",230435
+1,"Fortaleza",230440
+1,"Fortim",230445
+2,"Frecheirinha",230450
+1,"General Sampaio",230460
+2,"Graça",230465
+2,"Granja",230470
+1,"Granjeiro",230480
+2,"Groaíras",230490
+1,"Guaiúba",230495
+2,"Guaraciaba do Norte",230500
+1,"Guaramiranga",230510
+2,"Hidrolândia",230520
+1,"Horizonte",230523
+1,"Ibaretama",230526
+2,"Ibiapina",230530
+1,"Ibicuitinga",230533
+1,"Icapuí",230535
+1,"Icó",230540
+1,"Iguatu",230550
+1,"Independência",230560
+2,"Ipaporanga",230565
+1,"Ipaumirim",230570
+2,"Ipu",230580
+2,"Ipueiras",230590
+1,"Iracema",230600
+2,"Irauçuba",230610
+1,"Itaiçaba",230620
+1,"Itaitinga",230625
+1,"Itapagé",230630
+2,"Itapipoca",230640
+1,"Itapiúna",230650
+2,"Itarema",230655
+1,"Itatira",230660
+1,"Jaguaretama",230670
+1,"Jaguaribara",230680
+1,"Jaguaribe",230690
+1,"Jaguaruana",230700
+1,"Jardim",230710
+1,"Jati",230720
+2,"Jijoca de Jericoacoara",230725
+1,"Juazeiro do Norte",230730
+1,"Jucás",230740
+1,"Lavras da Mangabeira",230750
+1,"Limoeiro do Norte",230760
+1,"Madalena",230763
+1,"Maracanaú",230765
+1,"Maranguape",230770
+2,"Marco",230780
+2,"Martinópole",230790
+2,"Massapê",230800
+1,"Mauriti",230810
+2,"Meruoca",230820
+1,"Milagres",230830
+1,"Milhã",230835
+2,"Miraíma",230837
+1,"Missão Velha",230840
+1,"Mombaça",230850
+1,"Monsenhor Tabosa",230860
+1,"Morada Nova",230870
+2,"Moraújo",230880
+2,"Morrinhos",230890
+2,"Mucambo",230900
+1,"Mulungu",230910
+1,"Nova Olinda",230920
+2,"Nova Russas",230930
+1,"Novo Oriente",230940
+1,"Ocara",230945
+1,"Orós",230950
+1,"Pacajus",230960
+1,"Pacatuba",230970
+1,"Pacoti",230980
+2,"Pacujá",230990
+1,"Palhano",231000
+1,"Palmácia",231010
+1,"Paracuru",231020
+1,"Paraipaba",231025
+1,"Parambu",231030
+1,"Paramoti",231040
+1,"Pedra Branca",231050
+1,"Penaforte",231060
+1,"Pentecoste",231070
+1,"Pereiro",231080
+1,"Pindoretama",231085
+1,"Piquet Carneiro",231090
+2,"Pires Ferreira",231095
+2,"Poranga",231100
+1,"Porteiras",231110
+1,"Potengi",231120
+1,"Potiretama",231123
+1,"Quiterianópolis",231126
+1,"Quixadá",231130
+1,"Quixelô",231135
+1,"Quixeramobim",231140
+1,"Quixeré",231150
+1,"Redenção",231160
+2,"Reriutaba",231170
+1,"Russas",231180
+1,"Saboeiro",231190
+1,"Salitre",231195
+2,"Santana do Acaraú",231200
+1,"Santana do Cariri",231210
+2,"Santa Quitéria",231220
+2,"São Benedito",231230
+1,"São Gonçalo do Amarante",231240
+1,"São João do Jaguaribe",231250
+1,"São Luís do Curu",231260
+1,"Senador Pompeu",231270
+2,"Senador Sá",231280
+2,"Sobral",231290
+1,"Solonópole",231300
+1,"Tabuleiro do Norte",231310
+2,"Tamboril",231320
+1,"Tarrafas",231325
+1,"Tauá",231330
+1,"Tejuçuoca",231335
+2,"Tianguá",231340
+1,"Trairi",231350
+1,"Tururu",231355
+2,"Ubajara",231360
+1,"Umari",231370
+1,"Umirim",231375
+1,"Uruburetama",231380
+2,"Uruoca",231390
+2,"Varjota",231395
+1,"Várzea Alegre",231400
+2,"Viçosa do Ceará",231410
+1,"Acari",240010
+1,"Açu",240020
+1,"Afonso Bezerra",240030
+1,"Água Nova",240040
+1,"Alexandria",240050
+1,"Almino Afonso",240060
+1,"Alto do Rodrigues",240070
+1,"Angicos",240080
+1,"Antônio Martins",240090
+1,"Apodi",240100
+1,"Areia Branca",240110
+2,"Arês",240120
+1,"Augusto Severo",240130
+2,"Baía Formosa",240140
+1,"Baraúna",240145
+1,"Barcelona",240150
+1,"Bento Fernandes",240160
+1,"Bodó",240165
+1,"Bom Jesus",240170
+2,"Brejinho",240180
+1,"Caiçara do Norte",240185
+1,"Caiçara do Rio do Vento",240190
+1,"Caicó",240200
+1,"Campo Redondo",240210
+2,"Canguaretama",240220
+1,"Caraúbas",240230
+1,"Carnaúba dos Dantas",240240
+1,"Carnaubais",240250
+1,"Ceará-Mirim",240260
+1,"Cerro Corá",240270
+1,"Coronel Ezequiel",240280
+1,"Coronel João Pessoa",240290
+1,"Cruzeta",240300
+1,"Currais Novos",240310
+1,"Doutor Severiano",240320
+2,"Parnamirim",240325
+1,"Encanto",240330
+1,"Equador",240340
+2,"Espírito Santo",240350
+1,"Extremoz",240360
+1,"Felipe Guerra",240370
+1,"Fernando Pedroza",240375
+1,"Florânia",240380
+1,"Francisco Dantas",240390
+1,"Frutuoso Gomes",240400
+1,"Galinhos",240410
+2,"Goianinha",240420
+1,"Governador Dix-Sept Rosado",240430
+1,"Grossos",240440
+1,"Guamaré",240450
+1,"Ielmo Marinho",240460
+1,"Ipanguaçu",240470
+1,"Ipueira",240480
+1,"Itajá",240485
+1,"Itaú",240490
+1,"Jaçanã",240500
+1,"Jandaíra",240510
+1,"Janduís",240520
+1,"Januário Cicco",240530
+1,"Japi",240540
+1,"Jardim de Angicos",240550
+1,"Jardim de Piranhas",240560
+1,"Jardim do Seridó",240570
+1,"João Câmara",240580
+1,"João Dias",240590
+1,"José da Penha",240600
+1,"Jucurutu",240610
+2,"Jundiá",240615
+1,"Lagoa d'Anta",240620
+2,"Lagoa de Pedras",240630
+1,"Lagoa de Velhos",240640
+1,"Lagoa Nova",240650
+2,"Lagoa Salgada",240660
+1,"Lajes",240670
+1,"Lajes Pintadas",240680
+1,"Lucrécia",240690
+1,"Luís Gomes",240700
+2,"Macaíba",240710
+1,"Macau",240720
+1,"Major Sales",240725
+1,"Marcelino Vieira",240730
+1,"Martins",240740
+1,"Maxaranguape",240750
+1,"Messias Targino",240760
+2,"Montanhas",240770
+2,"Monte Alegre",240780
+1,"Monte das Gameleiras",240790
+1,"Mossoró",240800
+2,"Natal",240810
+2,"Nísia Floresta",240820
+2,"Nova Cruz",240830
+1,"Olho-d'Água do Borges",240840
+1,"Ouro Branco",240850
+1,"Paraná",240860
+1,"Paraú",240870
+1,"Parazinho",240880
+1,"Parelhas",240890
+1,"Rio do Fogo",240895
+1,"Passa e Fica",240910
+2,"Passagem",240920
+1,"Patu",240930
+1,"Santa Maria",240933
+1,"Pau dos Ferros",240940
+1,"Pedra Grande",240950
+1,"Pedra Preta",240960
+1,"Pedro Avelino",240970
+2,"Pedro Velho",240980
+1,"Pendências",240990
+1,"Pilões",241000
+1,"Poço Branco",241010
+1,"Portalegre",241020
+1,"Porto do Mangue",241025
+1,"Presidente Juscelino",241030
+1,"Pureza",241040
+1,"Rafael Fernandes",241050
+1,"Rafael Godeiro",241060
+1,"Riacho da Cruz",241070
+1,"Riacho de Santana",241080
+1,"Riachuelo",241090
+1,"Rodolfo Fernandes",241100
+1,"Tibau",241105
+1,"Ruy Barbosa",241110
+1,"Santa Cruz",241120
+1,"Santana do Matos",241140
+1,"Santana do Seridó",241142
+2,"Santo Antônio",241150
+1,"São Bento do Norte",241160
+1,"São Bento do Trairí",241170
+1,"São Fernando",241180
+1,"São Francisco do Oeste",241190
+1,"São Gonçalo do Amarante",241200
+1,"São João do Sabugi",241210
+2,"São José de Mipibu",241220
+1,"São José do Campestre",241230
+1,"São José do Seridó",241240
+1,"São Miguel",241250
+1,"São Miguel de Touros",241255
+1,"São Paulo do Potengi",241260
+1,"São Pedro",241270
+1,"São Rafael",241280
+1,"São Tomé",241290
+1,"São Vicente",241300
+1,"Senador Elói de Souza",241310
+2,"Senador Georgino Avelino",241320
+1,"Serra de São Bento",241330
+1,"Serra do Mel",241335
+1,"Serra Negra do Norte",241340
+2,"Serrinha",241350
+1,"Serrinha dos Pintos",241355
+1,"Severiano Melo",241360
+1,"Sítio Novo",241370
+1,"Taboleiro Grande",241380
+1,"Taipu",241390
+1,"Tangará",241400
+1,"Tenente Ananias",241410
+1,"Tenente Laurentino Cruz",241415
+2,"Tibau do Sul",241420
+1,"Timbaúba dos Batistas",241430
+1,"Touros",241440
+1,"Triunfo Potiguar",241445
+1,"Umarizal",241450
+1,"Upanema",241460
+2,"Várzea",241470
+1,"Venha-Ver",241475
+2,"Vera Cruz",241480
+1,"Viçosa",241490
+2,"Vila Flor",241500
+1,"Água Branca",250010
+1,"Aguiar",250020
+2,"Alagoa Grande",250030
+1,"Alagoa Nova",250040
+2,"Alagoinha",250050
+1,"Alcantil",250053
+1,"Algodão de Jandaíra",250057
+2,"Alhandra",250060
+1,"São João do Rio do Peixe",250070
+1,"Amparo",250073
+1,"Aparecida",250077
+2,"Araçagi",250080
+1,"Arara",250090
+1,"Araruna",250100
+1,"Areia",250110
+1,"Areia de Baraúnas",250115
+1,"Areial",250120
+2,"Aroeiras",250130
+1,"Assunção",250135
+2,"Baía da Traição",250140
+1,"Bananeiras",250150
+1,"Baraúna",250153
+1,"Barra de Santana",250157
+1,"Barra de Santa Rosa",250160
+1,"Barra de São Miguel",250170
+2,"Bayeux",250180
+2,"Belém",250190
+1,"Belém do Brejo do Cruz",250200
+1,"Bernardino Batista",250205
+1,"Boa Ventura",250210
+1,"Boa Vista",250215
+1,"Bom Jesus",250220
+1,"Bom Sucesso",250230
+1,"Bonito de Santa Fé",250240
+1,"Boqueirão",250250
+1,"Igaracy",250260
+1,"Borborema",250270
+1,"Brejo do Cruz",250280
+1,"Brejo dos Santos",250290
+2,"Caaporã",250300
+1,"Cabaceiras",250310
+2,"Cabedelo",250320
+1,"Cachoeira dos Índios",250330
+1,"Cacimba de Areia",250340
+1,"Cacimba de Dentro",250350
+1,"Cacimbas",250355
+2,"Caiçara",250360
+1,"Cajazeiras",250370
+1,"Cajazeirinhas",250375
+2,"Caldas Brandão",250380
+1,"Camalaú",250390
+1,"Campina Grande",250400
+2,"Capim",250403
+1,"Caraúbas",250407
+1,"Carrapateira",250410
+1,"Casserengue",250415
+1,"Catingueira",250420
+1,"Catolé do Rocha",250430
+1,"Caturité",250435
+1,"Conceição",250440
+1,"Condado",250450
+2,"Conde",250460
+1,"Congo",250470
+1,"Coremas",250480
+1,"Coxixola",250485
+2,"Cruz do Espírito Santo",250490
+1,"Cubati",250500
+1,"Cuité",250510
+2,"Cuitegi",250520
+2,"Cuité de Mamanguape",250523
+2,"Curral de Cima",250527
+1,"Curral Velho",250530
+1,"Damião",250535
+1,"Desterro",250540
+1,"Vista Serrana",250550
+1,"Diamante",250560
+1,"Dona Inês",250570
+2,"Duas Estradas",250580
+1,"Emas",250590
+1,"Esperança",250600
+1,"Fagundes",250610
+1,"Frei Martinho",250620
+1,"Gado Bravo",250625
+2,"Guarabira",250630
+2,"Gurinhém",250640
+1,"Gurjão",250650
+1,"Ibiara",250660
+1,"Imaculada",250670
+2,"Ingá",250680
+2,"Itabaiana",250690
+1,"Itaporanga",250700
+2,"Itapororoca",250710
+2,"Itatuba",250720
+2,"Jacaraú",250730
+1,"Jericó",250740
+2,"João Pessoa",250750
+2,"Juarez Távora",250760
+1,"Juazeirinho",250770
+1,"Junco do Seridó",250780
+2,"Juripiranga",250790
+1,"Juru",250800
+1,"Lagoa",250810
+2,"Lagoa de Dentro",250820
+1,"Lagoa Seca",250830
+1,"Lastro",250840
+1,"Livramento",250850
+2,"Logradouro",250855
+2,"Lucena",250860
+1,"Mãe d'Água",250870
+1,"Malta",250880
+2,"Mamanguape",250890
+1,"Manaíra",250900
+2,"Marcação",250905
+2,"Mari",250910
+1,"Marizópolis",250915
+1,"Massaranduba",250920
+2,"Mataraca",250930
+1,"Matinhas",250933
+1,"Mato Grosso",250937
+1,"Maturéia",250939
+2,"Mogeiro",250940
+1,"Montadas",250950
+1,"Monte Horebe",250960
+1,"Monteiro",250970
+2,"Mulungu",250980
+2,"Natuba",250990
+1,"Nazarezinho",251000
+1,"Nova Floresta",251010
+1,"Nova Olinda",251020
+1,"Nova Palmeira",251030
+1,"Olho d'Água",251040
+1,"Olivedos",251050
+1,"Ouro Velho",251060
+1,"Parari",251065
+1,"Passagem",251070
+1,"Patos",251080
+1,"Paulista",251090
+1,"Pedra Branca",251100
+1,"Pedra Lavrada",251110
+2,"Pedras de Fogo",251120
+1,"Piancó",251130
+1,"Picuí",251140
+2,"Pilar",251150
+1,"Pilões",251160
+1,"Pilõezinhos",251170
+2,"Pirpirituba",251180
+2,"Pitimbu",251190
+1,"Pocinhos",251200
+1,"Poço Dantas",251203
+1,"Poço de José de Moura",251207
+1,"Pombal",251210
+1,"Prata",251220
+1,"Princesa Isabel",251230
+1,"Puxinanã",251240
+1,"Queimadas",251250
+1,"Quixabá",251260
+1,"Remígio",251270
+2,"Pedro Régis",251272
+1,"Riachão",251274
+1,"Riachão do Bacamarte",251275
+2,"Riachão do Poço",251276
+1,"Riacho de Santo Antônio",251278
+1,"Riacho dos Cavalos",251280
+2,"Rio Tinto",251290
+1,"Salgadinho",251300
+2,"Salgado de São Félix",251310
+1,"Santa Cecília",251315
+1,"Santa Cruz",251320
+1,"Santa Helena",251330
+1,"Santa Inês",251335
+1,"Santa Luzia",251340
+1,"Santana de Mangueira",251350
+1,"Santana dos Garrotes",251360
+1,"Santarém",251365
+2,"Santa Rita",251370
+1,"Santa Teresinha",251380
+1,"Santo André",251385
+1,"São Bento",251390
+1,"São Bentinho",251392
+1,"São Domingos do Cariri",251394
+1,"São Domingos de Pombal",251396
+1,"São Francisco",251398
+1,"São João do Cariri",251400
+1,"São João do Tigre",251410
+1,"São José da Lagoa Tapada",251420
+1,"São José de Caiana",251430
+1,"São José de Espinharas",251440
+2,"São José dos Ramos",251445
+1,"São José de Piranhas",251450
+1,"São José de Princesa",251455
+1,"São José do Bonfim",251460
+1,"São José do Brejo do Cruz",251465
+1,"São José do Sabugi",251470
+1,"São José dos Cordeiros",251480
+1,"São Mamede",251490
+2,"São Miguel de Taipu",251500
+1,"São Sebastião de Lagoa de Roça",251510
+1,"São Sebastião do Umbuzeiro",251520
+2,"Sapé",251530
+1,"Seridó",251540
+1,"Serra Branca",251550
+2,"Serra da Raiz",251560
+1,"Serra Grande",251570
+1,"Serra Redonda",251580
+1,"Serraria",251590
+2,"Sertãozinho",251593
+2,"Sobrado",251597
+1,"Solânea",251600
+1,"Soledade",251610
+1,"Sossêgo",251615
+1,"Sousa",251620
+1,"Sumé",251630
+2,"Campo de Santana",251640
+1,"Taperoá",251650
+1,"Tavares",251660
+1,"Teixeira",251670
+1,"Tenório",251675
+1,"Triunfo",251680
+1,"Uiraúna",251690
+1,"Umbuzeiro",251700
+1,"Várzea",251710
+1,"Vieirópolis",251720
+1,"Zabelê",251740
+2,"Abreu e Lima",260005
+1,"Afogados da Ingazeira",260010
+1,"Afrânio",260020
+2,"Agrestina",260030
+2,"Água Preta",260040
+1,"Águas Belas",260050
+1,"Alagoinha",260060
+2,"Aliança",260070
+2,"Altinho",260080
+2,"Amaraji",260090
+1,"Angelim",260100
+2,"Araçoiaba",260105
+1,"Araripina",260110
+1,"Arcoverde",260120
+2,"Barra de Guabiraba",260130
+2,"Barreiros",260140
+2,"Belém de Maria",260150
+1,"Belém de São Francisco",260160
+1,"Belo Jardim",260170
+1,"Betânia",260180
+2,"Bezerros",260190
+1,"Bodocó",260200
+1,"Bom Conselho",260210
+2,"Bom Jardim",260220
+2,"Bonito",260230
+1,"Brejão",260240
+1,"Brejinho",260250
+1,"Brejo da Madre de Deus",260260
+2,"Buenos Aires",260270
+1,"Buíque",260280
+2,"Cabo de Santo Agostinho",260290
+1,"Cabrobó",260300
+1,"Cachoeirinha",260310
+1,"Caetés",260320
+1,"Calçado",260330
+1,"Calumbi",260340
+2,"Camaragibe",260345
+2,"Camocim de São Félix",260350
+2,"Camutanga",260360
+2,"Canhotinho",260370
+1,"Capoeiras",260380
+1,"Carnaíba",260390
+1,"Carnaubeira da Penha",260392
+2,"Carpina",260400
+2,"Caruaru",260410
+1,"Casinhas",260415
+2,"Catende",260420
+1,"Cedro",260430
+2,"Chã de Alegria",260440
+2,"Chã Grande",260450
+2,"Condado",260460
+2,"Correntes",260470
+2,"Cortês",260480
+2,"Cumaru",260490
+2,"Cupira",260500
+1,"Custódia",260510
+1,"Dormentes",260515
+2,"Escada",260520
+1,"Exu",260530
+2,"Feira Nova",260540
+0,"Fernando de Noronha",260545
+2,"Ferreiros",260550
+1,"Flores",260560
+1,"Floresta",260570
+1,"Frei Miguelinho",260580
+2,"Gameleira",260590
+1,"Garanhuns",260600
+2,"Glória do Goitá",260610
+2,"Goiana",260620
+1,"Granito",260630
+2,"Gravatá",260640
+1,"Iati",260650
+1,"Ibimirim",260660
+1,"Ibirajuba",260670
+2,"Igarassu",260680
+1,"Iguaraci",260690
+1,"Inajá",260700
+1,"Ingazeira",260710
+2,"Ipojuca",260720
+1,"Ipubi",260730
+1,"Itacuruba",260740
+1,"Itaíba",260750
+2,"Ilha de Itamaracá",260760
+2,"Itambé",260765
+1,"Itapetim",260770
+2,"Itapissuma",260775
+2,"Itaquitinga",260780
+2,"Jaboatão dos Guararapes",260790
+2,"Jaqueira",260795
+1,"Jataúba",260800
+1,"Jatobá",260805
+2,"João Alfredo",260810
+2,"Joaquim Nabuco",260820
+1,"Jucati",260825
+1,"Jupi",260830
+2,"Jurema",260840
+2,"Lagoa do Carro",260845
+2,"Lagoa do Itaenga",260850
+1,"Lagoa do Ouro",260860
+2,"Lagoa dos Gatos",260870
+1,"Lagoa Grande",260875
+1,"Lajedo",260880
+2,"Limoeiro",260890
+2,"Macaparana",260900
+2,"Machados",260910
+1,"Manari",260915
+2,"Maraial",260920
+1,"Mirandiba",260930
+2,"Moreno",260940
+2,"Nazaré da Mata",260950
+2,"Olinda",260960
+2,"Orobó",260970
+1,"Orocó",260980
+1,"Ouricuri",260990
+2,"Palmares",261000
+2,"Palmeirina",261010
+2,"Panelas",261020
+1,"Paranatama",261030
+1,"Parnamirim",261040
+2,"Passira",261050
+2,"Paudalho",261060
+2,"Paulista",261070
+1,"Pedra",261080
+1,"Pesqueira",261090
+1,"Petrolândia",261100
+1,"Petrolina",261110
+1,"Poção",261120
+2,"Pombos",261130
+2,"Primavera",261140
+2,"Quipapá",261150
+1,"Quixaba",261153
+2,"Recife",261160
+1,"Riacho das Almas",261170
+2,"Ribeirão",261180
+2,"Rio Formoso",261190
+2,"Sairé",261200
+2,"Salgadinho",261210
+1,"Salgueiro",261220
+1,"Saloá",261230
+1,"Sanharó",261240
+1,"Santa Cruz",261245
+1,"Santa Cruz da Baixa Verde",261247
+1,"Santa Cruz do Capibaribe",261250
+1,"Santa Filomena",261255
+1,"Santa Maria da Boa Vista",261260
+1,"Santa Maria do Cambucá",261270
+1,"Santa Terezinha",261280
+2,"São Benedito do Sul",261290
+1,"São Bento do Una",261300
+1,"São Caitano",261310
+1,"São João",261320
+2,"São Joaquim do Monte",261330
+2,"São José da Coroa Grande",261340
+1,"São José do Belmonte",261350
+1,"São José do Egito",261360
+2,"São Lourenço da Mata",261370
+2,"São Vicente Ferrer",261380
+1,"Serra Talhada",261390
+1,"Serrita",261400
+1,"Sertânia",261410
+2,"Sirinhaém",261420
+1,"Moreilândia",261430
+1,"Solidão",261440
+2,"Surubim",261450
+1,"Tabira",261460
+1,"Tacaimbó",261470
+1,"Tacaratu",261480
+2,"Tamandaré",261485
+1,"Taquaritinga do Norte",261500
+1,"Terezinha",261510
+1,"Terra Nova",261520
+2,"Timbaúba",261530
+1,"Toritama",261540
+2,"Tracunhaém",261550
+1,"Trindade",261560
+1,"Triunfo",261570
+1,"Tupanatinga",261580
+1,"Tuparetama",261590
+1,"Venturosa",261600
+1,"Verdejante",261610
+1,"Vertente do Lério",261618
+1,"Vertentes",261620
+2,"Vicência",261630
+2,"Vitória de Santo Antão",261640
+2,"Xexéu",261650
+1,"Água Branca",270010
+2,"Anadia",270020
+1,"Arapiraca",270030
+2,"Atalaia",270040
+2,"Barra de Santo Antônio",270050
+2,"Barra de São Miguel",270060
+1,"Batalha",270070
+2,"Belém",270080
+2,"Belo Monte",270090
+2,"Boca da Mata",270100
+2,"Branquinha",270110
+1,"Cacimbinhas",270120
+2,"Cajueiro",270130
+2,"Campestre",270135
+2,"Campo Alegre",270140
+1,"Campo Grande",270150
+1,"Canapi",270160
+2,"Capela",270170
+1,"Carneiros",270180
+2,"Chã Preta",270190
+1,"Coité do Nóia",270200
+2,"Colônia Leopoldina",270210
+2,"Coqueiro Seco",270220
+2,"Coruripe",270230
+1,"Craíbas",270235
+1,"Delmiro Gouveia",270240
+1,"Dois Riachos",270250
+1,"Estrela de Alagoas",270255
+1,"Feira Grande",270260
+2,"Feliz Deserto",270270
+2,"Flexeiras",270280
+1,"Girau do Ponciano",270290
+2,"Ibateguara",270300
+1,"Igaci",270310
+2,"Igreja Nova",270320
+1,"Inhapi",270330
+1,"Jacaré dos Homens",270340
+2,"Jacuípe",270350
+2,"Japaratinga",270360
+1,"Jaramataia",270370
+2,"Jequiá da Praia",270375
+2,"Joaquim Gomes",270380
+2,"Jundiá",270390
+2,"Junqueiro",270400
+1,"Lagoa da Canoa",270410
+2,"Limoeiro de Anadia",270420
+2,"Maceió",270430
+1,"Major Isidoro",270440
+2,"Maragogi",270450
+1,"Maravilha",270460
+2,"Marechal Deodoro",270470
+2,"Maribondo",270480
+2,"Mar Vermelho",270490
+1,"Mata Grande",270500
+2,"Matriz de Camaragibe",270510
+2,"Messias",270520
+1,"Minador do Negrão",270530
+1,"Monteirópolis",270540
+2,"Murici",270550
+2,"Novo Lino",270560
+1,"Olho d'Água das Flores",270570
+1,"Olho d'Água do Casado",270580
+1,"Olho d'Água Grande",270590
+1,"Olivença",270600
+1,"Ouro Branco",270610
+1,"Palestina",270620
+1,"Palmeira dos Índios",270630
+2,"Pão de Açúcar",270640
+1,"Pariconha",270642
+2,"Paripueira",270644
+2,"Passo de Camaragibe",270650
+2,"Paulo Jacinto",270660
+3,"Penedo",270670
+3,"Piaçabuçu",270680
+2,"Pilar",270690
+2,"Pindoba",270700
+2,"Piranhas",270710
+1,"Poço das Trincheiras",270720
+2,"Porto Calvo",270730
+2,"Porto de Pedras",270740
+3,"Porto Real do Colégio",270750
+1,"Quebrangulo",270760
+2,"Rio Largo",270770
+2,"Roteiro",270780
+2,"Santa Luzia do Norte",270790
+1,"Santana do Ipanema",270800
+2,"Santana do Mundaú",270810
+2,"São Brás",270820
+2,"São José da Laje",270830
+1,"São José da Tapera",270840
+2,"São Luís do Quitunde",270850
+2,"São Miguel dos Campos",270860
+2,"São Miguel dos Milagres",270870
+2,"São Sebastião",270880
+2,"Satuba",270890
+1,"Senador Rui Palmeira",270895
+2,"Tanque d'Arca",270900
+2,"Taquarana",270910
+2,"Teotônio Vilela",270915
+2,"Traipu",270920
+2,"União dos Palmares",270930
+2,"Viçosa",270940
+2,"Amparo de São Francisco",280010
+2,"Aquidabã",280020
+1,"Aracaju",280030
+1,"Arauá",280040
+1,"Areia Branca",280050
+1,"Barra dos Coqueiros",280060
+1,"Boquim",280067
+3,"Brejo Grande",280070
+1,"Campo do Brito",280100
+1,"Canhoba",280110
+3,"Canindé de São Francisco",280120
+2,"Capela",280130
+2,"Carira",280140
+1,"Carmópolis",280150
+2,"Cedro de São João",280160
+1,"Cristinápolis",280170
+1,"Cumbe",280190
+1,"Divina Pastora",280200
+1,"Estância",280210
+1,"Feira Nova",280220
+1,"Frei Paulo",280230
+2,"Gararu",280240
+1,"General Maynard",280250
+1,"Gracho Cardoso",280260
+2,"Ilha das Flores",280270
+1,"Indiaroba",280280
+1,"Itabaiana",280290
+1,"Itabaianinha",280300
+1,"Itabi",280310
+1,"Itaporanga d'Ajuda",280320
+2,"Japaratuba",280330
+2,"Japoatã",280340
+1,"Lagarto",280350
+1,"Laranjeiras",280360
+1,"Macambira",280370
+2,"Malhada dos Bois",280380
+1,"Malhador",280390
+1,"Maruim",280400
+1,"Moita Bonita",280410
+2,"Monte Alegre de Sergipe",280420
+2,"Muribeca",280430
+2,"Neópolis",280440
+1,"Nossa Senhora Aparecida",280445
+2,"Nossa Senhora da Glória",280450
+1,"Nossa Senhora das Dores",280460
+2,"Nossa Senhora de Lourdes",280470
+1,"Nossa Senhora do Socorro",280480
+2,"Pacatuba",280490
+1,"Pedra Mole",280500
+1,"Pedrinhas",280510
+1,"Pinhão",280520
+2,"Pirambu",280530
+3,"Poço Redondo",280540
+2,"Poço Verde",280550
+2,"Porto da Folha",280560
+2,"Propriá",280570
+1,"Riachão do Dantas",280580
+1,"Riachuelo",280590
+1,"Ribeirópolis",280600
+1,"Rosário do Catete",280610
+1,"Salgado",280620
+1,"Santa Luzia do Itanhy",280630
+3,"Santana do São Francisco",280640
+1,"Santa Rosa de Lima",280650
+1,"Santo Amaro das Brotas",280660
+1,"São Cristóvão",280670
+1,"São Domingos",280680
+2,"São Francisco",280690
+1,"São Miguel do Aleixo",280700
+1,"Simão Dias",280710
+1,"Siriri",280720
+3,"Telha",280730
+1,"Tobias Barreto",280740
+1,"Tomar do Geru",280750
+1,"Umbaúba",280760
+1,"Abaíra",290010
+1,"Abaré",290020
+1,"Acajutiba",290030
+2,"Adustina",290035
+1,"Água Fria",290040
+2,"Érico Cardoso",290050
+3,"Aiquara",290060
+1,"Alagoinhas",290070
+3,"Alcobaça",290080
+3,"Almadina",290090
+2,"Amargosa",290100
+2,"Amélia Rodrigues",290110
+1,"América Dourada",290115
+4,"Anagé",290120
+1,"Andaraí",290130
+1,"Andorinha",290135
+3,"Angical",290140
+2,"Anguera",290150
+2,"Antas",290160
+2,"Antônio Cardoso",290170
+1,"Antônio Gonçalves",290180
+0,"Aporá",290190
+2,"Apuarema",290195
+2,"Aracatu",290200
+1,"Araças",290205
+1,"Araci",290210
+1,"Aramari",290220
+3,"Arataca",290225
+2,"Aratuípe",290230
+3,"Aurelino Leal",290240
+2,"Baianópolis",290250
+1,"Baixa Grande",290260
+1,"Banzaê",290265
+2,"Barra",290270
+3,"Barra da Estiva",290280
+3,"Barra do Choça",290290
+1,"Barra do Mendes",290300
+2,"Barra do Rocha",290310
+3,"Barreiras",290320
+1,"Barro Alto",290323
+1,"Barrocas",290327
+3,"Governador Lomanto Júnior",290330
+4,"Belmonte",290340
+2,"Belo Campo",290350
+1,"Biritinga",290360
+3,"Boa Nova",290370
+2,"Boa Vista do Tupim",290380
+2,"Bom Jesus da Lapa",290390
+3,"Bom Jesus da Serra",290395
+1,"Boninal",290400
+1,"Bonito",290405
+1,"Boquira",290410
+2,"Botuporã",290420
+2,"Brejões",290430
+2,"Brejolândia",290440
+2,"Brotas de Macaúbas",290450
+3,"Brumado",290460
+3,"Buerarema",290470
+2,"Buritirama",290475
+3,"Caatiba",290480
+3,"Cabaceiras do Paraguaçu",290485
+4,"Cachoeira",290490
+2,"Caculé",290500
+1,"Caém",290510
+4,"Caetanos",290515
+2,"Caetité",290520
+1,"Cafarnaum",290530
+2,"Cairu",290540
+1,"Caldeirão Grande",290550
+3,"Camacan",290560
+2,"Camaçari",290570
+2,"Camamu",290580
+2,"Campo Alegre de Lourdes",290590
+1,"Campo Formoso",290600
+2,"Canápolis",290610
+1,"Canarana",290620
+3,"Canavieiras",290630
+1,"Candeal",290640
+2,"Candeias",290650
+2,"Candiba",290660
+2,"Cândido Sales",290670
+1,"Cansanção",290680
+1,"Canudos",290682
+1,"Capela do Alto Alegre",290685
+1,"Capim Grosso",290687
+2,"Caraíbas",290689
+3,"Caravelas",290690
+1,"Cardeal da Silva",290700
+2,"Carinhanha",290710
+1,"Casa Nova",290720
+3,"Castro Alves",290730
+2,"Catolândia",290740
+2,"Catu",290750
+2,"Caturama",290755
+1,"Central",290760
+0,"Chorrochó",290770
+2,"Cícero Dantas",290780
+1,"Cipó",290790
+3,"Coaraci",290800
+2,"Cocos",290810
+3,"Conceição da Feira",290820
+2,"Conceição do Almeida",290830
+1,"Conceição do Coité",290840
+2,"Conceição do Jacuípe",290850
+1,"Conde",290860
+2,"Condeúba",290870
+3,"Contendas do Sincorá",290880
+2,"Coração de Maria",290890
+2,"Cordeiros",290900
+2,"Coribe",290910
+2,"Coronel João Sá",290920
+2,"Correntina",290930
+3,"Cotegipe",290940
+2,"Cravolândia",290950
+0,"Crisópolis",290960
+2,"Cristópolis",290970
+2,"Cruz das Almas",290980
+1,"Curaçá",290990
+3,"Dário Meira",291000
+2,"Dias d'Ávila",291005
+1,"Dom Basílio",291010
+2,"Dom Macedo Costa",291020
+2,"Elísio Medrado",291030
+3,"Encruzilhada",291040
+1,"Entre Rios",291050
+1,"Esplanada",291060
+1,"Euclides da Cunha",291070
+4,"Eunápolis",291072
+2,"Fátima",291075
+2,"Feira da Mata",291077
+2,"Feira de Santana",291080
+1,"Filadélfia",291085
+3,"Firmino Alves",291090
+3,"Floresta Azul",291100
+3,"Formosa do Rio Preto",291110
+2,"Gandu",291120
+1,"Gavião",291125
+2,"Gentio do Ouro",291130
+1,"Glória",291140
+3,"Gongogi",291150
+4,"Governador Mangabeira",291160
+2,"Guajeru",291165
+2,"Guanambi",291170
+4,"Guaratinga",291180
+2,"Heliópolis",291185
+3,"Iaçu",291190
+2,"Ibiassucê",291200
+3,"Ibicaraí",291210
+1,"Ibicoara",291220
+3,"Ibicuí",291230
+1,"Ibipeba",291240
+1,"Ibipitanga",291250
+1,"Ibiquera",291260
+2,"Ibirapitanga",291270
+3,"Ibirapuã",291280
+2,"Ibirataia",291290
+2,"Ibitiara",291300
+1,"Ibititá",291310
+1,"Ibotirama",291320
+1,"Ichu",291330
+2,"Igaporã",291340
+2,"Igrapiúna",291345
+3,"Iguaí",291350
+3,"Ilhéus",291360
+0,"Inhambupe",291370
+2,"Ipecaetá",291380
+2,"Ipiaú",291390
+2,"Ipirá",291400
+2,"Ipupiara",291410
+2,"Irajuba",291420
+3,"Iramaia",291430
+1,"Iraquara",291440
+1,"Irará",291450
+1,"Irecê",291460
+3,"Itabela",291465
+2,"Itaberaba",291470
+3,"Itabuna",291480
+3,"Itacaré",291490
+1,"Itaeté",291500
+3,"Itagi",291510
+3,"Itagibá",291520
+4,"Itagimirim",291530
+2,"Itaguaçu da Bahia",291535
+3,"Itaju do Colônia",291540
+3,"Itajuípe",291550
+3,"Itamaraju",291560
+2,"Itamari",291570
+4,"Itambé",291580
+1,"Itanagra",291590
+4,"Itanhém",291600
+2,"Itaparica",291610
+3,"Itapé",291620
+4,"Itapebi",291630
+3,"Itapetinga",291640
+2,"Itapicuru",291650
+3,"Itapitanga",291660
+2,"Itaquara",291670
+4,"Itarantim",291680
+3,"Itatim",291685
+2,"Itiruçu",291690
+1,"Itiúba",291700
+3,"Itororó",291710
+1,"Ituaçu",291720
+2,"Ituberá",291730
+2,"Iuiú",291733
+2,"Jaborandi",291735
+2,"Jacaraci",291740
+1,"Jacobina",291750
+2,"Jaguaquara",291760
+1,"Jaguarari",291770
+2,"Jaguaripe",291780
+1,"Jandaíra",291790
+3,"Jequié",291800
+2,"Jeremoabo",291810
+2,"Jiquiriçá",291820
+2,"Jitaúna",291830
+1,"João Dourado",291835
+1,"Juazeiro",291840
+4,"Jucuruçu",291845
+1,"Jussara",291850
+3,"Jussari",291855
+1,"Jussiape",291860
+2,"Lafaiete Coutinho",291870
+2,"Lagoa Real",291875
+2,"Laje",291880
+4,"Lajedão",291890
+1,"Lajedinho",291900
+2,"Lajedo do Tabocal",291905
+1,"Lamarão",291910
+1,"Lapão",291915
+1,"Lauro de Freitas",291920
+1,"Lençóis",291930
+2,"Licínio de Almeida",291940
+2,"Livramento de Nossa Senhora",291950
+2,"Luís Eduardo Magalhães",291955
+1,"Macajuba",291960
+3,"Macarani",291970
+2,"Macaúbas",291980
+0,"Macururé",291990
+0,"Madre de Deus",291992
+2,"Maetinga",291995
+3,"Maiquinique",292000
+1,"Mairi",292010
+2,"Malhada",292020
+2,"Malhada de Pedras",292030
+5,"Manoel Vitorino",292040
+2,"Mansidão",292045
+3,"Maracás",292050
+3,"Maragogipe",292060
+2,"Maraú",292070
+2,"Marcionílio Souza",292080
+3,"Mascote",292090
+2,"Mata de São João",292100
+2,"Matina",292105
+4,"Medeiros Neto",292110
+1,"Miguel Calmon",292120
+2,"Milagres",292130
+1,"Mirangaba",292140
+4,"Mirante",292145
+1,"Monte Santo",292150
+1,"Morpará",292160
+1,"Morro do Chapéu",292170
+2,"Mortugaba",292180
+1,"Mucugê",292190
+4,"Mucuri",292200
+1,"Mulungu do Morro",292205
+1,"Mundo Novo",292210
+2,"Muniz Ferreira",292220
+1,"Muquém de São Francisco",292225
+4,"Muritiba",292230
+2,"Mutuípe",292240
+2,"Nazaré",292250
+2,"Nilo Peçanha",292260
+1,"Nordestina",292265
+3,"Nova Canaã",292270
+1,"Nova Fátima",292273
+2,"Nova Ibiá",292275
+3,"Nova Itarana",292280
+1,"Nova Redenção",292285
+1,"Nova Soure",292290
+3,"Nova Viçosa",292300
+1,"Novo Horizonte",292303
+2,"Novo Triunfo",292305
+0,"Olindina",292310
+2,"Oliveira dos Brejinhos",292320
+0,"Ouriçangas",292330
+1,"Ourolândia",292335
+2,"Palmas de Monte Alto",292340
+1,"Palmeiras",292350
+2,"Paramirim",292360
+2,"Paratinga",292370
+2,"Paripiranga",292380
+3,"Pau Brasil",292390
+2,"Paulo Afonso",292400
+1,"Pé de Serra",292405
+0,"Pedrão",292410
+2,"Pedro Alexandre",292420
+1,"Piatã",292430
+2,"Pilão Arcado",292440
+2,"Pindaí",292450
+1,"Pindobaçu",292460
+1,"Pintadas",292465
+2,"Piraí do Norte",292467
+2,"Piripá",292470
+1,"Piritiba",292480
+3,"Planaltino",292490
+3,"Planalto",292500
+3,"Poções",292510
+2,"Pojuca",292520
+1,"Ponto Novo",292525
+3,"Porto Seguro",292530
+3,"Potiraguá",292540
+3,"Prado",292550
+1,"Presidente Dutra",292560
+2,"Presidente Jânio Quadros",292570
+2,"Presidente Tancredo Neves",292575
+1,"Queimadas",292580
+1,"Quijingue",292590
+1,"Quixabeira",292593
+3,"Rafael Jambeiro",292595
+1,"Remanso",292600
+1,"Retirolândia",292610
+3,"Riachão das Neves",292620
+1,"Riachão do Jacuípe",292630
+2,"Riacho de Santana",292640
+2,"Ribeira do Amparo",292650
+1,"Ribeira do Pombal",292660
+3,"Ribeirão do Largo",292665
+2,"Rio de Contas",292670
+2,"Rio do Antônio",292680
+3,"Rio do Pires",292690
+1,"Rio Real",292700
+1,"Rodelas",292710
+1,"Ruy Barbosa",292720
+2,"Salinas da Margarida",292730
+1,"Salvador",292740
+1,"Santa Bárbara",292750
+2,"Santa Brígida",292760
+4,"Santa Cruz Cabrália",292770
+3,"Santa Cruz da Vitória",292780
+2,"Santa Inês",292790
+1,"Santaluz",292800
+3,"Santa Luzia",292805
+2,"Santa Maria da Vitória",292810
+2,"Santana",292820
+1,"Santanópolis",292830
+2,"Santa Rita de Cássia",292840
+3,"Santa Teresinha",292850
+3,"Santo Amaro",292860
+2,"Santo Antônio de Jesus",292870
+2,"Santo Estêvão",292880
+3,"São Desidério",292890
+1,"São Domingos",292895
+4,"São Félix",292900
+2,"São Félix do Coribe",292905
+2,"São Felipe",292910
+2,"São Francisco do Conde",292920
+1,"São Gabriel",292925
+2,"São Gonçalo dos Campos",292930
+3,"São José da Vitória",292935
+1,"São José do Jacuípe",292937
+2,"São Miguel das Matas",292940
+2,"São Sebastião do Passé",292950
+2,"Sapeaçu",292960
+1,"Sátiro Dias",292970
+3,"Saubara",292975
+1,"Saúde",292980
+1,"Seabra",292990
+2,"Sebastião Laranjeiras",293000
+1,"Senhor do Bonfim",293010
+2,"Serra do Ramalho",293015
+1,"Sento Sé",293020
+2,"Serra Dourada",293030
+2,"Serra Preta",293040
+1,"Serrinha",293050
+1,"Serrolândia",293060
+2,"Simões Filho",293070
+2,"Sítio do Mato",293075
+2,"Sítio do Quinto",293076
+1,"Sobradinho",293077
+1,"Souto Soares",293080
+2,"Tabocas do Brejo Velho",293090
+4,"Tanhaçu",293100
+2,"Tanque Novo",293105
+1,"Tanquinho",293110
+2,"Taperoá",293120
+1,"Tapiramutá",293130
+3,"Teixeira de Freitas",293135
+1,"Teodoro Sampaio",293140
+1,"Teofilândia",293150
+2,"Teolândia",293160
+2,"Terra Nova",293170
+2,"Tremedal",293180
+1,"Tucano",293190
+1,"Uauá",293200
+2,"Ubaíra",293210
+2,"Ubaitaba",293220
+2,"Ubatã",293230
+1,"Uibaí",293240
+0,"Umburanas",293245
+3,"Una",293250
+2,"Urandi",293260
+3,"Uruçuca",293270
+1,"Utinga",293280
+2,"Valença",293290
+1,"Valente",293300
+1,"Várzea da Roça",293305
+1,"Várzea do Poço",293310
+1,"Várzea Nova",293315
+2,"Varzedo",293317
+2,"Vera Cruz",293320
+4,"Vereda",293325
+4,"Vitória da Conquista",293330
+1,"Wagner",293340
+2,"Wanderley",293345
+2,"Wenceslau Guimarães",293350
+2,"Xique-Xique",293360
+3,"Abadia dos Dourados",310010
+3,"Abaeté",310020
+3,"Abre Campo",310030
+4,"Acaiaca",310040
+3,"Açucena",310050
+3,"Água Boa",310060
+3,"Água Comprida",310070
+3,"Aguanil",310080
+3,"Águas Formosas",310090
+2,"Águas Vermelhas",310100
+4,"Aimorés",310110
+3,"Aiuruoca",310120
+3,"Alagoa",310130
+2,"Albertina",310140
+3,"Além Paraíba",310150
+3,"Alfenas",310160
+3,"Alfredo Vasconcelos",310163
+5,"Almenara",310170
+3,"Alpercata",310180
+3,"Alpinópolis",310190
+3,"Alterosa",310200
+4,"Alto Caparaó",310205
+3,"Alto Rio Doce",310210
+3,"Alvarenga",310220
+4,"Alvinópolis",310230
+3,"Alvorada de Minas",310240
+2,"Amparo do Serra",310250
+3,"Andradas",310260
+2,"Cachoeira de Pajeú",310270
+3,"Andrelândia",310280
+3,"Angelândia",310285
+3,"Antônio Carlos",310290
+5,"Antônio Dias",310300
+3,"Antônio Prado de Minas",310310
+3,"Araçaí",310320
+3,"Aracitaba",310330
+4,"Araçuaí",310340
+3,"Araguari",310350
+3,"Arantina",310360
+3,"Araponga",310370
+3,"Araporã",310375
+3,"Arapuá",310380
+3,"Araújos",310390
+3,"Araxá",310400
+3,"Arceburgo",310410
+3,"Arcos",310420
+3,"Areado",310430
+2,"Argirita",310440
+3,"Aricanduva",310445
+2,"Arinos",310450
+2,"Astolfo Dutra",310460
+3,"Ataléia",310470
+3,"Augusto de Lima",310480
+3,"Baependi",310490
+3,"Baldim",310500
+3,"Bambuí",310510
+2,"Bandeira",310520
+2,"Bandeira do Sul",310530
+4,"Barão de Cocais",310540
+2,"Barão de Monte Alto",310550
+3,"Barbacena",310560
+4,"Barra Longa",310570
+3,"Barroso",310590
+4,"Bela Vista de Minas",310600
+3,"Belmiro Braga",310610
+2,"Belo Horizonte",310620
+3,"Belo Oriente",310630
+2,"Belo Vale",310640
+4,"Berilo",310650
+3,"Bertópolis",310660
+2,"Berizal",310665
+3,"Betim",310670
+3,"Bias Fortes",310680
+3,"Bicas",310690
+3,"Biquinhas",310700
+3,"Boa Esperança",310710
+3,"Bocaina de Minas",310720
+4,"Bocaiúva",310730
+3,"Bom Despacho",310740
+3,"Bom Jardim de Minas",310750
+3,"Bom Jesus da Penha",310760
+3,"Bom Jesus do Amparo",310770
+4,"Bom Jesus do Galho",310780
+2,"Bom Repouso",310790
+4,"Bom Sucesso",310800
+2,"Bonfim",310810
+2,"Bonfinópolis de Minas",310820
+2,"Bonito de Minas",310825
+3,"Borda da Mata",310830
+3,"Botelhos",310840
+3,"Botumirim",310850
+2,"Brasilândia de Minas",310855
+2,"Brasília de Minas",310860
+3,"Brás Pires",310870
+3,"Braúnas",310880
+3,"Brasópolis",310890
+2,"Brumadinho",310900
+2,"Bueno Brandão",310910
+3,"Buenópolis",310920
+3,"Bugre",310925
+2,"Buritis",310930
+3,"Buritizeiro",310940
+2,"Cabeceira Grande",310945
+3,"Cabo Verde",310950
+3,"Cachoeira da Prata",310960
+3,"Cachoeira de Minas",310970
+3,"Cachoeira Dourada",310980
+3,"Caetanópolis",310990
+3,"Caeté",311000
+4,"Caiana",311010
+2,"Cajuri",311020
+3,"Caldas",311030
+3,"Camacho",311040
+3,"Camanducaia",311050
+3,"Cambuí",311060
+3,"Cambuquira",311070
+3,"Campanário",311080
+3,"Campanha",311090
+4,"Campestre",311100
+3,"Campina Verde",311110
+2,"Campo Azul",311115
+3,"Campo Belo",311120
+3,"Campo do Meio",311130
+3,"Campo Florido",311140
+3,"Campos Altos",311150
+3,"Campos Gerais",311160
+2,"Canaã",311170
+3,"Canápolis",311180
+3,"Cana Verde",311190
+3,"Candeias",311200
+3,"Cantagalo",311205
+4,"Caparaó",311210
+3,"Capela Nova",311220
+3,"Capelinha",311230
+3,"Capetinga",311240
+3,"Capim Branco",311250
+3,"Capinópolis",311260
+3,"Capitão Andrade",311265
+2,"Capitão Enéas",311270
+3,"Capitólio",311280
+3,"Caputira",311290
+3,"Caraí",311300
+3,"Caranaíba",311310
+3,"Carandaí",311320
+3,"Carangola",311330
+4,"Caratinga",311340
+5,"Carbonita",311350
+3,"Careaçu",311360
+3,"Carlos Chagas",311370
+3,"Carmésia",311380
+3,"Carmo da Cachoeira",311390
+3,"Carmo da Mata",311400
+3,"Carmo de Minas",311410
+3,"Carmo do Cajuru",311420
+3,"Carmo do Paranaíba",311430
+3,"Carmo do Rio Claro",311440
+3,"Carmópolis de Minas",311450
+3,"Carneirinho",311455
+3,"Carrancas",311460
+3,"Carvalhópolis",311470
+3,"Carvalhos",311480
+3,"Casa Grande",311490
+3,"Cascalho Rico",311500
+3,"Cássia",311510
+3,"Conceição da Barra de Minas",311520
+2,"Cataguases",311530
+4,"Catas Altas",311535
+3,"Catas Altas da Noruega",311540
+3,"Catuji",311545
+2,"Catuti",311547
+3,"Caxambu",311550
+3,"Cedro do Abaeté",311560
+3,"Central de Minas",311570
+3,"Centralina",311580
+3,"Chácara",311590
+3,"Chalé",311600
+3,"Chapada do Norte",311610
+2,"Chapada Gaúcha",311615
+3,"Chiador",311620
+3,"Cipotânea",311630
+3,"Claraval",311640
+2,"Claro dos Poções",311650
+3,"Cláudio",311660
+2,"Coimbra",311670
+3,"Coluna",311680
+3,"Comendador Gomes",311690
+2,"Comercinho",311700
+3,"Conceição da Aparecida",311710
+3,"Conceição das Pedras",311720
+3,"Conceição das Alagoas",311730
+3,"Conceição de Ipanema",311740
+4,"Conceição do Mato Dentro",311750
+3,"Conceição do Pará",311760
+3,"Conceição do Rio Verde",311770
+3,"Conceição dos Ouros",311780
+2,"Cônego Marinho",311783
+2,"Confins",311787
+2,"Congonhal",311790
+3,"Congonhas",311800
+3,"Congonhas do Norte",311810
+3,"Conquista",311820
+3,"Conselheiro Lafaiete",311830
+4,"Conselheiro Pena",311840
+3,"Consolação",311850
+2,"Contagem",311860
+3,"Coqueiral",311870
+2,"Coração de Jesus",311880
+3,"Cordisburgo",311890
+2,"Cordislândia",311900
+3,"Corinto",311910
+3,"Coroaci",311920
+3,"Coromandel",311930
+4,"Coronel Fabriciano",311940
+3,"Coronel Murta",311950
+3,"Coronel Pacheco",311960
+3,"Coronel Xavier Chaves",311970
+3,"Córrego Danta",311980
+3,"Córrego do Bom Jesus",311990
+3,"Córrego Fundo",311995
+3,"Córrego Novo",312000
+3,"Couto de Magalhães de Minas",312010
+3,"Crisólita",312015
+3,"Cristais",312020
+4,"Cristália",312030
+3,"Cristiano Otoni",312040
+3,"Cristina",312050
+2,"Crucilândia",312060
+3,"Cruzeiro da Fortaleza",312070
+3,"Cruzília",312080
+3,"Cuparaque",312083
+2,"Curral de Dentro",312087
+3,"Curvelo",312090
+3,"Datas",312100
+3,"Delfim Moreira",312110
+3,"Delfinópolis",312120
+3,"Delta",312125
+3,"Descoberto",312130
+2,"Desterro de Entre Rios",312140
+3,"Desterro do Melo",312150
+4,"Diamantina",312160
+4,"Diogo de Vasconcelos",312170
+4,"Dionísio",312180
+3,"Divinésia",312190
+3,"Divino",312200
+3,"Divino das Laranjeiras",312210
+3,"Divinolândia de Minas",312220
+3,"Divinópolis",312230
+2,"Divisa Alegre",312235
+3,"Divisa Nova",312240
+3,"Divisópolis",312245
+2,"Dom Bosco",312247
+3,"Dom Cavati",312250
+3,"Dom Joaquim",312260
+4,"Dom Silvério",312270
+3,"Dom Viçoso",312280
+2,"Dona Eusébia",312290
+3,"Dores de Campos",312300
+4,"Dores de Guanhães",312310
+3,"Dores do Indaiá",312320
+3,"Dores do Turvo",312330
+3,"Doresópolis",312340
+3,"Douradoquara",312350
+4,"Durandé",312352
+4,"Elói Mendes",312360
+3,"Engenheiro Caldas",312370
+2,"Engenheiro Navarro",312380
+4,"Entre Folhas",312385
+3,"Entre Rios de Minas",312390
+2,"Ervália",312400
+3,"Esmeraldas",312410
+4,"Espera Feliz",312420
+2,"Espinosa",312430
+3,"Espírito Santo do Dourado",312440
+3,"Estiva",312450
+2,"Estrela Dalva",312460
+3,"Estrela do Indaiá",312470
+3,"Estrela do Sul",312480
+3,"Eugenópolis",312490
+3,"Ewbank da Câmara",312500
+3,"Extrema",312510
+3,"Fama",312520
+3,"Faria Lemos",312530
+2,"Felício dos Santos",312540
+3,"São Gonçalo do Rio Preto",312550
+3,"Felisburgo",312560
+3,"Felixlândia",312570
+3,"Fernandes Tourinho",312580
+4,"Ferros",312590
+3,"Fervedouro",312595
+3,"Florestal",312600
+3,"Formiga",312610
+2,"Formoso",312620
+3,"Fortaleza de Minas",312630
+3,"Fortuna de Minas",312640
+3,"Francisco Badaró",312650
+3,"Francisco Dumont",312660
+2,"Francisco Sá",312670
+3,"Franciscópolis",312675
+3,"Frei Gaspar",312680
+4,"Frei Inocêncio",312690
+3,"Frei Lagonegro",312695
+3,"Fronteira",312700
+3,"Fronteira dos Vales",312705
+3,"Fruta de Leite",312707
+3,"Frutal",312710
+3,"Funilândia",312720
+4,"Galiléia",312730
+2,"Gameleiras",312733
+2,"Glaucilândia",312735
+3,"Goiabeira",312737
+3,"Goianá",312738
+3,"Gonçalves",312740
+3,"Gonzaga",312750
+3,"Gouveia",312760
+5,"Governador Valadares",312770
+4,"Grão Mogol",312780
+3,"Grupiara",312790
+4,"Guanhães",312800
+3,"Guapé",312810
+4,"Guaraciaba",312820
+2,"Guaraciama",312825
+3,"Guaranésia",312830
+3,"Guarani",312840
+3,"Guarará",312850
+2,"Guarda-Mor",312860
+3,"Guaxupé",312870
+2,"Guidoval",312880
+3,"Guimarânia",312890
+2,"Guiricema",312900
+3,"Gurinhatã",312910
+3,"Heliodora",312920
+3,"Iapu",312930
+3,"Ibertioga",312940
+3,"Ibiá",312950
+2,"Ibiaí",312960
+2,"Ibiracatu",312965
+3,"Ibiraci",312970
+2,"Ibirité",312980
+3,"Ibitiúra de Minas",312990
+4,"Ibituruna",313000
+2,"Icaraí de Minas",313005
+3,"Igarapé",313010
+3,"Igaratinga",313020
+3,"Iguatama",313030
+2,"Ijaci",313040
+3,"Ilicínea",313050
+3,"Imbé de Minas",313055
+2,"Inconfidentes",313060
+2,"Indaiabira",313065
+3,"Indianópolis",313070
+3,"Ingaí",313080
+3,"Inhapim",313090
+3,"Inhaúma",313100
+3,"Inimutaba",313110
+3,"Ipaba",313115
+3,"Ipanema",313120
+4,"Ipatinga",313130
+3,"Ipiaçu",313140
+3,"Ipuiúna",313150
+3,"Iraí de Minas",313160
+4,"Itabira",313170
+3,"Itabirinha de Mantena",313180
+4,"Itabirito",313190
+2,"Itacambira",313200
+2,"Itacarambi",313210
+3,"Itaguara",313220
+3,"Itaipé",313230
+3,"Itajubá",313240
+4,"Itamarandiba",313250
+2,"Itamarati de Minas",313260
+3,"Itambacuri",313270
+3,"Itambé do Mato Dentro",313280
+3,"Itamogi",313290
+3,"Itamonte",313300
+3,"Itanhandu",313310
+3,"Itanhomi",313320
+4,"Itaobim",313330
+3,"Itapagipe",313340
+3,"Itapecerica",313350
+3,"Itapeva",313360
+3,"Itatiaiuçu",313370
+3,"Itaú de Minas",313375
+3,"Itaúna",313380
+3,"Itaverava",313390
+4,"Itinga",313400
+4,"Itueta",313410
+3,"Ituiutaba",313420
+4,"Itumirim",313430
+3,"Iturama",313440
+3,"Itutinga",313450
+2,"Jaboticatubas",313460
+5,"Jacinto",313470
+3,"Jacuí",313480
+2,"Jacutinga",313490
+4,"Jaguaraçu",313500
+2,"Jaíba",313505
+3,"Jampruca",313507
+2,"Janaúba",313510
+2,"Januária",313520
+3,"Japaraíba",313530
+2,"Japonvar",313535
+3,"Jeceaba",313540
+3,"Jenipapo de Minas",313545
+3,"Jequeri",313550
+3,"Jequitaí",313560
+3,"Jequitibá",313570
+5,"Jequitinhonha",313580
+3,"Jesuânia",313590
+3,"Joaíma",313600
+3,"Joanésia",313610
+4,"João Monlevade",313620
+3,"João Pinheiro",313630
+3,"Joaquim Felício",313640
+3,"Jordânia",313650
+3,"José Gonçalves de Minas",313652
+3,"José Raydan",313655
+2,"Josenópolis",313657
+2,"Nova União",313660
+3,"Juatuba",313665
+3,"Juiz de Fora",313670
+2,"Juramento",313680
+3,"Juruaia",313690
+2,"Juvenília",313695
+3,"Ladainha",313700
+3,"Lagamar",313710
+3,"Lagoa da Prata",313720
+2,"Lagoa dos Patos",313730
+3,"Lagoa Dourada",313740
+3,"Lagoa Formosa",313750
+2,"Lagoa Grande",313753
+2,"Lagoa Santa",313760
+3,"Lajinha",313770
+3,"Lambari",313780
+3,"Lamim",313790
+2,"Laranjal",313800
+3,"Lassance",313810
+4,"Lavras",313820
+3,"Leandro Ferreira",313830
+3,"Leme do Prado",313835
+2,"Leopoldina",313840
+3,"Liberdade",313850
+3,"Lima Duarte",313860
+3,"Limeira do Oeste",313862
+2,"Lontra",313865
+3,"Luisburgo",313867
+2,"Luislândia",313868
+3,"Luminárias",313870
+3,"Luz",313880
+3,"Machacalis",313890
+4,"Machado",313900
+3,"Madre de Deus de Minas",313910
+3,"Malacacheta",313920
+2,"Mamonas",313925
+2,"Manga",313930
+4,"Manhuaçu",313940
+4,"Manhumirim",313950
+3,"Mantena",313960
+3,"Maravilhas",313970
+3,"Mar de Espanha",313980
+3,"Maria da Fé",313990
+4,"Mariana",314000
+4,"Marilac",314010
+2,"Mário Campos",314015
+3,"Maripá de Minas",314020
+4,"Marliéria",314030
+3,"Marmelópolis",314040
+3,"Martinho Campos",314050
+4,"Martins Soares",314053
+2,"Mata Verde",314055
+4,"Materlândia",314060
+3,"Mateus Leme",314070
+3,"Matias Barbosa",314080
+2,"Matias Cardoso",314085
+3,"Matipó",314090
+2,"Mato Verde",314100
+3,"Matozinhos",314110
+3,"Matutina",314120
+3,"Medeiros",314130
+3,"Medina",314140
+3,"Mendes Pimentel",314150
+3,"Mercês",314160
+3,"Mesquita",314170
+3,"Minas Novas",314180
+3,"Minduri",314190
+2,"Mirabela",314200
+3,"Miradouro",314210
+2,"Miraí",314220
+2,"Miravânia",314225
+2,"Moeda",314230
+3,"Moema",314240
+3,"Monjolos",314250
+2,"Monsenhor Paulo",314260
+2,"Montalvânia",314270
+3,"Monte Alegre de Minas",314280
+2,"Monte Azul",314290
+3,"Monte Belo",314300
+3,"Monte Carmelo",314310
+3,"Monte Formoso",314315
+3,"Monte Santo de Minas",314320
+2,"Montes Claros",314330
+2,"Monte Sião",314340
+2,"Montezuma",314345
+3,"Morada Nova de Minas",314350
+3,"Morro da Garça",314360
+3,"Morro do Pilar",314370
+3,"Munhoz",314380
+2,"Muriaé",314390
+3,"Mutum",314400
+3,"Muzambinho",314410
+4,"Nacip Raydan",314420
+4,"Nanuque",314430
+3,"Naque",314435
+2,"Natalândia",314437
+3,"Natércia",314440
+4,"Nazareno",314450
+3,"Nepomuceno",314460
+2,"Ninheira",314465
+3,"Nova Belém",314467
+4,"Nova Era",314470
+2,"Nova Lima",314480
+3,"Nova Módica",314490
+3,"Nova Ponte",314500
+2,"Nova Porteirinha",314505
+3,"Nova Resende",314510
+3,"Nova Serrana",314520
+3,"Novo Cruzeiro",314530
+3,"Novo Oriente de Minas",314535
+2,"Novorizonte",314537
+3,"Olaria",314540
+4,"Olhos-d'Água",314545
+3,"Olímpio Noronha",314550
+3,"Oliveira",314560
+3,"Oliveira Fortes",314570
+3,"Onça de Pitangui",314580
+2,"Oratórios",314585
+3,"Orizânia",314587
+3,"Ouro Branco",314590
+3,"Ouro Fino",314600
+4,"Ouro Preto",314610
+3,"Ouro Verde de Minas",314620
+2,"Padre Carvalho",314625
+3,"Padre Paraíso",314630
+3,"Paineiras",314640
+3,"Pains",314650
+2,"Pai Pedro",314655
+3,"Paiva",314660
+2,"Palma",314670
+4,"Palmópolis",314675
+3,"Papagaios",314690
+2,"Paracatu",314700
+3,"Pará de Minas",314710
+4,"Paraguaçu",314720
+3,"Paraisópolis",314730
+3,"Paraopeba",314740
+3,"Passabém",314750
+3,"Passa Quatro",314760
+3,"Passa Tempo",314770
+3,"Passa-Vinte",314780
+3,"Passos",314790
+2,"Patis",314795
+3,"Patos de Minas",314800
+3,"Patrocínio",314810
+2,"Patrocínio do Muriaé",314820
+3,"Paula Cândido",314830
+3,"Paulistas",314840
+3,"Pavão",314850
+4,"Peçanha",314860
+3,"Pedra Azul",314870
+3,"Pedra Bonita",314875
+2,"Pedra do Anta",314880
+3,"Pedra do Indaiá",314890
+3,"Pedra Dourada",314900
+3,"Pedralva",314910
+2,"Pedras de Maria da Cruz",314915
+3,"Pedrinópolis",314920
+3,"Pedro Leopoldo",314930
+3,"Pedro Teixeira",314940
+3,"Pequeri",314950
+3,"Pequi",314960
+3,"Perdigão",314970
+3,"Perdizes",314980
+3,"Perdões",314990
+4,"Periquito",314995
+3,"Pescador",315000
+3,"Piau",315010
+3,"Piedade de Caratinga",315015
+3,"Piedade de Ponte Nova",315020
+3,"Piedade do Rio Grande",315030
+2,"Piedade dos Gerais",315040
+3,"Pimenta",315050
+3,"Pingo-d'Água",315053
+2,"Pintópolis",315057
+3,"Piracema",315060
+3,"Pirajuba",315070
+4,"Piranga",315080
+3,"Piranguçu",315090
+3,"Piranguinho",315100
+2,"Pirapetinga",315110
+3,"Pirapora",315120
+3,"Piraúba",315130
+3,"Pitangui",315140
+3,"Piumhi",315150
+3,"Planura",315160
+3,"Poço Fundo",315170
+4,"Poços de Caldas",315180
+3,"Pocrane",315190
+3,"Pompéu",315200
+3,"Ponte Nova",315210
+2,"Ponto Chique",315213
+4,"Ponto dos Volantes",315217
+2,"Porteirinha",315220
+4,"Porto Firme",315230
+3,"Poté",315240
+3,"Pouso Alegre",315250
+3,"Pouso Alto",315260
+3,"Prados",315270
+3,"Prata",315280
+3,"Pratápolis",315290
+3,"Pratinha",315300
+4,"Presidente Bernardes",315310
+3,"Presidente Juscelino",315320
+3,"Presidente Kubitschek",315330
+3,"Presidente Olegário",315340
+4,"Alto Jequitibá",315350
+3,"Prudente de Morais",315360
+3,"Quartel Geral",315370
+3,"Queluzito",315380
+2,"Raposos",315390
+3,"Raul Soares",315400
+2,"Recreio",315410
+4,"Reduto",315415
+4,"Resende Costa",315420
+4,"Resplendor",315430
+3,"Ressaquinha",315440
+2,"Riachinho",315445
+2,"Riacho dos Machados",315450
+2,"Ribeirão das Neves",315460
+2,"Ribeirão Vermelho",315470
+3,"Rio Acima",315480
+4,"Rio Casca",315490
+3,"Rio Doce",315500
+3,"Rio do Prado",315510
+3,"Rio Espera",315520
+2,"Rio Manso",315530
+3,"Rio Novo",315540
+3,"Rio Paranaíba",315550
+2,"Rio Pardo de Minas",315560
+4,"Rio Piracicaba",315570
+3,"Rio Pomba",315580
+3,"Rio Preto",315590
+5,"Rio Vermelho",315600
+3,"Ritápolis",315610
+3,"Rochedo de Minas",315620
+2,"Rodeiro",315630
+3,"Romaria",315640
+2,"Rosário da Limeira",315645
+2,"Rubelita",315650
+4,"Rubim",315660
+2,"Sabará",315670
+4,"Sabinópolis",315680
+3,"Sacramento",315690
+2,"Salinas",315700
+4,"Salto da Divisa",315710
+4,"Santa Bárbara",315720
+3,"Santa Bárbara do Leste",315725
+3,"Santa Bárbara do Monte Verde",315727
+3,"Santa Bárbara do Tugúrio",315730
+3,"Santa Cruz de Minas",315733
+2,"Santa Cruz de Salinas",315737
+4,"Santa Cruz do Escalvado",315740
+3,"Santa Efigênia de Minas",315750
+2,"Santa Fé de Minas",315760
+3,"Santa Helena de Minas",315765
+3,"Santa Juliana",315770
+2,"Santa Luzia",315780
+3,"Santa Margarida",315790
+4,"Santa Maria de Itabira",315800
+4,"Santa Maria do Salto",315810
+4,"Santa Maria do Suaçuí",315820
+3,"Santana da Vargem",315830
+2,"Santana de Cataguases",315840
+3,"Santana de Pirapama",315850
+3,"Santana do Deserto",315860
+3,"Santana do Garambéu",315870
+3,"Santana do Jacaré",315880
+4,"Santana do Manhuaçu",315890
+5,"Santana do Paraíso",315895
+2,"Santana do Riacho",315900
+3,"Santana dos Montes",315910
+3,"Santa Rita de Caldas",315920
+3,"Santa Rita de Jacutinga",315930
+3,"Santa Rita de Minas",315935
+3,"Santa Rita de Ibitipoca",315940
+3,"Santa Rita do Itueto",315950
+3,"Santa Rita do Sapucaí",315960
+3,"Santa Rosa da Serra",315970
+3,"Santa Vitória",315980
+3,"Santo Antônio do Amparo",315990
+3,"Santo Antônio do Aventureiro",316000
+3,"Santo Antônio do Grama",316010
+3,"Santo Antônio do Itambé",316020
+4,"Santo Antônio do Jacinto",316030
+3,"Santo Antônio do Monte",316040
+2,"Santo Antônio do Retiro",316045
+3,"Santo Antônio do Rio Abaixo",316050
+3,"Santo Hipólito",316060
+3,"Santos Dumont",316070
+3,"São Bento Abade",316080
+3,"São Brás do Suaçuí",316090
+3,"São Domingos das Dores",316095
+5,"São Domingos do Prata",316100
+3,"São Félix de Minas",316105
+2,"São Francisco",316110
+3,"São Francisco de Paula",316120
+3,"São Francisco de Sales",316130
+3,"São Francisco do Glória",316140
+2,"São Geraldo",316150
+3,"São Geraldo da Piedade",316160
+3,"São Geraldo do Baixio",316165
+3,"São Gonçalo do Abaeté",316170
+3,"São Gonçalo do Pará",316180
+4,"São Gonçalo do Rio Abaixo",316190
+3,"São Gonçalo do Sapucaí",316200
+3,"São Gotardo",316210
+3,"São João Batista do Glória",316220
+2,"São João da Lagoa",316225
+3,"São João da Mata",316230
+2,"São João da Ponte",316240
+2,"São João das Missões",316245
+3,"São João del Rei",316250
+3,"São João do Manhuaçu",316255
+3,"São João do Manteninha",316257
+3,"São João do Oriente",316260
+2,"São João do Pacuí",316265
+3,"São João do Paraíso",316270
+4,"São João Evangelista",316280
+3,"São João Nepomuceno",316290
+2,"São Joaquim de Bicas",316292
+3,"São José da Barra",316294
+2,"São José da Lapa",316295
+4,"São José da Safira",316300
+3,"São José da Varginha",316310
+3,"São José do Alegre",316320
+3,"São José do Divino",316330
+4,"São José do Goiabal",316340
+3,"São José do Jacuri",316350
+3,"São José do Mantimento",316360
+3,"São Lourenço",316370
+2,"São Miguel do Anta",316380
+3,"São Pedro da União",316390
+4,"São Pedro dos Ferros",316400
+4,"São Pedro do Suaçuí",316410
+2,"São Romão",316420
+3,"São Roque de Minas",316430
+3,"São Sebastião da Bela Vista",316440
+2,"São Sebastião da Vargem Alegre",316443
+3,"São Sebastião do Anta",316447
+3,"São Sebastião do Maranhão",316450
+3,"São Sebastião do Oeste",316460
+3,"São Sebastião do Paraíso",316470
+3,"São Sebastião do Rio Preto",316480
+3,"São Sebastião do Rio Verde",316490
+5,"São Tiago",316500
+3,"São Tomás de Aquino",316510
+3,"São Thomé das Letras",316520
+3,"São Vicente de Minas",316530
+3,"Sapucaí-Mirim",316540
+3,"Sardoá",316550
+2,"Sarzedo",316553
+3,"Setubinha",316555
+4,"Sem-Peixe",316556
+3,"Senador Amaral",316557
+3,"Senador Cortes",316560
+3,"Senador Firmino",316570
+3,"Senador José Bento",316580
+4,"Senador Modestino Gonçalves",316590
+3,"Senhora de Oliveira",316600
+3,"Senhora do Porto",316610
+3,"Senhora dos Remédios",316620
+3,"Sericita",316630
+3,"Seritinga",316640
+4,"Serra Azul de Minas",316650
+3,"Serra da Saudade",316660
+4,"Serra dos Aimorés",316670
+3,"Serra do Salitre",316680
+3,"Serrania",316690
+2,"Serranópolis de Minas",316695
+3,"Serranos",316700
+5,"Serro",316710
+3,"Sete Lagoas",316720
+3,"Silveirânia",316730
+2,"Silvianópolis",316740
+3,"Simão Pereira",316750
+4,"Simonésia",316760
+3,"Sobrália",316770
+3,"Soledade de Minas",316780
+3,"Tabuleiro",316790
+2,"Taiobeiras",316800
+3,"Taparuba",316805
+3,"Tapira",316810
+3,"Tapiraí",316820
+2,"Taquaraçu de Minas",316830
+3,"Tarumirim",316840
+2,"Teixeiras",316850
+3,"Teófilo Otoni",316860
+4,"Timóteo",316870
+3,"Tiradentes",316880
+3,"Tiros",316890
+3,"Tocantins",316900
+2,"Tocos do Moji",316905
+3,"Toledo",316910
+3,"Tombos",316920
+3,"Três Corações",316930
+3,"Três Marias",316935
+4,"Três Pontas",316940
+4,"Tumiritinga",316950
+3,"Tupaciguara",316960
+4,"Turmalina",316970
+2,"Turvolândia",316980
+3,"Ubá",316990
+2,"Ubaí",317000
+3,"Ubaporanga",317005
+3,"Uberaba",317010
+3,"Uberlândia",317020
+3,"Umburatiba",317030
+2,"Unaí",317040
+3,"União de Minas",317043
+2,"Uruana de Minas",317047
+3,"Urucânia",317050
+2,"Urucuia",317052
+4,"Vargem Alegre",317057
+3,"Vargem Bonita",317060
+2,"Vargem Grande do Rio Pardo",317065
+2,"Varginha",317070
+3,"Varjão de MInas",317075
+3,"Várzea da Palma",317080
+2,"Varzelândia",317090
+3,"Vazante",317100
+2,"Verdelândia",317103
+3,"Veredinha",317107
+3,"Veríssimo",317110
+3,"Vermelho Novo",317115
+2,"Vespasiano",317120
+2,"Viçosa",317130
+3,"Vieiras",317140
+4,"Mathias Lobato",317150
+4,"Virgem da Lapa",317160
+3,"Virgínia",317170
+3,"Virginópolis",317180
+4,"Virgolândia",317190
+2,"Visconde do Rio Branco",317200
+2,"Volta Grande",317210
+3,"Wenceslau Braz",317220
+3,"Afonso Cláudio",320010
+3,"Águia Branca",320013
+3,"Água Doce do Norte",320016
+3,"Alegre",320020
+3,"Alfredo Chaves",320030
+3,"Alto Rio Novo",320035
+2,"Anchieta",320040
+3,"Apiacá",320050
+3,"Aracruz",320060
+3,"Atilio Vivacqua",320070
+4,"Baixo Guandu",320080
+3,"Barra de São Francisco",320090
+3,"Boa Esperança",320100
+3,"Bom Jesus do Norte",320110
+3,"Brejetuba",320115
+4,"Cachoeiro de Itapemirim",320120
+3,"Cariacica",320130
+3,"Castelo",320140
+4,"Colatina",320150
+4,"Conceição da Barra",320160
+3,"Conceição do Castelo",320170
+3,"Divino de São Lourenço",320180
+3,"Domingos Martins",320190
+4,"Dores do Rio Preto",320200
+3,"Ecoporanga",320210
+3,"Fundão",320220
+3,"Governador Lindenberg",320225
+4,"Guaçuí",320230
+2,"Guarapari",320240
+3,"Ibatiba",320245
+3,"Ibiraçu",320250
+3,"Ibitirama",320255
+2,"Iconha",320260
+3,"Irupi",320265
+4,"Itaguaçu",320270
+3,"Itapemirim",320280
+4,"Itarana",320290
+3,"Iúna",320300
+3,"Jaguaré",320305
+3,"Jerônimo Monteiro",320310
+3,"João Neiva",320313
+3,"Laranja da Terra",320316
+3,"Linhares",320320
+3,"Mantenópolis",320330
+3,"Marataízes",320332
+3,"Marechal Floriano",320334
+3,"Marilândia",320335
+4,"Mimoso do Sul",320340
+4,"Montanha",320350
+3,"Mucurici",320360
+3,"Muniz Freire",320370
+3,"Muqui",320380
+3,"Nova Venécia",320390
+3,"Pancas",320400
+4,"Pedro Canário",320405
+4,"Pinheiros",320410
+2,"Piúma",320420
+3,"Ponto Belo",320425
+3,"Presidente Kennedy",320430
+3,"Rio Bananal",320435
+3,"Rio Novo do Sul",320440
+4,"Santa Leopoldina",320450
+4,"Santa Maria de Jetibá",320455
+4,"Santa Teresa",320460
+3,"São Domingos do Norte",320465
+3,"São Gabriel da Palha",320470
+4,"São José do Calçado",320480
+4,"São Mateus",320490
+3,"São Roque do Canaã",320495
+2,"Serra",320500
+3,"Sooretama",320501
+3,"Vargem Alta",320503
+3,"Venda Nova do Imigrante",320506
+2,"Viana",320510
+3,"Vila Pavão",320515
+3,"Vila Valério",320517
+2,"Vila Velha",320520
+2,"Vitória",320530
+3,"Angra dos Reis",330010
+2,"Aperibé",330015
+3,"Araruama",330020
+3,"Areal",330022
+3,"Armação dos Búzios",330023
+3,"Arraial do Cabo",330025
+3,"Barra do Piraí",330030
+3,"Barra Mansa",330040
+3,"Belford Roxo",330045
+2,"Bom Jardim",330050
+4,"Bom Jesus do Itabapoana",330060
+3,"Cabo Frio",330070
+3,"Cachoeiras de Macacu",330080
+2,"Cambuci",330090
+2,"Carapebus",330093
+3,"Comendador Levy Gasparian",330095
+3,"Campos dos Goytacazes",330100
+2,"Cantagalo",330110
+2,"Cardoso Moreira",330115
+2,"Carmo",330120
+3,"Casimiro de Abreu",330130
+2,"Conceição de Macabu",330140
+2,"Cordeiro",330150
+2,"Duas Barras",330160
+3,"Duque de Caxias",330170
+3,"Engenheiro Paulo de Frontin",330180
+3,"Guapimirim",330185
+3,"Iguaba Grande",330187
+3,"Itaboraí",330190
+3,"Itaguaí",330200
+3,"Italva",330205
+2,"Itaocara",330210
+3,"Itaperuna",330220
+3,"Itatiaia",330225
+3,"Japeri",330227
+2,"Laje do Muriaé",330230
+2,"Macaé",330240
+2,"Macuco",330245
+3,"Magé",330250
+3,"Mangaratiba",330260
+3,"Maricá",330270
+3,"Mendes",330280
+3,"Mesquita",330285
+3,"Miguel Pereira",330290
+2,"Miracema",330300
+3,"Natividade",330310
+3,"Nilópolis",330320
+3,"Niterói",330330
+3,"Nova Friburgo",330340
+3,"Nova Iguaçu",330350
+3,"Paracambi",330360
+3,"Paraíba do Sul",330370
+3,"Parati",330380
+3,"Paty do Alferes",330385
+3,"Petrópolis",330390
+3,"Pinheiral",330395
+3,"Piraí",330400
+4,"Porciúncula",330410
+3,"Porto Real",330411
+3,"Quatis",330412
+3,"Queimados",330414
+2,"Quissamã",330415
+3,"Resende",330420
+3,"Rio Bonito",330430
+3,"Rio Claro",330440
+3,"Rio das Flores",330450
+3,"Rio das Ostras",330452
+3,"Rio de Janeiro",330455
+2,"Santa Maria Madalena",330460
+2,"Santo Antônio de Pádua",330470
+3,"São Francisco de Itabapoana",330475
+2,"São Fidélis",330480
+3,"São Gonçalo",330490
+2,"São João da Barra",330500
+3,"São João de Meriti",330510
+2,"São José de Ubá",330513
+3,"São José do Vale do Rio Preto",330515
+3,"São Pedro da Aldeia",330520
+2,"São Sebastião do Alto",330530
+3,"Sapucaia",330540
+3,"Saquarema",330550
+3,"Seropédica",330555
+3,"Silva Jardim",330560
+3,"Sumidouro",330570
+3,"Tanguá",330575
+3,"Teresópolis",330580
+2,"Trajano de Morais",330590
+3,"Três Rios",330600
+3,"Valença",330610
+4,"Varre-Sai",330615
+3,"Vassouras",330620
+3,"Volta Redonda",330630
+2,"Adamantina",350010
+4,"Adolfo",350020
+3,"Aguaí",350030
+3,"Águas da Prata",350040
+2,"Águas de Lindóia",350050
+1,"Águas de Santa Bárbara",350055
+2,"Águas de São Pedro",350060
+2,"Agudos",350070
+3,"Alambari",350075
+2,"Alfredo Marcondes",350080
+3,"Altair",350090
+3,"Altinópolis",350100
+2,"Alto Alegre",350110
+3,"Alumínio",350115
+3,"Álvares Florence",350120
+1,"Álvares Machado",350130
+1,"Álvaro de Carvalho",350140
+1,"Alvinlândia",350150
+2,"Americana",350160
+4,"Américo Brasiliense",350170
+3,"Américo de Campos",350180
+3,"Amparo",350190
+3,"Analândia",350200
+2,"Andradina",350210
+2,"Angatuba",350220
+2,"Anhembi",350230
+1,"Anhumas",350240
+3,"Aparecida",350250
+3,"Aparecida d'Oeste",350260
+2,"Apiaí",350270
+3,"Araçariguama",350275
+4,"Araçatuba",350280
+3,"Araçoiaba da Serra",350290
+3,"Aramina",350300
+2,"Arandu",350310
+3,"Arapeí",350315
+4,"Araraquara",350320
+3,"Araras",350330
+2,"Arco-Íris",350335
+3,"Arealva",350340
+3,"Areias",350350
+2,"Areiópolis",350360
+3,"Ariranha",350370
+2,"Artur Nogueira",350380
+3,"Arujá",350390
+3,"Aspásia",350395
+1,"Assis",350400
+3,"Atibaia",350410
+3,"Auriflama",350420
+2,"Avaí",350430
+3,"Avanhandava",350440
+2,"Avaré",350450
+3,"Bady Bassitt",350460
+3,"Balbinos",350470
+3,"Bálsamo",350480
+3,"Bananal",350490
+1,"Barão de Antonina",350500
+4,"Barbosa",350510
+3,"Bariri",350520
+3,"Barra Bonita",350530
+1,"Barra do Chapéu",350535
+2,"Barra do Turvo",350540
+3,"Barretos",350550
+3,"Barrinha",350560
+3,"Barueri",350570
+2,"Bastos",350580
+3,"Batatais",350590
+2,"Bauru",350600
+3,"Bebedouro",350610
+2,"Bento de Abreu",350620
+1,"Bernardino de Campos",350630
+3,"Bertioga",350635
+2,"Bilac",350640
+4,"Birigui",350650
+3,"Biritiba-Mirim",350660
+4,"Boa Esperança do Sul",350670
+3,"Bocaina",350680
+2,"Bofete",350690
+3,"Boituva",350700
+3,"Bom Jesus dos Perdões",350710
+1,"Bom Sucesso de Itararé",350715
+1,"Borá",350720
+3,"Boracéia",350730
+4,"Borborema",350740
+2,"Borebi",350745
+2,"Botucatu",350750
+3,"Bragança Paulista",350760
+2,"Braúna",350770
+4,"Brejo Alegre",350775
+3,"Brodowski",350780
+3,"Brotas",350790
+2,"Buri",350800
+4,"Buritama",350810
+3,"Buritizal",350820
+1,"Cabrália Paulista",350830
+3,"Cabreúva",350840
+3,"Caçapava",350850
+3,"Cachoeira Paulista",350860
+3,"Caconde",350870
+4,"Cafelândia",350880
+2,"Caiabu",350890
+3,"Caieiras",350900
+2,"Caiuá",350910
+3,"Cajamar",350920
+2,"Cajati",350925
+3,"Cajobi",350930
+3,"Cajuru",350940
+2,"Campina do Monte Alegre",350945
+3,"Campinas",350950
+3,"Campo Limpo Paulista",350960
+3,"Campos do Jordão",350970
+1,"Campos Novos Paulista",350980
+2,"Cananéia",350990
+3,"Canas",350995
+1,"Cândido Mota",351000
+3,"Cândido Rodrigues",351010
+1,"Canitar",351015
+2,"Capão Bonito",351020
+3,"Capela do Alto",351030
+2,"Capivari",351040
+3,"Caraguatatuba",351050
+3,"Carapicuíba",351060
+3,"Cardoso",351070
+4,"Casa Branca",351080
+3,"Cássia dos Coqueiros",351090
+2,"Castilho",351100
+4,"Catanduva",351110
+3,"Catiguá",351120
+3,"Cedral",351130
+2,"Cerqueira César",351140
+2,"Cerquilho",351150
+2,"Cesário Lange",351160
+2,"Charqueada",351170
+2,"Clementina",351190
+3,"Colina",351200
+3,"Colômbia",351210
+3,"Conchal",351220
+2,"Conchas",351230
+2,"Cordeirópolis",351240
+2,"Coroados",351250
+1,"Coronel Macedo",351260
+3,"Corumbataí",351270
+2,"Cosmópolis",351280
+3,"Cosmorama",351290
+3,"Cotia",351300
+3,"Cravinhos",351310
+3,"Cristais Paulista",351320
+1,"Cruzália",351330
+3,"Cruzeiro",351340
+3,"Cubatão",351350
+3,"Cunha",351360
+4,"Descalvado",351370
+3,"Diadema",351380
+3,"Dirce Reis",351385
+3,"Divinolândia",351390
+4,"Dobrada",351400
+3,"Dois Córregos",351410
+3,"Dolcinópolis",351420
+3,"Dourado",351430
+2,"Dracena",351440
+1,"Duartina",351450
+3,"Dumont",351460
+1,"Echaporã",351470
+2,"Eldorado",351480
+3,"Elias Fausto",351490
+4,"Elisiário",351492
+3,"Embaúba",351495
+3,"Embu",351500
+3,"Embu-Guaçu",351510
+2,"Emilianópolis",351512
+2,"Engenheiro Coelho",351515
+3,"Espírito Santo do Pinhal",351518
+1,"Espírito Santo do Turvo",351519
+3,"Estrela d'Oeste",351520
+1,"Estrela do Norte",351530
+2,"Euclides da Cunha Paulista",351535
+1,"Fartura",351540
+3,"Fernandópolis",351550
+4,"Fernando Prestes",351560
+1,"Fernão",351565
+3,"Ferraz de Vasconcelos",351570
+2,"Flora Rica",351580
+3,"Floreal",351590
+2,"Flórida Paulista",351600
+1,"Florínia",351610
+3,"Franca",351620
+3,"Francisco Morato",351630
+3,"Franco da Rocha",351640
+2,"Gabriel Monteiro",351650
+1,"Gália",351660
+1,"Garça",351670
+3,"Gastão Vidigal",351680
+4,"Gavião Peixoto",351685
+3,"General Salgado",351690
+2,"Getulina",351700
+4,"Glicério",351710
+4,"Guaiçara",351720
+2,"Guaimbê",351730
+3,"Guaíra",351740
+3,"Guapiaçu",351750
+2,"Guapiara",351760
+3,"Guará",351770
+1,"Guaraçaí",351780
+3,"Guaraci",351790
+3,"Guarani d'Oeste",351800
+2,"Guarantã",351810
+2,"Guararapes",351820
+3,"Guararema",351830
+3,"Guaratinguetá",351840
+2,"Guareí",351850
+3,"Guariba",351860
+2,"Guarujá",351870
+3,"Guarulhos",351880
+3,"Guatapará",351885
+3,"Guzolândia",351890
+2,"Herculândia",351900
+2,"Holambra",351905
+2,"Hortolândia",351907
+3,"Iacanga",351910
+2,"Iacri",351920
+1,"Iaras",351925
+4,"Ibaté",351930
+4,"Ibirá",351940
+1,"Ibirarema",351950
+4,"Ibitinga",351960
+3,"Ibiúna",351970
+3,"Icém",351980
+1,"Iepê",351990
+2,"Igaraçu do Tietê",352000
+3,"Igarapava",352010
+3,"Igaratá",352020
+3,"Iguape",352030
+1,"Ilhabela",352040
+2,"Ilha Comprida",352042
+3,"Ilha Solteira",352044
+3,"Indaiatuba",352050
+1,"Indiana",352060
+3,"Indiaporã",352070
+2,"Inúbia Paulista",352080
+1,"Ipaussu",352090
+3,"Iperó",352100
+3,"Ipeúna",352110
+3,"Ipiguá",352115
+2,"Iporanga",352120
+3,"Ipuã",352130
+2,"Iracemápolis",352140
+4,"Irapuã",352150
+2,"Irapuru",352160
+1,"Itaberá",352170
+2,"Itaí",352180
+4,"Itajobi",352190
+4,"Itaju",352200
+3,"Itanhaém",352210
+2,"Itaóca",352215
+3,"Itapecerica da Serra",352220
+3,"Itapetininga",352230
+2,"Itapeva",352240
+3,"Itapevi",352250
+2,"Itapira",352260
+1,"Itapirapuã Paulista",352265
+4,"Itápolis",352270
+1,"Itaporanga",352280
+3,"Itapuí",352290
+2,"Itapura",352300
+3,"Itaquaquecetuba",352310
+1,"Itararé",352320
+3,"Itariri",352330
+3,"Itatiba",352340
+2,"Itatinga",352350
+3,"Itirapina",352360
+3,"Itirapuã",352370
+3,"Itobi",352380
+3,"Itu",352390
+3,"Itupeva",352400
+3,"Ituverava",352410
+3,"Jaborandi",352420
+3,"Jaboticabal",352430
+3,"Jacareí",352440
+3,"Jaci",352450
+2,"Jacupiranga",352460
+2,"Jaguariúna",352470
+3,"Jales",352480
+3,"Jambeiro",352490
+3,"Jandira",352500
+3,"Jardinópolis",352510
+3,"Jarinu",352520
+3,"Jaú",352530
+3,"Jeriquara",352540
+3,"Joanópolis",352550
+1,"João Ramalho",352560
+4,"José Bonifácio",352570
+1,"Júlio Mesquita",352580
+2,"Jumirim",352585
+3,"Jundiaí",352590
+2,"Junqueirópolis",352600
+3,"Juquiá",352610
+3,"Juquitiba",352620
+3,"Lagoinha",352630
+2,"Laranjal Paulista",352640
+2,"Lavínia",352650
+3,"Lavrinhas",352660
+3,"Leme",352670
+2,"Lençóis Paulista",352680
+2,"Limeira",352690
+2,"Lindóia",352700
+3,"Lins",352710
+3,"Lorena",352720
+3,"Lourdes",352725
+3,"Louveira",352730
+2,"Lucélia",352740
+1,"Lucianópolis",352750
+3,"Luís Antônio",352760
+2,"Luiziânia",352770
+1,"Lupércio",352780
+1,"Lutécia",352790
+2,"Macatuba",352800
+3,"Macaubal",352810
+3,"Macedônia",352820
+3,"Magda",352830
+3,"Mairinque",352840
+3,"Mairiporã",352850
+1,"Manduri",352860
+2,"Marabá Paulista",352870
+1,"Maracaí",352880
+4,"Marapoama",352885
+2,"Mariápolis",352890
+1,"Marília",352900
+3,"Marinópolis",352910
+2,"Martinópolis",352920
+4,"Matão",352930
+3,"Mauá",352940
+4,"Mendonça",352950
+3,"Meridiano",352960
+3,"Mesópolis",352965
+3,"Miguelópolis",352970
+3,"Mineiros do Tietê",352980
+3,"Miracatu",352990
+3,"Mira Estrela",353000
+2,"Mirandópolis",353010
+1,"Mirante do Paranapanema",353020
+3,"Mirassol",353030
+3,"Mirassolândia",353040
+3,"Mococa",353050
+3,"Moji das Cruzes",353060
+3,"Mogi Guaçu",353070
+3,"Moji-Mirim",353080
+2,"Mombuca",353090
+3,"Monções",353100
+3,"Mongaguá",353110
+3,"Monte Alegre do Sul",353120
+3,"Monte Alto",353130
+3,"Monte Aprazível",353140
+3,"Monte Azul Paulista",353150
+1,"Monte Castelo",353160
+3,"Monteiro Lobato",353170
+3,"Monte Mor",353180
+3,"Morro Agudo",353190
+3,"Morungaba",353200
+3,"Motuca",353205
+1,"Murutinga do Sul",353210
+1,"Nantes",353215
+1,"Narandiba",353220
+3,"Natividade da Serra",353230
+3,"Nazaré Paulista",353240
+3,"Neves Paulista",353250
+3,"Nhandeara",353260
+3,"Nipoã",353270
+4,"Nova Aliança",353280
+1,"Nova Campina",353282
+3,"Nova Canaã Paulista",353284
+3,"Nova Castilho",353286
+4,"Nova Europa",353290
+3,"Nova Granada",353300
+1,"Nova Guataporanga",353310
+1,"Nova Independência",353320
+3,"Novais",353325
+3,"Nova Luzitânia",353330
+2,"Nova Odessa",353340
+4,"Novo Horizonte",353350
+3,"Nuporanga",353360
+1,"Ocauçu",353370
+1,"Óleo",353380
+3,"Olímpia",353390
+3,"Onda Verde",353400
+1,"Oriente",353410
+3,"Orindiúva",353420
+3,"Orlândia",353430
+3,"Osasco",353440
+1,"Oscar Bressane",353450
+2,"Osvaldo Cruz",353460
+1,"Ourinhos",353470
+3,"Ouroeste",353475
+2,"Ouro Verde",353480
+2,"Pacaembu",353490
+3,"Palestina",353500
+3,"Palmares Paulista",353510
+3,"Palmeira d'Oeste",353520
+1,"Palmital",353530
+2,"Panorama",353540
+1,"Paraguaçu Paulista",353550
+3,"Paraibuna",353560
+3,"Paraíso",353570
+2,"Paranapanema",353580
+3,"Paranapuã",353590
+2,"Parapuã",353600
+2,"Pardinho",353610
+2,"Pariquera-Açu",353620
+3,"Parisi",353625
+3,"Patrocínio Paulista",353630
+2,"Paulicéia",353640
+2,"Paulínia",353650
+1,"Paulistânia",353657
+3,"Paulo de Faria",353660
+2,"Pederneiras",353670
+3,"Pedra Bela",353680
+3,"Pedranópolis",353690
+3,"Pedregulho",353700
+3,"Pedreira",353710
+1,"Pedrinhas Paulista",353715
+3,"Pedro de Toledo",353720
+4,"Penápolis",353730
+3,"Pereira Barreto",353740
+2,"Pereiras",353750
+3,"Peruíbe",353760
+2,"Piacatu",353770
+3,"Piedade",353780
+3,"Pilar do Sul",353790
+3,"Pindamonhangaba",353800
+4,"Pindorama",353810
+3,"Pinhalzinho",353820
+2,"Piquerobi",353830
+3,"Piquete",353850
+3,"Piracaia",353860
+2,"Piracicaba",353870
+2,"Piraju",353880
+3,"Pirajuí",353890
+3,"Pirangi",353900
+3,"Pirapora do Bom Jesus",353910
+1,"Pirapozinho",353920
+3,"Pirassununga",353930
+1,"Piratininga",353940
+3,"Pitangueiras",353950
+4,"Planalto",353960
+1,"Platina",353970
+3,"Poá",353980
+3,"Poloni",353990
+2,"Pompéia",354000
+3,"Pongaí",354010
+3,"Pontal",354020
+3,"Pontalinda",354025
+3,"Pontes Gestal",354030
+3,"Populina",354040
+2,"Porangaba",354050
+3,"Porto Feliz",354060
+4,"Porto Ferreira",354070
+3,"Potim",354075
+4,"Potirendaba",354080
+2,"Pracinha",354085
+3,"Pradópolis",354090
+3,"Praia Grande",354100
+2,"Pratânia",354105
+1,"Presidente Alves",354110
+2,"Presidente Bernardes",354120
+2,"Presidente Epitácio",354130
+2,"Presidente Prudente",354140
+2,"Presidente Venceslau",354150
+4,"Promissão",354160
+2,"Quadra",354165
+1,"Quatá",354170
+2,"Queiroz",354180
+3,"Queluz",354190
+1,"Quintana",354200
+2,"Rafard",354210
+1,"Rancharia",354220
+3,"Redenção da Serra",354230
+1,"Regente Feijó",354240
+3,"Reginópolis",354250
+2,"Registro",354260
+3,"Restinga",354270
+2,"Ribeira",354280
+4,"Ribeirão Bonito",354290
+2,"Ribeirão Branco",354300
+3,"Ribeirão Corrente",354310
+1,"Ribeirão do Sul",354320
+2,"Ribeirão dos Índios",354323
+2,"Ribeirão Grande",354325
+3,"Ribeirão Pires",354330
+3,"Ribeirão Preto",354340
+1,"Riversul",354350
+3,"Rifaina",354360
+3,"Rincão",354370
+2,"Rinópolis",354380
+3,"Rio Claro",354390
+2,"Rio das Pedras",354400
+3,"Rio Grande da Serra",354410
+3,"Riolândia",354420
+2,"Rosana",354425
+3,"Roseira",354430
+2,"Rubiácea",354440
+3,"Rubinéia",354450
+4,"Sabino",354460
+2,"Sagres",354470
+4,"Sales",354480
+3,"Sales Oliveira",354490
+3,"Salesópolis",354500
+2,"Salmourão",354510
+2,"Saltinho",354515
+3,"Salto",354520
+3,"Salto de Pirapora",354530
+1,"Salto Grande",354540
+1,"Sandovalina",354550
+4,"Santa Adélia",354560
+3,"Santa Albertina",354570
+2,"Santa Bárbara d'Oeste",354580
+3,"Santa Branca",354600
+3,"Santa Clara d'Oeste",354610
+3,"Santa Cruz da Conceição",354620
+3,"Santa Cruz da Esperança",354625
+4,"Santa Cruz das Palmeiras",354630
+1,"Santa Cruz do Rio Pardo",354640
+3,"Santa Ernestina",354650
+3,"Santa Fé do Sul",354660
+2,"Santa Gertrudes",354670
+3,"Santa Isabel",354680
+4,"Santa Lúcia",354690
+2,"Santa Maria da Serra",354700
+1,"Santa Mercedes",354710
+3,"Santana da Ponte Pensa",354720
+3,"Santana de Parnaíba",354730
+3,"Santa Rita d'Oeste",354740
+4,"Santa Rita do Passa Quatro",354750
+3,"Santa Rosa de Viterbo",354760
+3,"Santa Salete",354765
+2,"Santo Anastácio",354770
+3,"Santo André",354780
+3,"Santo Antônio da Alegria",354790
+2,"Santo Antônio de Posse",354800
+3,"Santo Antônio do Aracanguá",354805
+3,"Santo Antônio do Jardim",354810
+3,"Santo Antônio do Pinhal",354820
+2,"Santo Expedito",354830
+2,"Santópolis do Aguapeí",354840
+3,"Santos",354850
+3,"São Bento do Sapucaí",354860
+3,"São Bernardo do Campo",354870
+3,"São Caetano do Sul",354880
+4,"São Carlos",354890
+3,"São Francisco",354900
+3,"São João da Boa Vista",354910
+3,"São João das Duas Pontes",354920
+3,"São João de Iracema",354925
+1,"São João do Pau d'Alho",354930
+3,"São Joaquim da Barra",354940
+3,"São José da Bela Vista",354950
+3,"São José do Barreiro",354960
+3,"São José do Rio Pardo",354970
+3,"São José do Rio Preto",354980
+3,"São José dos Campos",354990
+3,"São Lourenço da Serra",354995
+3,"São Luís do Paraitinga",355000
+2,"São Manuel",355010
+3,"São Miguel Arcanjo",355020
+3,"São Paulo",355030
+3,"São Pedro",355040
+1,"São Pedro do Turvo",355050
+3,"São Roque",355060
+3,"São Sebastião",355070
+4,"São Sebastião da Grama",355080
+3,"São Simão",355090
+3,"São Vicente",355100
+3,"Sarapuí",355110
+1,"Sarutaiá",355120
+3,"Sebastianópolis do Sul",355130
+3,"Serra Azul",355140
+3,"Serrana",355150
+2,"Serra Negra",355160
+3,"Sertãozinho",355170
+3,"Sete Barras",355180
+3,"Severínia",355190
+3,"Silveiras",355200
+3,"Socorro",355210
+3,"Sorocaba",355220
+3,"Sud Mennucci",355230
+2,"Sumaré",355240
+3,"Suzano",355250
+3,"Suzanápolis",355255
+3,"Tabapuã",355260
+4,"Tabatinga",355270
+3,"Taboão da Serra",355280
+1,"Taciba",355290
+1,"Taguaí",355300
+3,"Taiaçu",355310
+3,"Taiúva",355320
+3,"Tambaú",355330
+3,"Tanabi",355340
+3,"Tapiraí",355350
+3,"Tapiratiba",355360
+3,"Taquaral",355365
+4,"Taquaritinga",355370
+1,"Taquarituba",355380
+2,"Taquarivaí",355385
+1,"Tarabai",355390
+1,"Tarumã",355395
+2,"Tatuí",355400
+3,"Taubaté",355410
+1,"Tejupá",355420
+2,"Teodoro Sampaio",355430
+3,"Terra Roxa",355440
+2,"Tietê",355450
+1,"Timburi",355460
+2,"Torre de Pedra",355465
+3,"Torrinha",355470
+3,"Trabiju",355475
+3,"Tremembé",355480
+3,"Três Fronteiras",355490
+3,"Tuiuti",355495
+2,"Tupã",355500
+2,"Tupi Paulista",355510
+3,"Turiúba",355520
+3,"Turmalina",355530
+4,"Ubarana",355535
+3,"Ubatuba",355540
+1,"Ubirajara",355550
+3,"Uchoa",355560
+3,"União Paulista",355570
+3,"Urânia",355580
+3,"Uru",355590
+4,"Urupês",355600
+3,"Valentim Gentil",355610
+3,"Valinhos",355620
+2,"Valparaíso",355630
+3,"Vargem",355635
+3,"Vargem Grande do Sul",355640
+3,"Vargem Grande Paulista",355645
+3,"Várzea Paulista",355650
+1,"Vera Cruz",355660
+3,"Vinhedo",355670
+3,"Viradouro",355680
+3,"Vista Alegre do Alto",355690
+3,"Vitória Brasil",355695
+3,"Votorantim",355700
+3,"Votuporanga",355710
+4,"Zacarias",355715
+1,"Chavantes",355720
+3,"Estiva Gerbi",355730
+1,"Abatiá",410010
+2,"Adrianópolis",410020
+1,"Agudos do Sul",410030
+1,"Almirante Tamandaré",410040
+1,"Altamira do Paraná",410045
+2,"Altônia",410050
+1,"Alto Paraná",410060
+1,"Alto Piquiri",410070
+1,"Alvorada do Sul",410080
+1,"Amaporã",410090
+1,"Ampére",410100
+1,"Anahy",410105
+1,"Andirá",410110
+1,"Ângulo",410115
+1,"Antonina",410120
+1,"Antônio Olinto",410130
+1,"Apucarana",410140
+1,"Arapongas",410150
+1,"Arapoti",410160
+1,"Arapuã",410165
+1,"Araruna",410170
+1,"Araucária",410180
+1,"Ariranha do Ivaí",410185
+1,"Assaí",410190
+1,"Assis Chateaubriand",410200
+1,"Astorga",410210
+1,"Atalaia",410220
+1,"Balsa Nova",410230
+1,"Bandeirantes",410240
+1,"Barbosa Ferraz",410250
+1,"Barracão",410260
+1,"Barra do Jacaré",410270
+1,"Bela Vista da Caroba",410275
+1,"Bela Vista do Paraíso",410280
+1,"Bituruna",410290
+1,"Boa Esperança",410300
+1,"Boa Esperança do Iguaçu",410302
+1,"Boa Ventura de São Roque",410304
+1,"Boa Vista da Aparecida",410305
+2,"Bocaiúva do Sul",410310
+1,"Bom Jesus do Sul",410315
+1,"Bom Sucesso",410320
+1,"Bom Sucesso do Sul",410322
+1,"Borrazópolis",410330
+1,"Braganey",410335
+1,"Brasilândia do Sul",410337
+1,"Cafeara",410340
+1,"Cafelândia",410345
+1,"Cafezal do Sul",410347
+1,"Califórnia",410350
+1,"Cambará",410360
+1,"Cambé",410370
+1,"Cambira",410380
+1,"Campina da Lagoa",410390
+1,"Campina do Simão",410395
+2,"Campina Grande do Sul",410400
+1,"Campo Bonito",410405
+1,"Campo do Tenente",410410
+1,"Campo Largo",410420
+1,"Campo Magro",410425
+1,"Campo Mourão",410430
+1,"Cândido de Abreu",410440
+1,"Candói",410442
+1,"Cantagalo",410445
+1,"Capanema",410450
+1,"Capitão Leônidas Marques",410460
+1,"Carambeí",410465
+1,"Carlópolis",410470
+1,"Cascavel",410480
+1,"Castro",410490
+1,"Catanduvas",410500
+1,"Centenário do Sul",410510
+1,"Cerro Azul",410520
+1,"Céu Azul",410530
+1,"Chopinzinho",410540
+1,"Cianorte",410550
+1,"Cidade Gaúcha",410560
+1,"Clevelândia",410570
+1,"Colombo",410580
+1,"Colorado",410590
+1,"Congonhinhas",410600
+1,"Conselheiro Mairinck",410610
+1,"Contenda",410620
+1,"Corbélia",410630
+1,"Cornélio Procópio",410640
+1,"Coronel Domingos Soares",410645
+1,"Coronel Vivida",410650
+1,"Corumbataí do Sul",410655
+1,"Cruzeiro do Iguaçu",410657
+1,"Cruzeiro do Oeste",410660
+1,"Cruzeiro do Sul",410670
+1,"Cruz Machado",410680
+1,"Cruzmaltina",410685
+1,"Curitiba",410690
+1,"Curiúva",410700
+2,"Diamante do Norte",410710
+1,"Diamante do Sul",410712
+2,"Diamante d'Oeste",410715
+1,"Dois Vizinhos",410720
+1,"Douradina",410725
+1,"Doutor Camargo",410730
+1,"Enéas Marques",410740
+1,"Engenheiro Beltrão",410750
+1,"Esperança Nova",410752
+2,"Entre Rios do Oeste",410753
+1,"Espigão Alto do Iguaçu",410754
+1,"Farol",410755
+1,"Faxinal",410760
+1,"Fazenda Rio Grande",410765
+1,"Fênix",410770
+1,"Fernandes Pinheiro",410773
+1,"Figueira",410775
+1,"Floraí",410780
+1,"Flor da Serra do Sul",410785
+1,"Floresta",410790
+1,"Florestópolis",410800
+1,"Flórida",410810
+1,"Formosa do Oeste",410820
+2,"Foz do Iguaçu",410830
+1,"Francisco Alves",410832
+1,"Francisco Beltrão",410840
+1,"Foz do Jordão",410845
+1,"General Carneiro",410850
+1,"Godoy Moreira",410855
+1,"Goioerê",410860
+1,"Goioxim",410865
+1,"Grandes Rios",410870
+1,"Guaíra",410880
+1,"Guairaçá",410890
+1,"Guamiranga",410895
+1,"Guapirama",410900
+1,"Guaporema",410910
+1,"Guaraci",410920
+1,"Guaraniaçu",410930
+1,"Guarapuava",410940
+2,"Guaraqueçaba",410950
+1,"Guaratuba",410960
+1,"Honório Serpa",410965
+1,"Ibaiti",410970
+1,"Ibema",410975
+1,"Ibiporã",410980
+1,"Icaraíma",410990
+1,"Iguaraçu",411000
+1,"Iguatu",411005
+1,"Imbaú",411007
+1,"Imbituva",411010
+1,"Inácio Martins",411020
+1,"Inajá",411030
+1,"Indianópolis",411040
+1,"Ipiranga",411050
+1,"Iporã",411060
+1,"Iracema do Oeste",411065
+1,"Irati",411070
+1,"Iretama",411080
+1,"Itaguajé",411090
+2,"Itaipulândia",411095
+1,"Itambaracá",411100
+1,"Itambé",411110
+1,"Itapejara d'Oeste",411120
+1,"Itaperuçu",411125
+1,"Itaúna do Sul",411130
+1,"Ivaí",411140
+1,"Ivaiporã",411150
+1,"Ivaté",411155
+1,"Ivatuba",411160
+1,"Jaboti",411170
+1,"Jacarezinho",411180
+1,"Jaguapitã",411190
+1,"Jaguariaíva",411200
+1,"Jandaia do Sul",411210
+1,"Janiópolis",411220
+1,"Japira",411230
+1,"Japurá",411240
+1,"Jardim Alegre",411250
+1,"Jardim Olinda",411260
+1,"Jataizinho",411270
+1,"Jesuítas",411275
+1,"Joaquim Távora",411280
+1,"Jundiaí do Sul",411290
+1,"Juranda",411295
+1,"Jussara",411300
+1,"Kaloré",411310
+1,"Lapa",411320
+1,"Laranjal",411325
+1,"Laranjeiras do Sul",411330
+1,"Leópolis",411340
+1,"Lidianópolis",411342
+1,"Lindoeste",411345
+1,"Loanda",411350
+1,"Lobato",411360
+1,"Londrina",411370
+1,"Luiziana",411373
+1,"Lunardelli",411375
+1,"Lupionópolis",411380
+1,"Mallet",411390
+1,"Mamborê",411400
+1,"Mandaguaçu",411410
+1,"Mandaguari",411420
+1,"Mandirituba",411430
+1,"Manfrinópolis",411435
+1,"Mangueirinha",411440
+1,"Manoel Ribas",411450
+2,"Marechal Cândido Rondon",411460
+1,"Maria Helena",411470
+1,"Marialva",411480
+1,"Marilândia do Sul",411490
+2,"Marilena",411500
+1,"Mariluz",411510
+1,"Maringá",411520
+1,"Mariópolis",411530
+1,"Maripá",411535
+1,"Marmeleiro",411540
+1,"Marquinho",411545
+1,"Marumbi",411550
+1,"Matelândia",411560
+1,"Matinhos",411570
+1,"Mato Rico",411573
+1,"Mauá da Serra",411575
+2,"Medianeira",411580
+2,"Mercedes",411585
+1,"Mirador",411590
+1,"Miraselva",411600
+2,"Missal",411605
+1,"Moreira Sales",411610
+1,"Morretes",411620
+1,"Munhoz de Melo",411630
+1,"Nossa Senhora das Graças",411640
+1,"Nova Aliança do Ivaí",411650
+1,"Nova América da Colina",411660
+1,"Nova Aurora",411670
+1,"Nova Cantu",411680
+1,"Nova Esperança",411690
+1,"Nova Esperança do Sudoeste",411695
+1,"Nova Fátima",411700
+1,"Nova Laranjeiras",411705
+2,"Nova Londrina",411710
+1,"Nova Olímpia",411720
+1,"Nova Santa Bárbara",411721
+1,"Nova Santa Rosa",411722
+1,"Nova Prata do Iguaçu",411725
+1,"Nova Tebas",411727
+1,"Novo Itacolomi",411729
+1,"Ortigueira",411730
+1,"Ourizona",411740
+1,"Ouro Verde do Oeste",411745
+1,"Paiçandu",411750
+1,"Palmas",411760
+1,"Palmeira",411770
+1,"Palmital",411780
+1,"Palotina",411790
+1,"Paraíso do Norte",411800
+1,"Paranacity",411810
+1,"Paranaguá",411820
+1,"Paranapoema",411830
+1,"Paranavaí",411840
+2,"Pato Bragado",411845
+1,"Pato Branco",411850
+1,"Paula Freitas",411860
+1,"Paulo Frontin",411870
+1,"Peabiru",411880
+1,"Perobal",411885
+1,"Pérola",411890
+1,"Pérola d'Oeste",411900
+1,"Piên",411910
+1,"Pinhais",411915
+1,"Pinhalão",411920
+1,"Pinhal de São Bento",411925
+1,"Pinhão",411930
+1,"Piraí do Sul",411940
+1,"Piraquara",411950
+1,"Pitanga",411960
+1,"Pitangueiras",411965
+1,"Planaltina do Paraná",411970
+1,"Planalto",411980
+1,"Ponta Grossa",411990
+1,"Pontal do Paraná",411995
+1,"Porecatu",412000
+1,"Porto Amazonas",412010
+1,"Porto Barreiro",412015
+2,"Porto Rico",412020
+1,"Porto Vitória",412030
+1,"Prado Ferreira",412033
+1,"Pranchita",412035
+1,"Presidente Castelo Branco",412040
+1,"Primeiro de Maio",412050
+1,"Prudentópolis",412060
+1,"Quarto Centenário",412065
+1,"Quatiguá",412070
+1,"Quatro Barras",412080
+1,"Quatro Pontes",412085
+1,"Quedas do Iguaçu",412090
+2,"Querência do Norte",412100
+1,"Quinta do Sol",412110
+1,"Quitandinha",412120
+2,"Ramilândia",412125
+1,"Rancho Alegre",412130
+1,"Rancho Alegre d'Oeste",412135
+1,"Realeza",412140
+1,"Rebouças",412150
+1,"Renascença",412160
+1,"Reserva",412170
+1,"Reserva do Iguaçu",412175
+1,"Ribeirão Claro",412180
+1,"Ribeirão do Pinhal",412190
+1,"Rio Azul",412200
+1,"Rio Bom",412210
+1,"Rio Bonito do Iguaçu",412215
+1,"Rio Branco do Ivaí",412217
+1,"Rio Branco do Sul",412220
+1,"Rio Negro",412230
+1,"Rolândia",412240
+1,"Roncador",412250
+1,"Rondon",412260
+1,"Rosário do Ivaí",412265
+1,"Sabáudia",412270
+1,"Salgado Filho",412280
+1,"Salto do Itararé",412290
+1,"Salto do Lontra",412300
+1,"Santa Amélia",412310
+1,"Santa Cecília do Pavão",412320
+1,"Santa Cruz de Monte Castelo",412330
+1,"Santa Fé",412340
+2,"Santa Helena",412350
+1,"Santa Inês",412360
+1,"Santa Isabel do Ivaí",412370
+1,"Santa Izabel do Oeste",412380
+1,"Santa Lúcia",412382
+1,"Santa Maria do Oeste",412385
+1,"Santa Mariana",412390
+1,"Santa Mônica",412395
+1,"Santana do Itararé",412400
+1,"Santa Tereza do Oeste",412402
+2,"Santa Terezinha de Itaipu",412405
+1,"Santo Antônio da Platina",412410
+1,"Santo Antônio do Caiuá",412420
+1,"Santo Antônio do Paraíso",412430
+1,"Santo Antônio do Sudoeste",412440
+1,"Santo Inácio",412450
+1,"São Carlos do Ivaí",412460
+1,"São Jerônimo da Serra",412470
+1,"São João",412480
+1,"São João do Caiuá",412490
+1,"São João do Ivaí",412500
+1,"São João do Triunfo",412510
+1,"São Jorge d'Oeste",412520
+1,"São Jorge do Ivaí",412530
+2,"São Jorge do Patrocínio",412535
+1,"São José da Boa Vista",412540
+2,"São José das Palmeiras",412545
+1,"São José dos Pinhais",412550
+1,"São Manoel do Paraná",412555
+1,"São Mateus do Sul",412560
+2,"São Miguel do Iguaçu",412570
+1,"São Pedro do Iguaçu",412575
+1,"São Pedro do Ivaí",412580
+2,"São Pedro do Paraná",412590
+1,"São Sebastião da Amoreira",412600
+1,"São Tomé",412610
+1,"Sapopema",412620
+1,"Sarandi",412625
+1,"Saudade do Iguaçu",412627
+1,"Sengés",412630
+1,"Serranópolis do Iguaçu",412635
+1,"Sertaneja",412640
+1,"Sertanópolis",412650
+1,"Siqueira Campos",412660
+1,"Sulina",412665
+1,"Tamarana",412667
+1,"Tamboara",412670
+1,"Tapejara",412680
+1,"Tapira",412690
+1,"Teixeira Soares",412700
+1,"Telêmaco Borba",412710
+1,"Terra Boa",412720
+1,"Terra Rica",412730
+2,"Terra Roxa",412740
+1,"Tibagi",412750
+1,"Tijucas do Sul",412760
+1,"Toledo",412770
+1,"Tomazina",412780
+1,"Três Barras do Paraná",412785
+2,"Tunas do Paraná",412788
+1,"Tuneiras do Oeste",412790
+1,"Tupãssi",412795
+1,"Turvo",412796
+1,"Ubiratã",412800
+1,"Umuarama",412810
+1,"União da Vitória",412820
+1,"Uniflor",412830
+1,"Uraí",412840
+1,"Wenceslau Braz",412850
+1,"Ventania",412853
+1,"Vera Cruz do Oeste",412855
+1,"Verê",412860
+2,"Vila Alta",412862
+1,"Doutor Ulysses",412863
+1,"Virmond",412865
+1,"Vitorino",412870
+1,"Xambrê",412880
+1,"Abdon Batista",420005
+1,"Abelardo Luz",420010
+1,"Agrolândia",420020
+1,"Agronômica",420030
+1,"Água Doce",420040
+1,"Águas de Chapecó",420050
+1,"Águas Frias",420055
+1,"Águas Mornas",420060
+1,"Alfredo Wagner",420070
+1,"Alto Bela Vista",420075
+1,"Anchieta",420080
+1,"Angelina",420090
+1,"Anita Garibaldi",420100
+1,"Anitápolis",420110
+1,"Antônio Carlos",420120
+1,"Apiúna",420125
+1,"Arabutã",420127
+1,"Araquari",420130
+1,"Araranguá",420140
+1,"Armazém",420150
+1,"Arroio Trinta",420160
+1,"Arvoredo",420165
+1,"Ascurra",420170
+1,"Atalanta",420180
+1,"Aurora",420190
+1,"Balneário Arroio do Silva",420195
+1,"Balneário Camboriú",420200
+1,"Balneário Barra do Sul",420205
+1,"Balneário Gaivota",420207
+1,"Bandeirante",420208
+1,"Barra Bonita",420209
+1,"Barra Velha",420210
+1,"Bela Vista do Toldo",420213
+1,"Belmonte",420215
+1,"Benedito Novo",420220
+1,"Biguaçu",420230
+1,"Blumenau",420240
+1,"Bocaina do Sul",420243
+1,"Bombinhas",420245
+1,"Bom Jardim da Serra",420250
+1,"Bom Jesus",420253
+1,"Bom Jesus do Oeste",420257
+1,"Bom Retiro",420260
+1,"Botuverá",420270
+1,"Braço do Norte",420280
+1,"Braço do Trombudo",420285
+1,"Brunópolis",420287
+1,"Brusque",420290
+1,"Caçador",420300
+1,"Caibi",420310
+1,"Calmon",420315
+1,"Camboriú",420320
+1,"Capão Alto",420325
+1,"Campo Alegre",420330
+1,"Campo Belo do Sul",420340
+1,"Campo Erê",420350
+1,"Campos Novos",420360
+1,"Canelinha",420370
+1,"Canoinhas",420380
+1,"Capinzal",420390
+1,"Capivari de Baixo",420395
+1,"Catanduvas",420400
+1,"Caxambu do Sul",420410
+1,"Celso Ramos",420415
+1,"Cerro Negro",420417
+1,"Chapadão do Lageado",420419
+1,"Chapecó",420420
+1,"Cocal do Sul",420425
+1,"Concórdia",420430
+1,"Cordilheira Alta",420435
+1,"Coronel Freitas",420440
+1,"Coronel Martins",420445
+1,"Corupá",420450
+1,"Correia Pinto",420455
+1,"Criciúma",420460
+1,"Cunha Porã",420470
+1,"Cunhataí",420475
+1,"Curitibanos",420480
+1,"Descanso",420490
+1,"Dionísio Cerqueira",420500
+1,"Dona Emma",420510
+1,"Doutor Pedrinho",420515
+1,"Entre Rios",420517
+1,"Ermo",420519
+1,"Erval Velho",420520
+1,"Faxinal dos Guedes",420530
+1,"Flor do Sertão",420535
+1,"Florianópolis",420540
+1,"Formosa do Sul",420543
+1,"Forquilhinha",420545
+1,"Fraiburgo",420550
+1,"Frei Rogério",420555
+1,"Galvão",420560
+1,"Garopaba",420570
+1,"Garuva",420580
+1,"Gaspar",420590
+1,"Governador Celso Ramos",420600
+1,"Grão Pará",420610
+1,"Gravatal",420620
+1,"Guabiruba",420630
+1,"Guaraciaba",420640
+1,"Guaramirim",420650
+1,"Guarujá do Sul",420660
+1,"Guatambú",420665
+1,"Herval d'Oeste",420670
+1,"Ibiam",420675
+1,"Ibicaré",420680
+1,"Ibirama",420690
+1,"Içara",420700
+1,"Ilhota",420710
+1,"Imaruí",420720
+1,"Imbituba",420730
+1,"Imbuia",420740
+1,"Indaial",420750
+1,"Iomerê",420757
+1,"Ipira",420760
+1,"Iporã do Oeste",420765
+1,"Ipuaçu",420768
+1,"Ipumirim",420770
+1,"Iraceminha",420775
+1,"Irani",420780
+1,"Irati",420785
+1,"Irineópolis",420790
+1,"Itá",420800
+1,"Itaiópolis",420810
+1,"Itajaí",420820
+1,"Itapema",420830
+1,"Itapiranga",420840
+1,"Itapoá",420845
+1,"Ituporanga",420850
+1,"Jaborá",420860
+1,"Jacinto Machado",420870
+1,"Jaguaruna",420880
+1,"Jaraguá do Sul",420890
+1,"Jardinópolis",420895
+1,"Joaçaba",420900
+1,"Joinville",420910
+1,"José Boiteux",420915
+1,"Jupiá",420917
+1,"Lacerdópolis",420920
+1,"Lages",420930
+1,"Laguna",420940
+1,"Lajeado Grande",420945
+1,"Laurentino",420950
+1,"Lauro Muller",420960
+1,"Lebon Régis",420970
+1,"Leoberto Leal",420980
+1,"Lindóia do Sul",420985
+1,"Lontras",420990
+1,"Luiz Alves",421000
+1,"Luzerna",421003
+1,"Macieira",421005
+1,"Mafra",421010
+1,"Major Gercino",421020
+1,"Major Vieira",421030
+1,"Maracajá",421040
+1,"Maravilha",421050
+1,"Marema",421055
+1,"Massaranduba",421060
+1,"Matos Costa",421070
+1,"Meleiro",421080
+1,"Mirim Doce",421085
+1,"Modelo",421090
+1,"Mondaí",421100
+1,"Monte Carlo",421105
+1,"Monte Castelo",421110
+1,"Morro da Fumaça",421120
+1,"Morro Grande",421125
+1,"Navegantes",421130
+1,"Nova Erechim",421140
+1,"Nova Itaberaba",421145
+1,"Nova Trento",421150
+1,"Nova Veneza",421160
+1,"Novo Horizonte",421165
+1,"Orleans",421170
+1,"Otacílio Costa",421175
+1,"Ouro",421180
+1,"Ouro Verde",421185
+1,"Paial",421187
+1,"Painel",421189
+1,"Palhoça",421190
+1,"Palma Sola",421200
+1,"Palmeira",421205
+1,"Palmitos",421210
+1,"Papanduva",421220
+1,"Paraíso",421223
+1,"Passo de Torres",421225
+1,"Passos Maia",421227
+1,"Paulo Lopes",421230
+1,"Pedras Grandes",421240
+1,"Penha",421250
+1,"Peritiba",421260
+1,"Petrolândia",421270
+1,"Piçarras",421280
+1,"Pinhalzinho",421290
+1,"Pinheiro Preto",421300
+1,"Piratuba",421310
+1,"Planalto Alegre",421315
+1,"Pomerode",421320
+1,"Ponte Alta",421330
+1,"Ponte Alta do Norte",421335
+1,"Ponte Serrada",421340
+1,"Porto Belo",421350
+1,"Porto União",421360
+1,"Pouso Redondo",421370
+1,"Praia Grande",421380
+1,"Presidente Castelo Branco",421390
+1,"Presidente Getúlio",421400
+1,"Presidente Nereu",421410
+1,"Princesa",421415
+1,"Quilombo",421420
+1,"Rancho Queimado",421430
+1,"Rio das Antas",421440
+1,"Rio do Campo",421450
+1,"Rio do Oeste",421460
+1,"Rio dos Cedros",421470
+1,"Rio do Sul",421480
+1,"Rio Fortuna",421490
+1,"Rio Negrinho",421500
+1,"Rio Rufino",421505
+1,"Riqueza",421507
+1,"Rodeio",421510
+1,"Romelândia",421520
+1,"Salete",421530
+1,"Saltinho",421535
+1,"Salto Veloso",421540
+1,"Sangão",421545
+1,"Santa Cecília",421550
+1,"Santa Helena",421555
+1,"Santa Rosa de Lima",421560
+1,"Santa Rosa do Sul",421565
+1,"Santa Terezinha",421567
+1,"Santa Terezinha do Progresso",421568
+1,"Santiago do Sul",421569
+1,"Santo Amaro da Imperatriz",421570
+1,"São Bernardino",421575
+1,"São Bento do Sul",421580
+1,"São Bonifácio",421590
+1,"São Carlos",421600
+1,"São Cristovão do Sul",421605
+1,"São Domingos",421610
+1,"São Francisco do Sul",421620
+1,"São João do Oeste",421625
+1,"São João Batista",421630
+1,"São João do Itaperiú",421635
+1,"São João do Sul",421640
+1,"São Joaquim",421650
+1,"São José",421660
+1,"São José do Cedro",421670
+1,"São José do Cerrito",421680
+1,"São Lourenço do Oeste",421690
+1,"São Ludgero",421700
+1,"São Martinho",421710
+1,"São Miguel da Boa Vista",421715
+1,"São Miguel do Oeste",421720
+1,"São Pedro de Alcântara",421725
+1,"Saudades",421730
+1,"Schroeder",421740
+1,"Seara",421750
+1,"Serra Alta",421755
+1,"Siderópolis",421760
+1,"Sombrio",421770
+1,"Sul Brasil",421775
+1,"Taió",421780
+1,"Tangará",421790
+1,"Tigrinhos",421795
+1,"Tijucas",421800
+1,"Timbé do Sul",421810
+1,"Timbó",421820
+1,"Timbó Grande",421825
+1,"Três Barras",421830
+1,"Treviso",421835
+1,"Treze de Maio",421840
+1,"Treze Tílias",421850
+1,"Trombudo Central",421860
+1,"Tubarão",421870
+1,"Tunápolis",421875
+1,"Turvo",421880
+1,"União do Oeste",421885
+1,"Urubici",421890
+1,"Urupema",421895
+1,"Urussanga",421900
+1,"Vargeão",421910
+1,"Vargem",421915
+1,"Vargem Bonita",421917
+1,"Vidal Ramos",421920
+1,"Videira",421930
+1,"Vitor Meireles",421935
+1,"Witmarsum",421940
+1,"Xanxerê",421950
+1,"Xavantina",421960
+1,"Xaxim",421970
+1,"Zortéa",421985
+0,"Aceguá",430003
+1,"Água Santa",430005
+1,"Agudo",430010
+1,"Ajuricaba",430020
+2,"Alecrim",430030
+1,"Alegrete",430040
+2,"Alegria",430045
+1,"Almirante Tamandaré do Sul",430047
+1,"Alpestre",430050
+1,"Alto Alegre",430055
+1,"Alto Feliz",430057
+1,"Alvorada",430060
+1,"Amaral Ferrador",430063
+1,"Ametista do Sul",430064
+1,"André da Rocha",430066
+1,"Anta Gorda",430070
+1,"Antônio Prado",430080
+1,"Arambaré",430085
+1,"Araricá",430087
+1,"Aratiba",430090
+1,"Arroio do Meio",430100
+1,"Arroio do Sal",430105
+1,"Arroio do Padre",430107
+1,"Arroio dos Ratos",430110
+1,"Arroio do Tigre",430120
+1,"Arroio Grande",430130
+1,"Arvorezinha",430140
+2,"Augusto Pestana",430150
+1,"Áurea",430155
+1,"Bagé",430160
+1,"Balneário Pinhal",430163
+1,"Barão",430165
+1,"Barão de Cotegipe",430170
+1,"Barão do Triunfo",430175
+1,"Barracão",430180
+1,"Barra do Guarita",430185
+1,"Barra do Quaraí",430187
+1,"Barra do Ribeiro",430190
+1,"Barra do Rio Azul",430192
+1,"Barra Funda",430195
+1,"Barros Cassal",430200
+1,"Benjamin Constant do Sul",430205
+1,"Bento Gonçalves",430210
+1,"Boa Vista das Missões",430215
+2,"Boa Vista do Buricá",430220
+2,"Boa Vista do Cadeado",430222
+1,"Boa Vista do Incra",430223
+1,"Boa Vista do Sul",430225
+1,"Bom Jesus",430230
+1,"Bom Princípio",430235
+1,"Bom Progresso",430237
+1,"Bom Retiro do Sul",430240
+1,"Boqueirão do Leão",430245
+2,"Bossoroca",430250
+1,"Bozano",430258
+1,"Braga",430260
+1,"Brochier",430265
+1,"Butiá",430270
+1,"Caçapava do Sul",430280
+2,"Cacequi",430290
+1,"Cachoeira do Sul",430300
+1,"Cachoeirinha",430310
+1,"Cacique Doble",430320
+2,"Caibaté",430330
+1,"Caiçara",430340
+1,"Camaquã",430350
+1,"Camargo",430355
+1,"Cambará do Sul",430360
+1,"Campestre da Serra",430367
+2,"Campina das Missões",430370
+1,"Campinas do Sul",430380
+1,"Campo Bom",430390
+1,"Campo Novo",430400
+1,"Campos Borges",430410
+1,"Candelária",430420
+2,"Cândido Godói",430430
+0,"Candiota",430435
+1,"Canela",430440
+1,"Canguçu",430450
+1,"Canoas",430460
+1,"Canudos do Vale",430461
+1,"Capão Bonito do Sul",430462
+1,"Capão da Canoa",430463
+2,"Capão do Cipó",430465
+1,"Capão do Leão",430466
+1,"Capivari do Sul",430467
+1,"Capela de Santana",430468
+1,"Capitão",430469
+1,"Carazinho",430470
+1,"Caraá",430471
+1,"Carlos Barbosa",430480
+1,"Carlos Gomes",430485
+1,"Casca",430490
+1,"Caseiros",430495
+2,"Catuípe",430500
+1,"Caxias do Sul",430510
+1,"Centenário",430511
+1,"Cerrito",430512
+1,"Cerro Branco",430513
+1,"Cerro Grande",430515
+1,"Cerro Grande do Sul",430517
+2,"Cerro Largo",430520
+1,"Chapada",430530
+1,"Charqueadas",430535
+1,"Charrua",430537
+1,"Chiapetta",430540
+0,"Chuí",430543
+1,"Chuvisca",430544
+1,"Cidreira",430545
+1,"Ciríaco",430550
+1,"Colinas",430558
+1,"Colorado",430560
+1,"Condor",430570
+1,"Constantina",430580
+1,"Coqueiro Baixo",430583
+1,"Coqueiros do Sul",430585
+2,"Coronel Barros",430587
+1,"Coronel Bicaco",430590
+1,"Coronel Pilar",430593
+1,"Cotiporã",430595
+1,"Coxilha",430597
+2,"Crissiumal",430600
+1,"Cristal",430605
+1,"Cristal do Sul",430607
+1,"Cruz Alta",430610
+1,"Cruzaltense",430613
+1,"Cruzeiro do Sul",430620
+1,"David Canabarro",430630
+1,"Derrubadas",430632
+2,"Dezesseis de Novembro",430635
+2,"Dilermando de Aguiar",430637
+1,"Dois Irmãos",430640
+1,"Dois Irmãos das Missões",430642
+1,"Dois Lajeados",430645
+1,"Dom Feliciano",430650
+1,"Dom Pedro de Alcântara",430655
+0,"Dom Pedrito",430660
+1,"Dona Francisca",430670
+2,"Doutor Maurício Cardoso",430673
+1,"Doutor Ricardo",430675
+1,"Eldorado do Sul",430676
+1,"Encantado",430680
+1,"Encruzilhada do Sul",430690
+1,"Engenho Velho",430692
+2,"Entre-Ijuís",430693
+1,"Entre Rios do Sul",430695
+1,"Erebango",430697
+1,"Erechim",430700
+1,"Ernestina",430705
+0,"Herval",430710
+1,"Erval Grande",430720
+1,"Erval Seco",430730
+1,"Esmeralda",430740
+1,"Esperança do Sul",430745
+1,"Espumoso",430750
+1,"Estação",430755
+1,"Estância Velha",430760
+1,"Esteio",430770
+1,"Estrela",430780
+1,"Estrela Velha",430781
+2,"Eugênio de Castro",430783
+1,"Fagundes Varela",430786
+1,"Farroupilha",430790
+1,"Faxinal do Soturno",430800
+1,"Faxinalzinho",430805
+1,"Fazenda Vilanova",430807
+1,"Feliz",430810
+1,"Flores da Cunha",430820
+1,"Floriano Peixoto",430825
+1,"Fontoura Xavier",430830
+1,"Formigueiro",430840
+1,"Forquetinha",430843
+1,"Fortaleza dos Valos",430845
+1,"Frederico Westphalen",430850
+1,"Garibaldi",430860
+1,"Garruchos",430865
+1,"Gaurama",430870
+1,"General Câmara",430880
+1,"Gentil",430885
+1,"Getúlio Vargas",430890
+2,"Giruá",430900
+1,"Glorinha",430905
+1,"Gramado",430910
+1,"Gramado dos Loureiros",430912
+1,"Gramado Xavier",430915
+1,"Gravataí",430920
+1,"Guabiju",430925
+1,"Guaíba",430930
+1,"Guaporé",430940
+2,"Guarani das Missões",430950
+1,"Harmonia",430955
+1,"Herveiras",430957
+2,"Horizontina",430960
+0,"Hulha Negra",430965
+1,"Humaitá",430970
+1,"Ibarama",430975
+1,"Ibiaçá",430980
+1,"Ibiraiaras",430990
+1,"Ibirapuitã",430995
+1,"Ibirubá",431000
+1,"Igrejinha",431010
+2,"Ijuí",431020
+1,"Ilópolis",431030
+1,"Imbé",431033
+1,"Imigrante",431036
+2,"Independência",431040
+2,"Inhacorá",431041
+1,"Ipê",431043
+1,"Ipiranga do Sul",431046
+1,"Iraí",431050
+1,"Itaara",431053
+2,"Itacurubi",431055
+1,"Itapuca",431057
+1,"Itaqui",431060
+1,"Itati",431065
+1,"Itatiba do Sul",431070
+1,"Ivorá",431075
+1,"Ivoti",431080
+1,"Jaboticaba",431085
+1,"Jacuizinho",431087
+1,"Jacutinga",431090
+0,"Jaguarão",431100
+2,"Jaguari",431110
+1,"Jaquirana",431112
+2,"Jari",431113
+2,"Jóia",431115
+2,"Júlio de Castilhos",431120
+1,"Lagoa Bonita do Sul",431123
+1,"Lagoão",431125
+1,"Lagoa dos Três Cantos",431127
+1,"Lagoa Vermelha",431130
+1,"Lajeado",431140
+1,"Lajeado do Bugre",431142
+1,"Lavras do Sul",431150
+1,"Liberato Salzano",431160
+1,"Lindolfo Collor",431162
+1,"Linha Nova",431164
+1,"Machadinho",431170
+1,"Maçambara",431171
+1,"Mampituba",431173
+1,"Manoel Viana",431175
+1,"Maquiné",431177
+1,"Maratá",431179
+1,"Marau",431180
+1,"Marcelino Ramos",431190
+1,"Mariana Pimentel",431198
+1,"Mariano Moro",431200
+1,"Marques de Souza",431205
+2,"Mata",431210
+1,"Mato Castelhano",431213
+1,"Mato Leitão",431215
+2,"Mato Queimado",431217
+1,"Maximiliano de Almeida",431220
+1,"Minas do Leão",431225
+1,"Miraguaí",431230
+1,"Montauri",431235
+1,"Monte Alegre dos Campos",431237
+1,"Monte Belo do Sul",431238
+1,"Montenegro",431240
+1,"Mormaço",431242
+1,"Morrinhos do Sul",431244
+1,"Morro Redondo",431245
+1,"Morro Reuter",431247
+1,"Mostardas",431250
+1,"Muçum",431260
+1,"Muitos Capões",431261
+1,"Muliterno",431262
+1,"Não-Me-Toque",431265
+1,"Nicolau Vergueiro",431267
+1,"Nonoai",431270
+1,"Nova Alvorada",431275
+1,"Nova Araçá",431280
+1,"Nova Bassano",431290
+1,"Nova Boa Vista",431295
+1,"Nova Bréscia",431300
+2,"Nova Candelária",431301
+2,"Nova Esperança do Sul",431303
+1,"Nova Hartz",431306
+1,"Nova Pádua",431308
+1,"Nova Palma",431310
+1,"Nova Petrópolis",431320
+1,"Nova Prata",431330
+1,"Nova Ramada",431333
+1,"Nova Roma do Sul",431335
+1,"Nova Santa Rita",431337
+1,"Novo Cabrais",431339
+1,"Novo Hamburgo",431340
+2,"Novo Machado",431342
+1,"Novo Tiradentes",431344
+1,"Novo Xingu",431346
+1,"Novo Barreiro",431349
+1,"Osório",431350
+1,"Paim Filho",431360
+1,"Palmares do Sul",431365
+1,"Palmeira das Missões",431370
+1,"Palmitinho",431380
+1,"Panambi",431390
+1,"Pantano Grande",431395
+1,"Paraí",431400
+1,"Paraíso do Sul",431402
+1,"Pareci Novo",431403
+1,"Parobé",431405
+1,"Passa Sete",431406
+1,"Passo do Sobrado",431407
+1,"Passo Fundo",431410
+1,"Paulo Bento",431413
+1,"Paverama",431415
+0,"Pedras Altas",431417
+0,"Pedro Osório",431420
+1,"Pejuçara",431430
+1,"Pelotas",431440
+1,"Picada Café",431442
+1,"Pinhal",431445
+1,"Pinhal da Serra",431446
+1,"Pinhal Grande",431447
+1,"Pinheirinho do Vale",431449
+1,"Pinheiro Machado",431450
+1,"Pirapó",431455
+1,"Piratini",431460
+1,"Planalto",431470
+1,"Poço das Antas",431475
+1,"Pontão",431477
+1,"Ponte Preta",431478
+1,"Portão",431480
+1,"Porto Alegre",431490
+2,"Porto Lucena",431500
+2,"Porto Mauá",431505
+2,"Porto Vera Cruz",431507
+1,"Porto Xavier",431510
+1,"Pouso Novo",431513
+1,"Presidente Lucena",431514
+1,"Progresso",431515
+1,"Protásio Alves",431517
+1,"Putinga",431520
+1,"Quaraí",431530
+1,"Quatro Irmãos",431531
+2,"Quevedos",431532
+1,"Quinze de Novembro",431535
+1,"Redentora",431540
+1,"Relvado",431545
+1,"Restinga Seca",431550
+1,"Rio dos Índios",431555
+1,"Rio Grande",431560
+1,"Rio Pardo",431570
+1,"Riozinho",431575
+1,"Roca Sales",431580
+1,"Rodeio Bonito",431590
+2,"Rolador",431595
+1,"Rolante",431600
+1,"Ronda Alta",431610
+1,"Rondinha",431620
+2,"Roque Gonzales",431630
+1,"Rosário do Sul",431640
+1,"Sagrada Família",431642
+1,"Saldanha Marinho",431643
+1,"Salto do Jacuí",431645
+2,"Salvador das Missões",431647
+1,"Salvador do Sul",431650
+1,"Sananduva",431660
+1,"Santa Bárbara do Sul",431670
+1,"Santa Cecília do Sul",431673
+1,"Santa Clara do Sul",431675
+1,"Santa Cruz do Sul",431680
+2,"Santa Maria",431690
+1,"Santa Maria do Herval",431695
+1,"Santa Margarida do Sul",431697
+1,"Santana da Boa Vista",431700
+1,"Santana do Livramento",431710
+2,"Santa Rosa",431720
+1,"Santa Tereza",431725
+0,"Santa Vitória do Palmar",431730
+2,"Santiago",431740
+2,"Santo Ângelo",431750
+1,"Santo Antônio do Palma",431755
+1,"Santo Antônio da Patrulha",431760
+1,"Santo Antônio das Missões",431770
+1,"Santo Antônio do Planalto",431775
+1,"Santo Augusto",431780
+2,"Santo Cristo",431790
+1,"Santo Expedito do Sul",431795
+1,"São Borja",431800
+1,"São Domingos do Sul",431805
+1,"São Francisco de Assis",431810
+1,"São Francisco de Paula",431820
+1,"São Gabriel",431830
+1,"São Jerônimo",431840
+1,"São João da Urtiga",431842
+1,"São João do Polêsine",431843
+1,"São Jorge",431844
+1,"São José das Missões",431845
+1,"São José do Herval",431846
+1,"São José do Hortêncio",431848
+2,"São José do Inhacorá",431849
+1,"São José do Norte",431850
+1,"São José do Ouro",431860
+1,"São José do Sul",431861
+1,"São José dos Ausentes",431862
+1,"São Leopoldo",431870
+1,"São Lourenço do Sul",431880
+2,"São Luiz Gonzaga",431890
+1,"São Marcos",431900
+1,"São Martinho",431910
+2,"São Martinho da Serra",431912
+2,"São Miguel das Missões",431915
+1,"São Nicolau",431920
+2,"São Paulo das Missões",431930
+1,"São Pedro da Serra",431935
+1,"São Pedro das Missões",431936
+2,"São Pedro do Butiá",431937
+2,"São Pedro do Sul",431940
+1,"São Sebastião do Caí",431950
+1,"São Sepé",431960
+1,"São Valentim",431970
+1,"São Valentim do Sul",431971
+1,"São Valério do Sul",431973
+1,"São Vendelino",431975
+2,"São Vicente do Sul",431980
+1,"Sapiranga",431990
+1,"Sapucaia do Sul",432000
+1,"Sarandi",432010
+1,"Seberi",432020
+1,"Sede Nova",432023
+1,"Segredo",432026
+1,"Selbach",432030
+2,"Senador Salgado Filho",432032
+1,"Sentinela do Sul",432035
+1,"Serafina Corrêa",432040
+1,"Sério",432045
+1,"Sertão",432050
+1,"Sertão Santana",432055
+2,"Sete de Setembro",432057
+1,"Severiano de Almeida",432060
+1,"Silveira Martins",432065
+1,"Sinimbu",432067
+1,"Sobradinho",432070
+1,"Soledade",432080
+1,"Tabaí",432085
+1,"Tapejara",432090
+1,"Tapera",432100
+1,"Tapes",432110
+1,"Taquara",432120
+1,"Taquari",432130
+1,"Taquaruçu do Sul",432132
+1,"Tavares",432135
+1,"Tenente Portela",432140
+1,"Terra de Areia",432143
+1,"Teutônia",432145
+1,"Tio Hugo",432146
+2,"Tiradentes do Sul",432147
+2,"Toropi",432149
+1,"Torres",432150
+1,"Tramandaí",432160
+1,"Travesseiro",432162
+1,"Três Arroios",432163
+1,"Três Cachoeiras",432166
+1,"Três Coroas",432170
+2,"Três de Maio",432180
+1,"Três Forquilhas",432183
+1,"Três Palmeiras",432185
+1,"Três Passos",432190
+1,"Trindade do Sul",432195
+1,"Triunfo",432200
+2,"Tucunduva",432210
+1,"Tunas",432215
+1,"Tupanci do Sul",432218
+2,"Tupanciretã",432220
+1,"Tupandi",432225
+2,"Tuparendi",432230
+1,"Turuçu",432232
+2,"Ubiretama",432234
+1,"União da Serra",432235
+1,"Unistalda",432237
+1,"Uruguaiana",432240
+1,"Vacaria",432250
+1,"Vale Verde",432252
+1,"Vale do Sol",432253
+1,"Vale Real",432254
+1,"Vanini",432255
+1,"Venâncio Aires",432260
+1,"Vera Cruz",432270
+1,"Veranópolis",432280
+1,"Vespasiano Correa",432285
+1,"Viadutos",432290
+1,"Viamão",432300
+1,"Vicente Dutra",432310
+1,"Victor Graeff",432320
+1,"Vila Flores",432330
+1,"Vila Lângaro",432335
+1,"Vila Maria",432340
+1,"Vila Nova do Sul",432345
+1,"Vista Alegre",432350
+1,"Vista Alegre do Prata",432360
+1,"Vista Gaúcha",432370
+2,"Vitória das Missões",432375
+1,"Westfalia",432377
+1,"Xangri-lá",432380
+2,"Água Clara",500020
+2,"Alcinópolis",500025
+1,"Amambaí",500060
+1,"Anastácio",500070
+2,"Anaurilândia",500080
+1,"Angélica",500085
+1,"Antônio João",500090
+3,"Aparecida do Taboado",500100
+2,"Aquidauana",500110
+1,"Aral Moreira",500124
+2,"Bandeirantes",500150
+2,"Bataguassu",500190
+1,"Batayporã",500200
+1,"Bela Vista",500210
+2,"Bodoquena",500215
+2,"Bonito",500220
+2,"Brasilândia",500230
+1,"Caarapó",500240
+2,"Camapuã",500260
+2,"Campo Grande",500270
+1,"Caracol",500280
+2,"Cassilândia",500290
+2,"Chapadão do Sul",500295
+2,"Corguinho",500310
+1,"Coronel Sapucaia",500315
+4,"Corumbá",500320
+2,"Costa Rica",500325
+2,"Coxim",500330
+1,"Deodápolis",500345
+1,"Dois Irmãos do Buriti",500348
+1,"Douradina",500350
+1,"Dourados",500370
+1,"Eldorado",500375
+1,"Fátima do Sul",500380
+1,"Glória de Dourados",500400
+1,"Guia Lopes da Laguna",500410
+1,"Iguatemi",500430
+2,"Inocência",500440
+1,"Itaporã",500450
+1,"Itaquiraí",500460
+1,"Ivinhema",500470
+1,"Japorã",500480
+2,"Jaraguari",500490
+1,"Jardim",500500
+1,"Jateí",500510
+1,"Juti",500515
+2,"Ladário",500520
+1,"Laguna Carapã",500525
+1,"Maracaju",500540
+2,"Miranda",500560
+1,"Mundo Novo",500568
+1,"Naviraí",500570
+1,"Nioaque",500580
+2,"Nova Alvorada do Sul",500600
+1,"Nova Andradina",500620
+1,"Novo Horizonte do Sul",500625
+3,"Paranaíba",500630
+1,"Paranhos",500635
+1,"Pedro Gomes",500640
+1,"Ponta Porã",500660
+2,"Porto Murtinho",500690
+2,"Ribas do Rio Pardo",500710
+1,"Rio Brilhante",500720
+1,"Rio Negro",500730
+2,"Rio Verde de Mato Grosso",500740
+2,"Rochedo",500750
+3,"Santa Rita do Pardo",500755
+2,"São Gabriel do Oeste",500769
+1,"Sete Quedas",500770
+3,"Selvíria",500780
+2,"Sidrolândia",500790
+3,"Sonora",500793
+1,"Tacuru",500795
+1,"Taquarussu",500797
+2,"Terenos",500800
+2,"Três Lagoas",500830
+1,"Vicentina",500840
+3,"Acorizal",510010
+2,"Água Boa",510020
+6,"Alta Floresta",510025
+3,"Alto Araguaia",510030
+2,"Alto Boa Vista",510035
+2,"Alto Garças",510040
+3,"Alto Paraguai",510050
+2,"Alto Taquari",510060
+12,"Apiacás",510080
+3,"Araguaiana",510100
+2,"Araguainha",510120
+1,"Araputanga",510125
+2,"Arenápolis",510130
+8,"Aripuanã",510140
+2,"Barão de Melgaço",510160
+3,"Barra do Bugres",510170
+2,"Barra do Garças",510180
+2,"Bom Jesus do Araguaia",510185
+8,"Brasnorte",510190
+4,"Cáceres",510250
+2,"Campinápolis",510260
+4,"Campo Novo do Parecis",510263
+2,"Campo Verde",510267
+6,"Campos de Júlio",510268
+3,"CanaBrava do Norte",510269
+2,"Canarana",510270
+6,"Carlinda",510279
+8,"Castanheira",510285
+3,"Chapada dos Guimarães",510300
+5,"Cláudia",510305
+3,"Cocalinho",510310
+4,"Colíder",510320
+9,"Colniza",510325
+8,"Comodoro",510330
+5,"Confresa",510335
+4,"Conquista D'oeste",510336
+12,"Cotriguaçu",510337
+2,"Cuiabá",510340
+2,"Curvelândia",510343
+2,"Denise",510345
+5,"Diamantino",510350
+2,"Dom Aquino",510360
+5,"Feliz Natal",510370
+2,"Figueirópolis d'Oeste",510380
+4,"Gaúcha do Norte",510385
+2,"General Carneiro",510390
+2,"Glória d'Oeste",510395
+5,"Guarantã do Norte",510410
+2,"Guiratinga",510420
+1,"Indiavaí",510450
+5,"Itaúba",510455
+2,"Itiquira",510460
+2,"Jaciara",510480
+2,"Jangada",510490
+2,"Jauru",510500
+9,"Juara",510510
+9,"Juína",510515
+9,"Juruena",510517
+2,"Juscimeira",510520
+2,"Lambari d'Oeste",510523
+5,"Lucas do Rio Verde",510525
+3,"Luciára",510530
+5,"Vila Bela da Santíssima Trindade",510550
+5,"Marcelândia",510558
+7,"Matupá",510560
+2,"Mirassol d'Oeste",510562
+4,"Nobres",510590
+3,"Nortelândia",510600
+2,"Nossa Senhora do Livramento",510610
+12,"Nova Bandeirantes",510615
+2,"Nova Nazaré",510617
+4,"Nova Lacerda",510618
+5,"Nova Santa Helena",510619
+3,"Nova Brasilândia",510620
+5,"Nova Canaã do Norte",510621
+5,"Nova Mutum",510622
+2,"Nova Olímpia",510623
+5,"Nova Ubiratã",510624
+2,"Nova Xavantina",510625
+5,"Novo Mundo",510626
+4,"Novo Horizonte do Norte",510627
+2,"Novo São Joaquim",510628
+6,"Paranaíta",510629
+5,"Paranatinga",510630
+3,"Novo Santo Antônio",510631
+2,"Pedra Preta",510637
+7,"Peixoto de Azevedo",510642
+3,"Planalto da Serra",510645
+3,"Poconé",510650
+3,"Pontal do Araguaia",510665
+3,"Ponte Branca",510670
+3,"Pontes e Lacerda",510675
+5,"Porto Alegre do Norte",510677
+4,"Porto dos Gaúchos",510680
+3,"Porto Esperidião",510682
+2,"Porto Estrela",510685
+2,"Poxoréo",510700
+2,"Primavera do Leste",510704
+4,"Querência",510706
+2,"São José dos Quatro Marcos",510710
+1,"Reserva do Cabaçal",510715
+2,"Ribeirão Cascalheira",510718
+3,"Ribeirãozinho",510719
+1,"Rio Branco",510720
+5,"Santa Carmem",510724
+2,"Santo Afonso",510726
+2,"São José do Povo",510729
+4,"São José do Rio Claro",510730
+5,"São José do Xingu",510735
+2,"São Pedro da Cipa",510740
+8,"Rondolândia",510757
+2,"Rondonópolis",510760
+4,"Rosário Oeste",510770
+5,"Santa Cruz do Xingu",510774
+1,"Salto do Céu",510775
+4,"Santa Rita do Trivelato",510776
+5,"Santa Terezinha",510777
+2,"Santo Antônio do Leste",510779
+2,"Santo Antônio do Leverger",510780
+5,"São Félix do Araguaia",510785
+7,"Sapezal",510787
+2,"Serra Nova Dourada",510788
+5,"Sinop",510790
+6,"Sorriso",510792
+4,"Tabaporã",510794
+4,"Tangará da Serra",510795
+5,"Tapurah",510800
+5,"Terra Nova do Norte",510805
+2,"Tesouro",510810
+3,"Torixoréu",510820
+5,"União do Sul",510830
+4,"Vale de São Domingos",510835
+2,"Várzea Grande",510840
+5,"Vera",510850
+5,"Vila Rica",510860
+4,"Nova Guarita",510880
+2,"Nova Marilândia",510885
+4,"Nova Maringá",510890
+5,"Nova Monte Verde",510895
+2,"Abadia de Goiás",520005
+2,"Abadiânia",520010
+2,"Acreúna",520013
+2,"Adelândia",520015
+2,"Água Fria de Goiás",520017
+2,"Água Limpa",520020
+2,"Águas Lindas de Goiás",520025
+2,"Alexânia",520030
+2,"Aloândia",520050
+2,"Alto Horizonte",520055
+2,"Alto Paraíso de Goiás",520060
+2,"Alvorada do Norte",520080
+2,"Amaralina",520082
+2,"Americano do Brasil",520085
+2,"Amorinópolis",520090
+2,"Anápolis",520110
+3,"Anhanguera",520120
+2,"Anicuns",520130
+2,"Aparecida de Goiânia",520140
+2,"Aparecida do Rio Doce",520145
+2,"Aporé",520150
+2,"Araçu",520160
+3,"Aragarças",520170
+2,"Aragoiânia",520180
+2,"Araguapaz",520215
+2,"Arenópolis",520235
+3,"Aruanã",520250
+2,"Aurilândia",520260
+2,"Avelinópolis",520280
+3,"Baliza",520310
+2,"Barro Alto",520320
+2,"Bela Vista de Goiás",520330
+3,"Bom Jardim de Goiás",520340
+2,"Bom Jesus de Goiás",520350
+2,"Bonfinópolis",520355
+2,"Bonópolis",520357
+2,"Brazabrantes",520360
+3,"Britânia",520380
+3,"Buriti Alegre",520390
+2,"Buriti de Goiás",520393
+2,"Buritinópolis",520396
+2,"Cabeceiras",520400
+2,"Cachoeira Alta",520410
+2,"Cachoeira de Goiás",520420
+3,"Cachoeira Dourada",520425
+3,"Caçu",520430
+2,"Caiapônia",520440
+2,"Caldas Novas",520450
+2,"Caldazinha",520455
+2,"Campestre de Goiás",520460
+2,"Campinaçu",520465
+2,"Campinorte",520470
+2,"Campo Alegre de Goiás",520480
+2,"Campo Limpo de Goiás",520485
+3,"Campos Belos",520490
+2,"Campos Verdes",520495
+2,"Carmo do Rio Verde",520500
+2,"Castelândia",520505
+3,"Catalão",520510
+2,"Caturaí",520520
+2,"Cavalcante",520530
+2,"Ceres",520540
+2,"Cezarina",520545
+2,"Chapadão do Céu",520547
+2,"Cidade Ocidental",520549
+2,"Cocalzinho de Goiás",520551
+2,"Colinas do Sul",520552
+2,"Córrego do Ouro",520570
+2,"Corumbá de Goiás",520580
+3,"Corumbaíba",520590
+2,"Cristalina",520620
+2,"Cristianópolis",520630
+2,"Crixás",520640
+2,"Cromínia",520650
+3,"Cumari",520660
+2,"Damianópolis",520670
+2,"Damolândia",520680
+3,"Davinópolis",520690
+2,"Diorama",520710
+3,"Doverlândia",520725
+2,"Edealina",520735
+2,"Edéia",520740
+2,"Estrela do Norte",520750
+2,"Faina",520753
+2,"Fazenda Nova",520760
+2,"Firminópolis",520780
+2,"Flores de Goiás",520790
+2,"Formosa",520800
+2,"Formoso",520810
+2,"Gameleira de Goiás",520815
+2,"Divinópolis de Goiás",520830
+2,"Goianápolis",520840
+2,"Goiandira",520850
+2,"Goianésia",520860
+2,"Goiânia",520870
+2,"Goianira",520880
+2,"Goiás",520890
+2,"Goiatuba",520910
+3,"Gouvelândia",520915
+2,"Guapó",520920
+2,"Guaraíta",520929
+2,"Guarani de Goiás",520940
+2,"Guarinos",520945
+2,"Heitoraí",520960
+2,"Hidrolândia",520970
+2,"Hidrolina",520980
+2,"Iaciara",520990
+3,"Inaciolândia",520993
+2,"Indiara",520995
+2,"Inhumas",521000
+2,"Ipameri",521010
+2,"Ipiranga de Goiás",521015
+2,"Iporá",521020
+2,"Israelândia",521030
+2,"Itaberaí",521040
+2,"Itaguari",521056
+2,"Itaguaru",521060
+3,"Itajá",521080
+2,"Itapaci",521090
+2,"Itapirapuã",521100
+2,"Itapuranga",521120
+3,"Itarumã",521130
+2,"Itauçu",521140
+3,"Itumbiara",521150
+2,"Ivolândia",521160
+2,"Jandaia",521170
+2,"Jaraguá",521180
+2,"Jataí",521190
+2,"Jaupaci",521200
+2,"Jesúpolis",521205
+2,"Joviânia",521210
+3,"Jussara",521220
+2,"Lagoa Santa",521225
+2,"Leopoldo de Bulhões",521230
+2,"Luziânia",521250
+2,"Mairipotaba",521260
+2,"Mambaí",521270
+2,"Mara Rosa",521280
+2,"Marzagão",521290
+2,"Matrinchã",521295
+2,"Maurilândia",521300
+2,"Mimoso de Goiás",521305
+2,"Minaçu",521308
+3,"Mineiros",521310
+2,"Moiporá",521340
+2,"Monte Alegre de Goiás",521350
+3,"Montes Claros de Goiás",521370
+2,"Montividiu",521375
+2,"Montividiu do Norte",521377
+2,"Morrinhos",521380
+2,"Morro Agudo de Goiás",521385
+2,"Mossâmedes",521390
+2,"Mozarlândia",521400
+2,"Mundo Novo",521405
+2,"Mutunópolis",521410
+2,"Nazário",521440
+2,"Nerópolis",521450
+2,"Niquelândia",521460
+2,"Nova América",521470
+2,"Nova Aurora",521480
+3,"Nova Crixás",521483
+2,"Nova Glória",521486
+2,"Nova Iguaçu de Goiás",521487
+2,"Nova Roma",521490
+2,"Nova Veneza",521500
+2,"Novo Brasil",521520
+2,"Novo Gama",521523
+2,"Novo Planalto",521525
+2,"Orizona",521530
+2,"Ouro Verde de Goiás",521540
+3,"Ouvidor",521550
+2,"Padre Bernardo",521560
+2,"Palestina de Goiás",521565
+2,"Palmeiras de Goiás",521570
+2,"Palmelo",521580
+2,"Palminópolis",521590
+2,"Panamá",521600
+3,"Paranaiguara",521630
+2,"Paraúna",521640
+2,"Perolândia",521645
+2,"Petrolina de Goiás",521680
+2,"Pilar de Goiás",521690
+2,"Piracanjuba",521710
+2,"Piranhas",521720
+2,"Pirenópolis",521730
+2,"Pires do Rio",521740
+2,"Planaltina",521760
+2,"Pontalina",521770
+2,"Porangatu",521800
+2,"Porteirão",521805
+2,"Portelândia",521810
+2,"Posse",521830
+2,"Professor Jamil",521839
+3,"Quirinópolis",521850
+2,"Rialma",521860
+2,"Rianápolis",521870
+2,"Rio Quente",521878
+2,"Rio Verde",521880
+2,"Rubiataba",521890
+2,"Sanclerlândia",521900
+2,"Santa Bárbara de Goiás",521910
+2,"Santa Cruz de Goiás",521920
+2,"Santa Fé de Goiás",521925
+2,"Santa Helena de Goiás",521930
+2,"Santa Isabel",521935
+3,"Santa Rita do Araguaia",521940
+2,"Santa Rita do Novo Destino",521945
+2,"Santa Rosa de Goiás",521950
+2,"Santa Tereza de Goiás",521960
+2,"Santa Terezinha de Goiás",521970
+2,"Santo Antônio da Barra",521971
+2,"Santo Antônio de Goiás",521973
+2,"Santo Antônio do Descoberto",521975
+3,"São Domingos",521980
+2,"São Francisco de Goiás",521990
+2,"São João d'Aliança",522000
+2,"São João da Paraúna",522005
+2,"São Luís de Montes Belos",522010
+2,"São Luíz do Norte",522015
+3,"São Miguel do Araguaia",522020
+2,"São Miguel do Passa Quatro",522026
+2,"São Patrício",522028
+3,"São Simão",522040
+2,"Senador Canedo",522045
+2,"Serranópolis",522050
+2,"Silvânia",522060
+2,"Simolândia",522068
+2,"Sítio d'Abadia",522070
+2,"Taquaral de Goiás",522100
+2,"Teresina de Goiás",522108
+2,"Terezópolis de Goiás",522119
+3,"Três Ranchos",522130
+2,"Trindade",522140
+2,"Trombas",522145
+2,"Turvânia",522150
+2,"Turvelândia",522155
+2,"Uirapuru",522157
+2,"Uruaçu",522160
+2,"Uruana",522170
+2,"Urutaí",522180
+2,"Valparaíso de Goiás",522185
+2,"Varjão",522190
+2,"Vianópolis",522200
+2,"Vicentinópolis",522205
+2,"Vila Boa",522220
+2,"Vila Propício",522230
+2,"Brasília",530010

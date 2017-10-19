@@ -1,5 +1,30 @@
 ## This file processes the shapefiles of IUCN Red List mammals to get the amount of overlap of NHP habitat 
-# and cropland/agricultural land per muni per year (land use is yearly).
+# and cropland/agricultural land per muni per year (land use is yearly). It also calculates the species richness
+# per municipality.
+
+library(maptools)
+library(rgdal)
+library(sp)
+library(sf)
+library(raster)
+library(rgeos)
+library(doParallel)
+library(foreach)
+
+#load IUCN shapefile
+iucn <- readOGR("../../TERRESTRIAL_MAMMALS", "TERRESTRIAL_MAMMALS")
+
+# subset to brazil and genera of interest
+# genera based on Bicca-Marques 2010 and Hamrick et al 2017
+genera <- c("Ateles", "Aotus", "Alouatta", "Saimiri", "Cebus", "Callicebus", "Callithrix", "Saguinus", "Lagothrix")
+
+primates <- iucn[iucn@data$genus_name %in% genera,]
+writeOGR(primates, "../data_raw/environmental/NHPdata/", "primateSpecies", driver="ESRI Shapefile")
+
+#load brazil shapefile
+brazil <- readOGR("../data_clean","BRAZpolygons")
+
+#### Proportion Cropland + NHP ####
 
 # Steps
 # Portion shapefiles into more manageable chunk (only the genera we want and brazil) (save this seperately)
@@ -7,22 +32,6 @@
 # sum these values up over all nine genera, resulting in value of 0 - 9
 
 # seperate value: number of species that have a range within the municipality (static over time)
-library(maptools)
-library(rgdal)
-library(sp)
-library(raster)
-library(rgeos)
-library(doParallel)
-library(foreach)
-
-# #load IUCN shapefile
-# iucn <- readOGR("../../TERRESTRIAL_MAMMALS", "TERRESTRIAL_MAMMALS")
-# 
-# # subset to brazil and genera of interest
-# # genera based on Bicca-Marques 2010 and Hamrick et al 2017
-# genera <- c("Ateles", "Aotus", "Alouatta", "Saimiri", "Cebus", "Callicebus", "Callithrix", "Saguinus", "Lagothrix")
-# 
-# primates <- iucn[iucn@data$genus_name %in% genera,]
 
 # group primates by genus
 # primateDissolve <- unionSpatialPolygons(primates, IDs=primates$genus_name)
@@ -34,9 +43,6 @@ library(foreach)
 # the rasterized polygons were then run through 'Cell Statistics' in Arc to get the sum per cell (ie number of species whose range inclues that cell)
 # this was done with the landcover data as a template, so it all matches up
 # results in primateRaster.tif
-
-#load brazil shapefile
-brazil <- readOGR("../data_clean","BRAZpolygons")
 
 # stack all of the rasters and reclassify, then loop over the genera
 #files <- c("../../envCovariates/2001landcoverTest.tif", "../../envCovariates/2002landcoverTest.tif")
@@ -69,3 +75,22 @@ primateDF$muni.no <- brazil@data$muni_no
 primateDF$muni.name <- brazil@data$muni_name
 
 write.csv(primateDF, "../data_raw/environmental/primateProp.csv", row.names = F)
+
+#### Species Richness ####
+
+#load species shapfile, created at beginning of md
+primates <- readOGR("../data_raw/environmental/NHPdata/", "primateSpecies")
+primates$value <- 1
+
+#extracts all the polygons that fall within the municipality
+test <-over(brazil, primates, returnList=T)
+#get number of species within each municipality
+spRich <- lapply(test, nrow)
+spRich2 <- data.frame(spRich=do.call(c, spRich))
+spRich2$muni.no <- brazil$muni_no
+spRich2$muni.name <- brazil$muni_name
+#drop Pinto Bandeira (431454)
+speciesRichness <- spRich2[spRich2$muni.no!=431454,]
+
+#write to csv
+write.csv(speciesRichness, "../data_raw/environmental/primateRichness.csv", row.names = F)
