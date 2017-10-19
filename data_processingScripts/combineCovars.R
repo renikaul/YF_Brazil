@@ -407,3 +407,10 @@ primateFix <- as.data.frame(rbind(primateFix, toAppend))
 
 #save as R object
 saveRDS(primateFix, "../data_clean/environmental/primProp.rds")
+
+# PRIMATE SPECIES RICHNESS
+primateSpRich <- read.csv("../data_raw/environmental/primateRichness.csv", stringsAsFactors = F)
+
+#This data is only one point in time so just needs to be saved as an rds
+
+saveRDS(primateSpRich, "../data_clean/environmental/primRichness.rds")
