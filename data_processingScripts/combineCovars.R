@@ -365,7 +365,7 @@ fireDens <- fireNew2 %>%
   mutate(fireDens=numFire/area)
 
 #save as R object
-saveRDS(fireNew, "../data_clean/environmental/numFires.rds")
+saveRDS(fireDens, "../data_clean/environmental/numFires.rds")
 
 ####--------Primate####
 primate <- read.csv("../data_raw/environmental/primateProp.csv")
