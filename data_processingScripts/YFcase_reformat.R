@@ -32,7 +32,7 @@ for (j in 1:length(years)){
   #2. Add year
     d$year <- 2000+j 
   #3. Reshape table to long format
-    tmp2 <- melt(d, id = c("Muni", "muni.no", "year"))
+    tmp2 <- reshape2::melt(d, id = c("Muni", "muni.no", "year"))
   #4. Save long format
     YF.long <- rbind(YF.long, tmp2)
 }
@@ -75,7 +75,7 @@ tmp <- YF[-which(YF$muni.no %in% pop$muni.no),]
     
   # 9. Save the work
     saveRDS(YF, file="../data_clean/YFcases/YFlong.rds")
-    write.csv(YF, "../data_clean/YFcases/YFlong.csv")
+     write.csv(YF, "../data_clean/YFcases/YFlong.csv")
     
     
     
