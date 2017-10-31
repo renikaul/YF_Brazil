@@ -10,26 +10,76 @@ library(raster)
 library(rgeos)
 ```
 
-#Population Density
+
+```{r load data}
+brazil <- readOGR("../data_clean", "BRAZpolygons")
+
+covariates <- readRDS("../data_clean/FinalData.rds")
+```
+
+# Temporal Visualization
+
+The following function creates the anomaly images similar to those from Lowe et al. (2017), with the choice of choosing a municipality, state, or whole nation to view over.
 
 ```{r}
-pop <- readRDS("../data_clean/demographic/populationLong.rds")
-
-muniPoly <- readOGR("../data_clean", "BRAZpolygons") #read in spatial data (4 sperate files)
-
-muniPoly <- spTransform(muniPoly, CRS("+proj=aea +lat_1=-5 +lat_2=-42 +lat_0=-32 +lon_0=-60 +x_0=0 +y_0=0 +ellps=aust_SA +units=m")) #change projection to special SAmerican thing, Albers Conic
-muniArea <- gArea(muniPoly, byid=TRUE) #area for each muni
-muniAreaKey<- cbind(muni.no=as.numeric(as.character(muniPoly@data$muni_no)), muniArea=(muniArea/1000^2))   #attach area to muniPoly@data
-#row.names(muniAreaKey) <- NULL
-
-#add area into pop 
-pop1<- pop %>%
-      merge(muniAreaKey,by="muni.no")  %>%
-      mutate(densitypop = totPop/muniArea)
-
-
-#looking into population zeros
-
-tmp <- pop1[which(pop1$totPop==0),]
-
+anomalyViz <- function(agg, id, vars){
+  #' Visualize Temporal Anomalies
+  #'
+  #' This function returns plots of temporal anomalies over different aggregations and variables
+  #'
+  #' @param agg What level of aggregation do you want? "muni", "state", "nation"
+  #' @id only if agg is muni or state, the identifying codes for which one you want to visualize
+  #' @vars which variables you want to visualize, based on the column names of the covariate dataframe
+  
+  require(dplyr)
+  require(viridis)
+  # subset out data to meet those defined in function arguments
+  if (agg=="muni"){
+    data2plot <- covariates %>%
+      filter(muni.no==id) %>%
+      select(muni.no, "year", cal.month, vars)
+  } else if (agg=="state"){
+    id <- as.numeric(substr(id, 1,2)) #get state id from muni.no just in case
+    data2plot <- covariates %>%
+      mutate(state = as.numeric(substr(muni.no,1,2))) %>%
+      filter(state == id) %>%
+      select(state, "year", cal.month, vars) %>%
+      group_by(state, year, cal.month) %>%
+      summarise_all(mean, na.rm=T) %>%
+      ungroup()
+               
+  } else if (agg=="nation"){
+    id  <- NULL
+    data2plot <- covariates %>%
+      select("year", cal.month, vars) %>%
+      group_by(year, cal.month) %>%
+      summarise_all(mean, na.rm=T) %>%
+      ungroup()
+  }
+  for (i in 1:length(vars)){
+    varPlot <- vars[i]
+    x <- 1:12
+    y <- unique(data2plot$year)
+    dataVec <- as.numeric(unlist(data2plot[,varPlot])) #fix weird list thing
+    z <- array(dataVec, c(length(x), length(y)))
+    filled.contour(x,y,z, 
+                 color.palette = viridis,
+                 plot.title = title(main = paste(varPlot, "in", agg, id)),
+                 xlab = "Month", 
+                 ylab = "Year",
+                 plot.axes = {axis(1,at=c(1:12),labels=c("J","F","M","A","M","J","J","A","S","O","N","D"));
+                              axis(2,min(data2plot$year):max(data2plot$year))
+                   },
+                 nlevels = 10
+                 )
+    #mtext(paste(varPlot, "in", agg, id))
+  }
+  
+} #close function
 ```
+
+Test it out. Sometimes need to run dev.off to get labels to work appropriately
+```{r}
+anomalyViz(agg="muni", id=320490, vars = c("RF", "spRich", "tempMean"))
+```
+
