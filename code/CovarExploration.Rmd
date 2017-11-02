@@ -33,13 +33,21 @@ anomalyViz <- function(agg, id, vars){
   
   require(dplyr)
   require(viridis)
+  require(RColorBrewer)
   # subset out data to meet those defined in function arguments
   if (agg=="muni"){
     data2plot <- covariates %>%
       filter(muni.no==id) %>%
       select(muni.no, "year", cal.month, vars)
+    
+    cases <- covariates %>%
+      filter(muni.no==id) %>%
+      select(muni.no, "year", cal.month, case)
+    
   } else if (agg=="state"){
+    
     id <- as.numeric(substr(id, 1,2)) #get state id from muni.no just in case
+    
     data2plot <- covariates %>%
       mutate(state = as.numeric(substr(muni.no,1,2))) %>%
       filter(state == id) %>%
@@ -47,15 +55,32 @@ anomalyViz <- function(agg, id, vars){
       group_by(state, year, cal.month) %>%
       summarise_all(mean, na.rm=T) %>%
       ungroup()
+    
+      cases <- covariates %>%
+        mutate(state = as.numeric(substr(muni.no,1,2))) %>%
+        filter(state == id) %>%
+        select(state, "year", cal.month, case) %>%
+        group_by(state, year, cal.month) %>%
+        summarise_all(sum, na.rm=T)
                
   } else if (agg=="nation"){
+    
     id  <- NULL
+    
     data2plot <- covariates %>%
       select("year", cal.month, vars) %>%
       group_by(year, cal.month) %>%
       summarise_all(mean, na.rm=T) %>%
       ungroup()
+    
+    cases <- covariates %>%
+      select("year", cal.month, case) %>%
+      group_by(year, cal.month) %>%
+      summarise_all(sum, na.rm=T)
   }
+  #adjust weird NAs in cases
+  cases$case[is.na(cases$case)] <- 0
+  
   for (i in 1:length(vars)){
     varPlot <- vars[i]
     x <- 1:12
@@ -63,14 +88,15 @@ anomalyViz <- function(agg, id, vars){
     dataVec <- as.numeric(unlist(data2plot[,varPlot])) #fix weird list thing
     z <- array(dataVec, c(length(x), length(y)))
     filled.contour(x,y,z, 
-                 color.palette = viridis,
+                 col = rev(brewer.pal(7,'RdBu')),
                  plot.title = title(main = paste(varPlot, "in", agg, id)),
                  xlab = "Month", 
                  ylab = "Year",
                  plot.axes = {axis(1,at=c(1:12),labels=c("J","F","M","A","M","J","J","A","S","O","N","D"));
-                              axis(2,min(data2plot$year):max(data2plot$year))
+                              axis(2,min(data2plot$year):max(data2plot$year));
+                              points(x=cases$cal.month, y=cases$year, cex=cases$case/5)
                    },
-                 nlevels = 10
+                 nlevels = 7
                  )
     #mtext(paste(varPlot, "in", agg, id))
   }
@@ -78,8 +104,11 @@ anomalyViz <- function(agg, id, vars){
 } #close function
 ```
 
-Test it out. Sometimes need to run dev.off to get labels to work appropriately
+Test it out. Sometimes need to run dev.off to get labels to work appropriately. Circles represent cases at that aggregation scale (summed).
 ```{r}
-anomalyViz(agg="muni", id=320490, vars = c("RF", "spRich", "tempMean"))
+anomalyViz(agg="state", id=521690, vars = c("RFScale", "fireDens", "tempScale"))
 ```
+
+# Spatial Visualization
+
 
