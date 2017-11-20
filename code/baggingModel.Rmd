@@ -211,6 +211,14 @@ all.data <- all.data[complete.cases(all.data),]
 
 ## Model
 
+Environmental covariates were already processed in `GiantDataFrameMaker.R`. They can now be loaded in in one go.
+
+```{r}
+all.data <- readRDS("../data_clean/FinalData.rds")
+
+```
+
+
 ### Testing & Training Split
 
 Infected municipalities were 70/30 split into training and testing data, stratified by year. Background data was also split 70/30.  
@@ -272,7 +280,7 @@ Write formula for model. The infected municipality is a function of:
   - monthly mean temperature 
 
 ```{r train model}
-glm.formula <- as.formula("case~logpop+NDVI+scale.ndvi+log.mean.rf+scale.mean.rf+tempMean") 
+glm.formula <- as.formula("case~NDVI+NDVIScale+popLog10+RFScale+tempMean+tempScale+spRich+primProp") 
 ```
 
 The model is ran for 100 iterations with a subset of the cases. The subset consists of 10 presences (of the 39 training) and 100 background (of the ~300,000) observations.Each iteration of the model is used to predict on the whole training dataset. This is used to calculate AUC. 
@@ -281,7 +289,7 @@ The model is ran for 100 iterations with a subset of the cases. The subset consi
 
 #Set up parallel cores to return 2 lists: 1) predictions, 2) coef of model
 
-cores.to.use <- 1 #change dep on computer
+cores.to.use <- 4 #change dep on computer
 iterations <- 100 #number of low bias models to make
 
 #create class to combine multiple results
@@ -342,9 +350,76 @@ Originally the model was ran with binned populations sized, but have since chang
 ```{r training variable importance, echo=FALSE, eval=FALSE}
 trainingCoefs<- t(trainingCoefs)
 
-boxplot(trainingCoefs[,c(2:6)], ylim=c(-50,50))
-meanCoefs <- apply(trainingCoefs,1, mean)
+boxplot(trainingCoefs[,-c(1)], ylim = c(-50,50))
+meanCoefs <- apply(trainingCoefs,2, mean)
+meanCoefs
+```
 
+```{r}
+#drop one covar importance
+glm.formula <- as.formula("case~NDVI+NDVIScale+popLog10+RFScale+tempMean+tempScale+spRich+RFsqrt+fireDens") 
+
+droponeVar=function(glm.formula = glm.formula, train.pres = train.pres, train.bg = train.bg, training = training){
+  
+  variables <- trimws(unlist(strsplit(as.character(glm.formula)[3], "+", fixed = T)), which = "both")
+  train.auc <- data.frame(auc = rep(NA, length(variables)), variable = rep(NA, length(variables)))
+  for (i in 1:length(variables)){
+    newVariables <- paste(variables[-i], collapse ="+")
+    new.glm.formula <- as.formula(paste0("case~", newVariables))
+  #Set up parallel cores to return 2 lists: 1) predictions, 2) coef of model
+  
+  cores.to.use <- 4 #change dep on computer
+  iterations <- 100 #number of low bias models to make
+  
+  #create class to combine multiple results
+  multiResultClass <- function(predictions = NULL,coefs = NULL)
+  {
+    me <- list(
+      predictions = predictions,
+      coefs = coefs
+    )
+  
+    ## Set the name for the class
+    class(me) <- append(class(me),"multiResultClass")
+    return(me)
+  }
+  
+  
+  cl <- makeCluster(cores.to.use)
+  registerDoParallel(cl)
+  
+  trainModel <- foreach(i=1:iterations) %dopar% {
+      result <- multiResultClass()
+      output1 <- bagging(form.x.y=new.glm.formula,training.pres=train.pres,training.abs=train.bg,new.data=training)
+      result$predictions <-output1[[1]]
+      result$coefs <- output1[[2]]
+      return(result)
+  }
+  
+  stopCluster(cl)
+  
+  #pull out data in usable fashion
+  trainingPreds <- do.call(cbind,(lapply(trainModel, '[[', 1)))
+  trainingCoefs <- do.call(cbind,(lapply(trainModel, '[[', 2)))
+  
+  output.preds<- apply(trainingPreds, 1, mean)
+  preds <- prediction(output.preds, training$case)
+  
+  perf2 <- performance(preds, "tpr", "fpr")
+  plot(perf2, main=paste("Dropped:", variables[i]))
+  train.auc$auc[i] <- unlist(performance(preds, "auc")@y.values)
+  train.auc$variable[i] <- variables[i]
+  }
+  
+  return(train.auc)
+
+}
+
+```
+
+
+```{r}
+varImpDrop <- droponeVar(glm.formula = glm.formula)
 ```
 
 # Visualizing model
