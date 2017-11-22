@@ -1,5 +1,6 @@
 # YF_Brazil
-
+   Target journal: BMC Medicine [Special Issue](https://bmcmedicine.biomedcentral.com/articles/collections/spatialepidemiology?sap-outbound-id=): Spatial epidemiology and infectious diseases **Due Feb 28th**
+   
 # What are the areas most at risk of YF sylvatic spillover in Brazil and does this location change with season?
 
 # Outcome: probability of a YF sylvatic spillover/case per municipality and month (of 12, ie Jan- Dec)
