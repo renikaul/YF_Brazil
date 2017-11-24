@@ -1,7 +1,8 @@
 #script reads in all the data, assembles it and saves the final dataset in data_clean/FinalData.rds
 #Covarate information 
 
-# case : number of reported YF cases
+# case :reporting of any YF cases (0,1)
+# NumCase :number of reported YF cases 
 # NDVI : NDVI for that month
 # NDVIScale : NDVI rescaled to max value for that muni and calendar month
 # muniArea : km2
@@ -112,13 +113,16 @@ cases <- cases %>%
   #drop annual totals
   filter(cal.month<=12) %>%
   #drop unknown origin totals %>%
-  filter(!grepl("ignorado", muni)) 
+  filter(!grepl("ignorado", muni)) %>%
+  mutate(NumCase=case) %>% 
+  mutate(case=ifelse(NumCase==0,0,1))
 
 
 #3. Assemble data--------------------------
 
   #Put all the things together!  #Need to add fires after fix. 
-all.data <- plyr::join_all(list(ndvi, pop, rf, temp, cases, fires), by=c("muni.no", "month.no"), type="full") 
+all.data <- plyr::join_all(list(ndvi, pop, rf, temp, cases, fires), 
+                           by=c("muni.no", "month.no"), type="full") 
 
 # add in NHP for each year and muni
 # all.data <-  all.data %>%
@@ -136,7 +140,7 @@ all.data2 <- all.data2 %>%
 
 #4. Clean it up -------------
 
-final.data <- all.data2[c("case",
+final.data <- all.data2[c("case", "NumCase",
                  "NDVI","NDVIScale",
                  "muniArea","popLog10",
                  "RF","RFsqrt","RFScale",
