@@ -12,8 +12,10 @@
 # RFScale : mean hourly rainfall rescaled to max value for that muni and calendar month
 # tempMean : mean monthly air temperature 
 # tempScale : mean monthly air temperature rescaled to max value for that muni and calendar month
-# numFire : number of fires oberserved in month
-# fireDens : number of fires oberserved in month divided by muniArea
+# fireNum : number of fires oberserved in month
+# fireDen : number of fires oberserved in month divided by muniArea
+# fireDenSqrt : number of fires oberserved in month divided by muniArea sqrt transformed
+# firesDenScale : number of fires oberserved in month divided by muniArea rescaled to max value for that muni and calendar month. NA values converted to zero. 
 # spRich : number of non-human primates by species with ranges based on IUCN {0-22}
 # primProp : sum of each municipalities relative area that is both agricultural and falls within a primate genus range. {0,9} Missing for 2014
 # muni.no : unique number to identify municipality
@@ -96,14 +98,16 @@ NHPRichness <- readRDS("../data_clean/environmental/primRichness.rds")
 
 fires <- readRDS("../data_clean/environmental/numFires.rds")
   #hist(fires$numFire) #super overdispersed, only about 20% muniXmonth have had a fire. 6% of muniXmonths have only had a single fire. The upper bound is >5000 per a muniXmonth. 
-  #standard transformation really can correct for this extreme 
+  #standard transformation really cannot correct for this extreme 
   
-# fires <- fires %>%
-#   mutate(firesDenLog=log(fireDens)) %>%
-#   group_by(muni.no, cal.month) %>%
-#   mutate(firesDenScale = fireDens/max(fireDens)) %>% #scale fire densities to muni and month
-#   ungroup()
-
+ fires <- fires %>%
+   mutate(fireDenSqrt=sqrt(fireDens)) %>%
+   mutate(fireNum=numFire) %>% #rename col
+   mutate(fireDen=fireDens) %>% #remane col
+   group_by(muni.no, cal.month) %>%
+   mutate(fireDenScale = ifelse(max(fireDens)==0,0,fireDens/max(fireDens))) %>% #scale fire densities to muni and month
+   ungroup() 
+   
 ## YF cases------------------------------ 
 cases <- readRDS("../data_clean/YFcases/YFlong.rds")
 
@@ -142,12 +146,12 @@ all.data2 <- all.data2 %>%
 
 final.data <- all.data2[c("case", "NumCase",
                  "NDVI","NDVIScale",
-                 "muniArea","popLog10",
+                 "popLog10",
                  "RF","RFsqrt","RFScale",
                  "tempMean","tempScale",
-                 "numFire","fireDens",
+                 "fireNum", "fireDen", "fireDenSqrt","fireDenScale",
                  "spRich","primProp",
-                 "muni.no", "month.no", "muni.name", "month", "cal.month","year")]
+                 "muni.no", "month.no", "muni.name","muniArea", "month", "cal.month","year")]
 
 
 #5. Save the data ----------------------
