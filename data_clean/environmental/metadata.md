@@ -1,4 +1,4 @@
-All rds files were created via the combineCovars.R script in the data_processing folder.
+ All rds files were created via the combineCovars.R script in the data_processing folder.
 
 **allNDVI.rds**: spatial mean of NDVI (scale of 0 -1) data per municipality by month
 
