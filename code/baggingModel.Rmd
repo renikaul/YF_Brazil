@@ -49,12 +49,39 @@ Both rainfall and NDVI data were further transformed to create fine-scale enviro
 4. Monthly NDVI scaled to max value at that location and month
 5. Monthly mean temperature 
   
+
+# case :reporting of any YF cases (0,1)
+# NumCase :number of reported YF cases 
+# NDVI : NDVI for that month
+# NDVIScale : NDVI rescaled to max value for that muni and calendar month
+# muniArea : km2
+# popLog10 : population density 
+# RF : mean hourly rainfall
+# RFsqrt : mean hourly rainfall sqrt transformed
+# RFScale : mean hourly rainfall rescaled to max value for that muni and calendar month
+# tempMean : mean monthly air temperature 
+# tempScale : mean monthly air temperature rescaled to max value for that muni and calendar month
+# fireNum : number of fires oberserved in month
+# fireDen : number of fires oberserved in month divided by muniArea
+# fireDenSqrt : number of fires oberserved in month divided by muniArea sqrt transformed
+# firesDenScale : number of fires oberserved in month divided by muniArea rescaled to max value for that muni and calendar month. NA values converted to zero. 
+# spRich : number of non-human primates by species with ranges based on IUCN {0-22}
+# primProp : sum of each municipalities relative area that is both agricultural and falls within a primate genus range. {0,9} Missing for 2014
+# muni.no : unique number to identify municipality
+# month.no : numbered month of observation {1,168}
+# muni.name : character string name
+# month : abbrevated calendar month name
+# cal.month : calendar month {1,12}
+# year : year {2001,2014}
+
 ## Processing Environmental Covariates
 
+   All of the processesing is now done in `GiantDataFrameMaker.R`
+   
 ### Rainfall
 
 
-```{r rainfall}
+```{r rainfall, eval=FALSE}
 rf <- readRDS("../data_clean/environmental/allRainfall.rds")
 
 #distribution of raw rainfall rate
@@ -81,7 +108,7 @@ Rainfall ranges from (`r signif(range(rf$hourlyRainfallMean), digits=2)`), and i
 
 ### NDVI
 
-```{r ndvi}
+```{r ndvi, eval=FALSE}
 ndvi <- readRDS("../data_clean/environmental/allNDVI.rds")
 hist(ndvi$NDVI) #normal
 
@@ -108,7 +135,7 @@ NDVI data ranges from 0 - 1 and is normally distributed. This covariate will be 
 ### Temperature
 Temperature is normally distributed, and was used "as-is".
 
-```{r temperature}
+```{r temperature, eval=FALSE}
 temp <- readRDS("../data_clean/environmental/allTemperature.rds")
 hist(temp$tempMean)
 ```
@@ -167,7 +194,7 @@ saveRDS(pop, "../data_clean/demographic/populationLong.rds")
 ```
 
 
-```{r load pop data}
+```{r load pop data, eval=FALSE}
 pop <- readRDS("../data_clean/demographic/populationLong.rds")
 hist(pop$totPop, main="Total population size")
 hist(pop$logpop, main="Log10(Total population size + 1)")
@@ -177,7 +204,7 @@ hist(pop$logpop, main="Log10(Total population size + 1)")
 ### Case Data
   There are a total of 117 *infected* municipalities in the entire dataset. See `data_clean/case_sparsity.html` for more details. 
 
-```{r cases}
+```{r cases, eval=FALSE}
 cases <- readRDS("../data_clean/YFcases/YFlong.rds")
 
 cases <- cases %>%
@@ -190,7 +217,7 @@ cases <- cases %>%
 
 Combine it all into a giant dataframe!
 
-```{r build df}
+```{r build df, eval=FALSE}
 all.data <- plyr::join_all(list(ndvi, pop, rf, temp, cases), by=c("muni.no", "month.no"), type="full")
 
 #clean it up
@@ -280,7 +307,12 @@ Write formula for model. The infected municipality is a function of:
   - monthly mean temperature 
 
 ```{r train model}
-glm.formula <- as.formula("case~NDVI+NDVIScale+popLog10+RFScale+tempMean+tempScale+spRich+primProp") 
+glm.formula <- as.formula("case~  NDVI+NDVIScale+ 
+                          popLog10+
+                          RF+RFsqrt+RFScale+
+                          tempMean+tempScale+
+                          fireNum+fireDen+fireDenSqrt+fireDenScale+
+                          spRich+primProp") 
 ```
 
 The model is ran for 100 iterations with a subset of the cases. The subset consists of 10 presences (of the 39 training) and 100 background (of the ~300,000) observations.Each iteration of the model is used to predict on the whole training dataset. This is used to calculate AUC. 
@@ -289,7 +321,7 @@ The model is ran for 100 iterations with a subset of the cases. The subset consi
 
 #Set up parallel cores to return 2 lists: 1) predictions, 2) coef of model
 
-cores.to.use <- 4 #change dep on computer
+cores.to.use <- 2 #change dep on computer
 iterations <- 100 #number of low bias models to make
 
 #create class to combine multiple results
@@ -339,13 +371,16 @@ perf2 <- performance(preds, "tpr", "fpr")
 plot(perf2)
 
 train.auc <- performance(preds, "auc") #~0.91
+train.auc
 ```
 
 Originally the model was ran with binned populations sized, but have since changed to population size log10 transformed. This increases the training AUC to `r signif(train.auc@y.values[[1]], digits=2)` from ~0.8. Dropping any of the abiotic variables has minimal impact on the AUC. Removing any population variable from the model reduces the AUC to approx. 0.7.
 
-##Variable Importance: Needs development
+##Variable Importance
  
-   It seems like municipality population size is driving much of the model preformance, but I would like to explore some of the ways that the covariables interact or are more important in given situations. Generally, what intuition can be learned from this model.  
+### Drop One Variable 
+
+For the first pass at variable importance, we will use a drop one variable scheme. Starting with the all the variables, we will drop one and calculate the AUC on the training data. The population density ($Log_{10}$ transformed) seems to be the most important predictor of any YF cases in a municipality. This is expected and doesn't add any intuition to the system. 
    
 ```{r training variable importance, echo=FALSE, eval=FALSE}
 trainingCoefs<- t(trainingCoefs)
@@ -355,21 +390,51 @@ meanCoefs <- apply(trainingCoefs,2, mean)
 meanCoefs
 ```
 
-```{r}
-#drop one covar importance
-glm.formula <- as.formula("case~NDVI+NDVIScale+popLog10+RFScale+tempMean+tempScale+spRich+RFsqrt+fireDens") 
-
-droponeVar=function(glm.formula = glm.formula, train.pres = train.pres, train.bg = train.bg, training = training){
+```{r Drop One Variable Function}
+#Function to be fixed to run permutation tests.  
+dropOneVar=function(formula = glm.formula, train.pres = train.pres, train.bg = train.bg, training = training, cores=2, no.iterations= 100){
+      # glm.formula:
+      # train.pres
+      # train.bg
+      # training
+      # cores : number of cores to use for parallel; default to 2
+      # no.iterations : number of low bias models to make; default to 100
+  bagging<-function(form.x.y,training.pres,training.abs,new.data){
+  #' modified JP's bagging function
+  #' 
+  #' @param form.x.y the formula for model to use
+  #' @param training.pres dataframe containing training presence data
+  #' @param training.abs dataframe containing training background data
+  #' @param new.data new data for each logreg model to predict onto
+  #' @param iterations number of cores to use. also maybe has something to do with model iterations???
+  #'
+  #' @returns predictions on new data as a combination (sum??) of predictions from each logreg model
+    training_positions.p <- sample(nrow(training.pres),size=10)
+    training_positions.b <- sample(nrow(training.abs),size=100)
+    train_pos.p<-1:nrow(training.pres) %in% training_positions.p #presence
+    train_pos.b<-1:nrow(training.abs) %in% training_positions.b #background
+    glm_fit<-glm(form.x.y,data=rbind(training.pres[train_pos.p,],training.abs[train_pos.b,]),family=binomial(logit))
+    glm.coef <- coef(glm_fit)
+    predictions <- predict(glm_fit,newdata=new.data,type="response")
+  return(list(predictions, glm.coef))
+}
   
-  variables <- trimws(unlist(strsplit(as.character(glm.formula)[3], "+", fixed = T)), which = "both")
-  train.auc <- data.frame(auc = rep(NA, length(variables)), variable = rep(NA, length(variables)))
-  for (i in 1:length(variables)){
+  #parse out variables from formula object 
+  variables <- trimws(unlist(strsplit(as.character(formula)[3], "+", fixed = T)), which = "both")
+  variablesName <- c(variables, "full model")
+  train.auc <- data.frame(auc = rep(NA, length(variablesName)), variableDrop = rep(NA, length(variablesName)))
+  #create empty plot for AUC 
+  plot(NA, ylim=c(0,1), xlim=c(0,1))
+  legend("bottomright", title ="Variable Dropped", legend=variablesName, col=c(1:length(variablesName)), lty=1, lwd=2)
+  for (i in 1:(length(variables)+1)){
+    print(variables[i]) #let us know where the simulation is at. 
+  #drop one variable from formula object
     newVariables <- paste(variables[-i], collapse ="+")
     new.glm.formula <- as.formula(paste0("case~", newVariables))
+    
   #Set up parallel cores to return 2 lists: 1) predictions, 2) coef of model
-  
-  cores.to.use <- 4 #change dep on computer
-  iterations <- 100 #number of low bias models to make
+  cores.to.use <- cores #change dep on computer
+  iterations <- no.iterations #number of low bias models to make
   
   #create class to combine multiple results
   multiResultClass <- function(predictions = NULL,coefs = NULL)
@@ -406,11 +471,12 @@ droponeVar=function(glm.formula = glm.formula, train.pres = train.pres, train.bg
   preds <- prediction(output.preds, training$case)
   
   perf2 <- performance(preds, "tpr", "fpr")
-  plot(perf2, main=paste("Dropped:", variables[i]))
+  plot(perf2, add=TRUE, col=i)
   train.auc$auc[i] <- unlist(performance(preds, "auc")@y.values)
-  train.auc$variable[i] <- variables[i]
+  train.auc$variableDrop[i] <- variablesName[i]
   }
-  
+  #return training coefs and AUC for each iteration
+  train.auc[order(train.auc$auc),]
   return(train.auc)
 
 }
@@ -418,9 +484,39 @@ droponeVar=function(glm.formula = glm.formula, train.pres = train.pres, train.bg
 ```
 
 
-```{r}
-varImpDrop <- droponeVar(glm.formula = glm.formula)
+```{r kitchen sink variable importance}
+#drop one covar importance
+glm.formula <- as.formula("case~  NDVI+NDVIScale+ 
+                          popLog10+
+                          RF+RFsqrt+RFScale+
+                          tempMean+tempScale+
+                          fireNum+fireDen+fireDenSqrt+fireDenScale+
+                          spRich+primProp") 
+
+
+allDrop <- dropOneVar(formula = glm.formula, train.pres= train.pres, train.bg=train.bg ,training=training, cores=2, no.iterations = 100 )
+
+allDrop[order(allDrop$auc),]
 ```
+
+```{r}
+glm.formula2 <- as.formula("case~  NDVIScale+ 
+                          popLog10+
+                          RFsqrt+ RF+
+                          tempScale+
+                          fireDenScale+
+                          spRich") 
+
+eachGroupDrop3 <- dropOneVar(formula = glm.formula2, train.pres= train.pres, train.bg=train.bg ,training=training, cores=2, no.iterations = 100 )
+
+```
+
+permutate to get a base AUC 
+correlation of covariates
+lagged rainfall (maybe not)
+adding interactions (temp and rain)
+
+
 
 # Visualizing model
 
