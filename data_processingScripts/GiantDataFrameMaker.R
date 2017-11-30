@@ -89,11 +89,11 @@ temp <- temp %>%
 
 ## Non-human primates------------------------------ 
     #primProp
-NHPProp <- readRDS("../data_clean/environmental/primProp.rds") 
+NHPProp <- readRDS("../data_clean/environmental/primProp.rds") #changes every year, missing 2014
     #hist(sqrt(NHP$primProp))
       #transformations are ugly too 
 
-NHPRichness <- readRDS("../data_clean/environmental/primRichness.rds")
+NHPRichness <- readRDS("../data_clean/environmental/primRichness.rds") #doesn't change with time
 ## Fires ----------------------------------
 
 fires <- readRDS("../data_clean/environmental/numFires.rds")
@@ -110,7 +110,7 @@ fires <- readRDS("../data_clean/environmental/numFires.rds")
    
 ## YF cases------------------------------ 
 cases <- readRDS("../data_clean/YFcases/YFlong.rds")
-
+ #dimensions: Entries for all muni ONLY if a case reported in any muni that month
 cases[is.na(cases)] <- 0 #replace NA with zero  
 
 cases <- cases %>%
@@ -124,9 +124,10 @@ cases <- cases %>%
 
 #3. Assemble data--------------------------
 
-  #Put all the things together!  #Need to add fires after fix. 
-all.data <- plyr::join_all(list(ndvi, pop, rf, temp, cases, fires), 
-                           by=c("muni.no", "month.no"), type="full") 
+  #Put all the things together!  
+all.enviro <- plyr::join_all(list(ndvi, pop, rf, temp, fires), 
+                           by=c("muni.no", "month.no"), type="full") %>%
+              select(-c(muni))
 
 # add in NHP for each year and muni
 # all.data <-  all.data %>%
@@ -135,23 +136,32 @@ all.data <- plyr::join_all(list(ndvi, pop, rf, temp, cases, fires),
 #               select(-c(muni.name.y, muni.name.x)) #drop second muni.name
 
 #add in NHP Richness for each muni
-all.data2 <- all.data %>%
-            dplyr::left_join(NHPRichness)
+NHPenviro <- NHPRichness %>%
+             select(-c(muni.name)) %>%
+            dplyr::right_join(all.enviro, by=c('muni.no'))
 
-all.data2 <- all.data2 %>%
-            plyr::join(NHPProp)
+          
+all.covar <- NHPProp %>%
+             select(-c(muni.name)) %>%  
+            dplyr::right_join(NHPenviro, by=c('muni.no','year'))
 
+#add in cases
+all.data <- cases %>%
+            select(c(muni.no, month.no, case, NumCase)) %>%
+            dplyr::right_join(all.covar, by=c('muni.no', 'month.no')) %>%
+            mutate(case=ifelse(is.na(case),0,case)) %>% #replace NA with zero
+            mutate(NumCase=ifelse(is.na(NumCase),0,NumCase)) #replace NA with zero
 
 #4. Clean it up -------------
 
-final.data <- all.data2[c("case", "NumCase",
+final.data <- all.data[c("case", "NumCase",
                  "NDVI","NDVIScale",
                  "popLog10",
                  "RF","RFsqrt","RFScale",
                  "tempMean","tempScale",
                  "fireNum", "fireDen", "fireDenSqrt","fireDenScale",
                  "spRich","primProp",
-                 "muni.no", "month.no", "muni.name","muniArea", "month", "cal.month","year")]
+                 "muni.no", "month.no", "muni.name","muniArea", "cal.month","year")]
 
 
 #5. Save the data ----------------------
