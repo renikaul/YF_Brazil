@@ -18,7 +18,7 @@ for (j in 1:length(years)){
   d <- read.csv(paste("../data_raw/YF_case/YF_20", yr,".txt", sep=""), sep=",", encoding="UTF-8",colClasses = c("character", rep("numeric",mon[j])))
   
   #d <- d[,-c(ncol(d))]   #drop total for that month
-  #1. Pull out muni no 
+  #1. Pull out muni no ----
     d.names <- strsplit(d$Muni, " " ) #return list of list where first entery is muni no.
     #pull out first entry in the list and save
     muni.no <- c()
@@ -29,14 +29,14 @@ for (j in 1:length(years)){
     }
     muni.no <- as.numeric(muni.no)
     d$muni.no <- muni.no
-  #2. Add year
+  #2. Add year ----
     d$year <- 2000+j 
-  #3. Reshape table to long format
+  #3. Reshape table to long format ----
     tmp2 <- reshape2::melt(d, id = c("Muni", "muni.no", "year"))
   #4. Save long format
     YF.long <- rbind(YF.long, tmp2)
 }
-  #5. check for cases in any of the emancipated muni
+  #5. check for cases in any of the emancipated muni ----
     correctedMuni <- read.csv("../data_raw/demographic/muniCorrections.csv")
     
     #pull out those created post 2001
@@ -49,7 +49,7 @@ for (j in 1:length(years)){
 
 tmp <- YF[-which(YF$muni.no %in% pop$muni.no),]
 
-  #6. Add year mon
+  #6. Add year mon ----
       #build conversion table
     port.mon <- c('Jan','Fev','Mar',	'Abr',	'Mai','Jun', 'Jul', 'Ago', 'Set',	'Out',	'Nov',	'Dez')
     cal.month <- c(1:12) 
@@ -63,19 +63,19 @@ tmp <- YF[-which(YF$muni.no %in% pop$muni.no),]
     cont.mon.conversion$month.no <- c(1:nrow(cont.mon.conversion))
       #month.no 169 to 182 are year totals
   
-  #7. Add month.no to YF.long
+  #7. Add month.no to YF.long ----
     YF.long <- merge(YF.long, cont.mon.conversion, by=c("year", "variable"))
       #tidy it up by ordering by month.no
     YF <- YF.long[order(YF.long$month.no),]
     colnames(YF) <- c('year', 'month', 'muni', 'muni.no','case','cal.month', 'month.no') #clean up names
-  #8. drop yearly totals and ignorado muni
+  #8. drop yearly totals and ignorado muni ----
     YF <- YF[-which(YF$cal.month==13),]
     YF <- YF[!((substr(YF$muni.no, 3,6) == "0000")| (substr(YF$muni.no, 3,6) == "+05")),]
     YF <- YF[-which(YF$muni.no==000000),] #stubborn muni doesn't want to go. 
-    
-  # 9. Save the work
+     #final data set has entries for all muni for each month that a case was reported    
+  # 9. Save the work ----
     saveRDS(YF, file="../data_clean/YFcases/YFlong.rds")
-     write.csv(YF, "../data_clean/YFcases/YFlong.csv")
+    write.csv(YF, "../data_clean/YFcases/YFlong.csv")
     
     
     
