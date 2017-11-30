@@ -9,6 +9,7 @@ library(rgdal)
 library(raster)
 library(rgeos)
 library(corrplot)
+library(GGally)
 ```
 
 
@@ -24,14 +25,52 @@ covariates <- readRDS("../data_clean/FinalData.rds")
 
 We wanted to explore the correlation between covariates, particularly as many are features created from each other.
 
+The primate proportion data doesn't have 2014, generating NAs. Becuase this hasn't come up as an informative variable in our model so far, I'm just ignoring it for now.
+
 ```{r}
-corrplot(cor(covariates[, 3:16]), method = "number")
+corrplot(cor(covariates[, 3:15]), method = "number")
 ```
 
-We can also plot them against each other to further explore this.
+All of the rainfall variables are extremely correlated (>0.95), suggesting we should only use one of those in the model. The rest seem okay.
+
+There is also a way to scatterplot them all against each other. You cannot do all of them at once (because it is millions and millions of points), so I have chosen some to explore based on the plot above. In this case, they are colored by if there was a case or not. The device driver also can't deal with it, so it is better to save to a seperate image. It will take 2-3 minutes per variable (increasing exponentially too), and I wouldn't include more than 8 unless on a high-mem machine.
 
 ```{r}
+#reorder so that lines with cases are on top
+covariates <- covariates[order(covariates$case, decreasing = F),]
+#drop NAs in case data
+covariates <- dplyr::filter(covariates, !is.na(case))
+covariates$caseSort <- as.factor(covariates$case) #variable for color
+```
 
+
+```{r}
+png("pairwisePlotBase.png", res = 400, width = 8, height = 8, units ="in")
+graphics::pairs(covariates[,c('NDVIScale', 'popLog10', "spRich", "RFScale", "fireDenSqrt", "tempScale")], 
+                col = c("black", "red")[covariates$case+1], pch=20)
+dev.off()
+```
+
+We can also do it with 'ggpairs' to get an idea of the density of data at the same time (since some trends that stand out may be irrelevant when considering distribution of data). Just note that ggpairs really sucks sometimes as far as configuration, and is slightly slower than base graphics.
+
+```{r}
+png("pairwisePlotPairs.png", res = 400, width = 8, height = 8, units ="in")
+p <- ggpairs(covariates, columns = c('NDVIScale', 'popLog10', "spRich", "RFScale", "fireDenSqrt", "tempScale"), 
+        diag = list(continuous = "density"), 
+        mapping = aes(color = caseSort, alpha = 0.5))
+
+#hack colors
+for(i in 1:p$nrow) {
+  for(j in 1:p$ncol){
+    p[i,j] <- p[i,j] + 
+        scale_fill_manual(values=c("black", "red")) +
+        scale_color_manual(values=c("black", "red"))  
+  }
+}
+
+p
+
+dev.off()
 ```
 
 
