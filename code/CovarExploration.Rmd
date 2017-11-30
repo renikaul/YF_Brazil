@@ -8,6 +8,7 @@ knitr::opts_chunk$set(echo = TRUE)
 library(rgdal)
 library(raster)
 library(rgeos)
+library(corrplot)
 ```
 
 
@@ -16,6 +17,25 @@ brazil <- readOGR("../data_clean", "BRAZpolygons")
 
 covariates <- readRDS("../data_clean/FinalData.rds")
 ```
+
+# Basic Visualizations
+
+## Correlation Amongst Covariates
+
+We wanted to explore the correlation between covariates, particularly as many are features created from each other.
+
+```{r}
+corrplot(cor(covariates[, 3:16]), method = "number")
+```
+
+We can also plot them against each other to further explore this.
+
+```{r}
+
+```
+
+
+## Covariates Over Time
 
 # Temporal Visualization
 
