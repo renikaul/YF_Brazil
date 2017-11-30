@@ -287,10 +287,19 @@ bagging<-function(form.x.y,training.pres,training.abs,new.data){
   #' @param iterations number of cores to use. also maybe has something to do with model iterations???
   #'
   #' @returns predictions on new data as a combination (sum??) of predictions from each logreg model
-    training_positions.p <- sample(nrow(training.pres),size=10)
+  #for writing script
+    #need to permutate acroos ALL columns in dataset; not just those 110 sampled. 
+    training.pres <- train.pres
+    training.abs <- train.bg
+    
+  #balance presence/background 1:10
+    training_positions.p <- sample(nrow(training.pres),size=10) 
     training_positions.b <- sample(nrow(training.abs),size=100)
     train_pos.p<-1:nrow(training.pres) %in% training_positions.p #presence
     train_pos.b<-1:nrow(training.abs) %in% training_positions.b #background
+  #premute data  
+    permute.data <- balanced.data <-         rbind(training.pres[train_pos.p,],training.abs[train_pos.b,])#make data
+    permuted.data[,vari] <- sample(balanced.data[,vari],110,FALSE) #permute the col named included in vari (ie. variable.names)
     glm_fit<-glm(form.x.y,data=rbind(training.pres[train_pos.p,],training.abs[train_pos.b,]),family=binomial(logit))
     glm.coef <- coef(glm_fit)
     predictions <- predict(glm_fit,newdata=new.data,type="response")
@@ -343,7 +352,8 @@ registerDoParallel(cl)
 
 trainModel <- foreach(i=1:iterations) %dopar% {
     result <- multiResultClass()
-    output1 <- bagging(form.x.y=glm.formula,training.pres=train.pres,training.abs=train.bg,new.data=training)
+    output1 <- bagging(form.x.y=glm.formula,training.pres=train.pres,training.abs=train.bg,
+                       new.data=training)
     result$predictions <-output1[[1]]
     result$coefs <- output1[[2]]
     return(result)
@@ -377,7 +387,101 @@ train.auc
 Originally the model was ran with binned populations sized, but have since changed to population size log10 transformed. This increases the training AUC to `r signif(train.auc@y.values[[1]], digits=2)` from ~0.8. Dropping any of the abiotic variables has minimal impact on the AUC. Removing any population variable from the model reduces the AUC to approx. 0.7.
 
 ##Variable Importance
- 
+
+### Baseline AUC for the model
+
+```{r permutation}
+permOneVar=function(formula = glm.formula, train.pres = train.pres, train.bg = train.bg, training = training, cores=2, no.iterations= 100){
+      # glm.formula:
+      # train.pres
+      # train.bg
+      # training
+      # cores : number of cores to use for parallel; default to 2
+      # no.iterations : number of low bias models to make; default to 100
+  bagging<-function(form.x.y,training.pres,training.abs,new.data){
+  #' modified JP's bagging function
+  #' 
+  #' @param form.x.y the formula for model to use
+  #' @param training.pres dataframe containing training presence data
+  #' @param training.abs dataframe containing training background data
+  #' @param new.data new data for each logreg model to predict onto
+  #' @param iterations number of cores to use. also maybe has something to do with model iterations???
+  #'
+  #' @returns predictions on new data as a combination (sum??) of predictions from each logreg model
+    training_positions.p <- sample(nrow(training.pres),size=10)
+    training_positions.b <- sample(nrow(training.abs),size=100)
+    train_pos.p<-1:nrow(training.pres) %in% training_positions.p #presence
+    train_pos.b<-1:nrow(training.abs) %in% training_positions.b #background
+    glm_fit<-glm(form.x.y,data=rbind(training.pres[train_pos.p,],training.abs[train_pos.b,]),family=binomial(logit))
+    glm.coef <- coef(glm_fit)
+    predictions <- predict(glm_fit,newdata=new.data,type="response")
+  return(list(predictions, glm.coef))
+}
+  
+  #parse out variables from formula object 
+  variables <- trimws(unlist(strsplit(as.character(formula)[3], "+", fixed = T)), which = "both")
+  variablesName <- c(variables, "full model")
+  train.auc <- data.frame(auc = rep(NA, length(variablesName)), variableDrop = rep(NA, length(variablesName)))
+  #create empty plot for AUC 
+  plot(NA, ylim=c(0,1), xlim=c(0,1))
+  legend("bottomright", title ="Variable Dropped", legend=variablesName, col=c(1:length(variablesName)), lty=1, lwd=2)
+  
+  for (i in 1:(length(variables)+1)){
+    print(variables[i]) #let us know where the simulation is at. 
+  #drop one variable from formula object
+    newVariables <- paste(variables[-i], collapse ="+")
+    new.glm.formula <- as.formula(paste0("case~", newVariables))
+    
+  #Set up parallel cores to return 2 lists: 1) predictions, 2) coef of model
+  cores.to.use <- cores #change dep on computer
+  iterations <- no.iterations #number of low bias models to make
+  
+  #create class to combine multiple results
+  multiResultClass <- function(predictions = NULL,coefs = NULL)
+  {
+    me <- list(
+      predictions = predictions,
+      coefs = coefs
+    )
+  
+    ## Set the name for the class
+    class(me) <- append(class(me),"multiResultClass")
+    return(me)
+  }
+  
+  
+  cl <- makeCluster(cores.to.use)
+  registerDoParallel(cl)
+  
+  trainModel <- foreach(i=1:iterations) %dopar% {
+      result <- multiResultClass()
+      output1 <- bagging(form.x.y=new.glm.formula,training.pres=train.pres,training.abs=train.bg,new.data=training)
+      result$predictions <-output1[[1]]
+      result$coefs <- output1[[2]]
+      return(result)
+  }
+  
+  stopCluster(cl)
+  
+  #pull out data in usable fashion
+  trainingPreds <- do.call(cbind,(lapply(trainModel, '[[', 1)))
+  trainingCoefs <- do.call(cbind,(lapply(trainModel, '[[', 2)))
+  
+  output.preds<- apply(trainingPreds, 1, mean)
+  preds <- prediction(output.preds, training$case)
+  
+  perf2 <- performance(preds, "tpr", "fpr")
+  plot(perf2, add=TRUE, col=i)
+  train.auc$auc[i] <- unlist(performance(preds, "auc")@y.values)
+  train.auc$variableDrop[i] <- variablesName[i]
+  }
+  #return training coefs and AUC for each iteration
+  train.auc[order(train.auc$auc),]
+  return(train.auc)
+
+}
+
+```
 ### Drop One Variable 
 
 For the first pass at variable importance, we will use a drop one variable scheme. Starting with the all the variables, we will drop one and calculate the AUC on the training data. The population density ($Log_{10}$ transformed) seems to be the most important predictor of any YF cases in a municipality. This is expected and doesn't add any intuition to the system. 
