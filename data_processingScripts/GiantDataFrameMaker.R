@@ -164,6 +164,32 @@ final.data <- all.data[c("case", "NumCase",
                  "muni.no", "month.no", "muni.name","muniArea", "cal.month","year")]
 
 
-#5. Save the data ----------------------
+#5. Split the data ----------------------
 
+all.data <- final.data[order(-final.data$case, final.data$month.no),] 
+
+all.pres <- filter(all.data, case==1)
+all.bg <- filter(all.data, case==0)
+
+#Split infected municipalities
+#test.pres.inds <- base::sample(nrow(all.pres), ceiling(nrow(all.pres)/3)) #without year stratification
+test.pres.inds <- seq(1,nrow(all.pres), by=3) #with year stratification
+test.pres <- all.pres[test.pres.inds,]
+train.pres <- all.pres[-test.pres.inds,]
+
+#Split background data
+test.bg.inds <- base::sample(nrow(all.bg), ceiling(nrow(all.bg)/3))
+test.bg <- all.bg[test.bg.inds,]
+train.bg <- all.bg[-test.bg.inds,]
+
+training <- rbind(train.pres, train.bg)
+testing <- rbind(test.pres, test.bg)
+
+#6. Save data ---------------------------
+#individual training and testing data
+saveRDS(training, file="../data_clean/TrainingData.rds")
+saveRDS(testing, file="../data_clean/TestingData.rds")
 saveRDS(final.data, file="../data_clean/FinalData.rds")
+
+#index of data to create training and testing
+save(test.pres.inds, test.bg.inds, file="IndexForDataSplit.RData")
