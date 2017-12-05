@@ -178,6 +178,7 @@ permOneVar=function(formula = glm.formula, bag.fnc=bagging,permute.fnc=permuteda
   # cores : number of cores to use for parallel; default to 2
   # no.iterations : number of low bias models to make; default to 100
   library(dplyr)
+  library(doParallel)
   
   #parse out variables from formula object 
   variables <- trimws(unlist(strsplit(as.character(formula)[3], "+", fixed = T)), which = "both")
@@ -186,13 +187,13 @@ permOneVar=function(formula = glm.formula, bag.fnc=bagging,permute.fnc=permuteda
   #make objects for outputs to be saved in
   perm.auc <- matrix(NA, nrow=perm, ncol=length(variablesName)) #place to save AUC of models based on different permuation
   
-  for (i in 1:length(variablesName)){
-    print(c(i,variablesName[i])) #let us know where the simulation is at. 
-    VarToPerm <- i
+  for (j in 1:length(variablesName)){
+    print(c(j,variablesName[j])) #let us know where the simulation is at. 
+    VarToPerm <- j
     for (k in 1:perm){
     #if statments to permute data as needed, replaced with permuteddata fnc ----
         permuted.data <- permute.fnc(formula=formula, trainingdata= traindata, i=VarToPerm)  #permute variable of interest
-        print("data permuted")
+        print(c(j,k))
       
     #Set up parallel cores to return 2 lists: 1) predictions, 2) coef of model ----
       cores.to.use <- cores #change dep on computer
@@ -215,16 +216,16 @@ permOneVar=function(formula = glm.formula, bag.fnc=bagging,permute.fnc=permuteda
       cl <- makeCluster(cores.to.use)
       registerDoParallel(cl)
       
-      trainModel <- foreach(j=1:iterations) %dopar% {
+      trainModel <- foreach(i=1:iterations) %dopar% {
         result <- multiResultClass()
         output1 <- bag.fnc(form.x.y=formula,training= permuted.data ,new.data=traindata)
         result$predictions <-output1[[1]]
-        result$coefs <- output1[[2]]
+        #result$coefs <- output1[[2]]
         return(result)
       }
       
       stopCluster(cl)
-      print("model ran")
+      #aggregate data from clusters ----
       #pull out data in usable fashion
       trainingPreds <- do.call(cbind,(lapply(trainModel, '[[', 1)))
       #trainingCoefs <- do.call(cbind,(lapply(trainModel, '[[', 2)))
@@ -233,7 +234,7 @@ permOneVar=function(formula = glm.formula, bag.fnc=bagging,permute.fnc=permuteda
       preds <- prediction(output.preds, traindata$case) #other projects have used dismo::evaluate instead. Not sure if is makes a difference. 
       
       #matrix of AUC to return
-      perm.auc[k,i] <- unlist(performance(preds, "auc")@y.values)
+      perm.auc[k,j] <- unlist(performance(preds, "auc")@y.values)
       
     }
   }
@@ -295,13 +296,13 @@ glm.formula <- as.formula("case~  NDVI+NDVIScale+
                           spRich+primProp") 
 
 
-PermFullModel1 <- permOneVar(formula = glm.formula,traindata = training.data, cores=3, no.iterations = 10, perm = 10 )
+PermFullModel <- permOneVar(formula = glm.formula,traindata = training.data, cores=20, no.iterations = 100, perm = 10 )
 
-PermFullAUC1 <- PermFullModel[[2]]
-PermFullAUC1[,2] <- round(as.numeric(as.character(PermFullAUC1[,2])),digits=3)
-PermFullAUC1[,3] <- round(as.numeric(as.character(PermFullAUC1[,3])),digits=3)
+PermFullAUC <- PermFullModel[[2]]
+PermFullAUC[,2] <- round(as.numeric(as.character(PermFullAUC[,2])),digits=3)
+PermFullAUC[,3] <- round(as.numeric(as.character(PermFullAUC[,3])),digits=3)
 
-PermFullAUC1[order(PermFullAUC1$meanAUC),]
+PermFullAUC[order(PermFullAUC$meanAUC),]
 
 
 ```
