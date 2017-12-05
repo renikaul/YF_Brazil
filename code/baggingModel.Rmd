@@ -135,103 +135,127 @@ bagging<-function(form.x.y,training,new.data){
   return(list(predictions, glm.coef))
 }
 
-permOneVar=function(formula = glm.formula, bag.fnc=bagging, traindata = training,  cores=2, no.iterations= 100){
+# Permute Variable based on loop iteration of PermOneVar ----
+permutedata=function(formula = glm.formula,trainingdata, i){
+  # glm.formula:
+  # training : training data with pres and abs
+  # cores : number of cores to use for parallel; default to 2
+  # no.iterations : number of low bias models to make; default to 100
+  
+  #parse out variables from formula object 
+  variables <- trimws(unlist(strsplit(as.character(formula)[3], "+", fixed = T)), which = "both")
+  variablesName <- c("full model", variables, "all permutated")
+  
+  #if statments to permute data as needed ----
+    if(i==1){
+      #run full model
+      permuted.data <- trainingdata
+    }else if(i==length(variablesName)){
+      #permute all variables; using loop so can I can use same sampling method (apply statement coherced data into weird format)
+      # temp.data <- dplyr::select(traindata, variables) %>%
+      #   dplyr::sample_frac() 
+      # permuted.data <- cbind(case=traindata$case, tmp.data)
+      
+      #bug: treating colnames as colnumber in fun but not when ran in console. :(   
+      permuted.data <- trainingdata
+      for( j in 1:length(variables)){
+        vari <- variables[j]
+        permuted.data[,vari] <- sample(permuted.data[,vari],dim(permuted.data)[1],FALSE) #permute the col named included in vari (ie. variable.names)
+      }   
+    } else {
+      #permute single variable
+      permuted.data <- trainingdata
+      permuted.data[,variablesName[i]] <- sample(permuted.data[,variablesName[i]],dim(permuted.data)[1],FALSE) #permute the col named included in vari (ie. variable.names)
+    } 
+    
+    return(permuted.data)
+}
+  
+
+permOneVar=function(formula = glm.formula, bag.fnc=bagging,permute.fnc=permutedata, traindata = training,  cores=2, no.iterations= 100, perm=10){
   # glm.formula:
   # training : training data with pres and abs
   # cores : number of cores to use for parallel; default to 2
   # no.iterations : number of low bias models to make; default to 100
   library(dplyr)
   
-  
   #parse out variables from formula object 
   variables <- trimws(unlist(strsplit(as.character(formula)[3], "+", fixed = T)), which = "both")
   variablesName <- c("full model", variables, "all permutated")
+  
   #make objects for outputs to be saved in
-  train.auc <- data.frame(auc = rep(NA, length(variablesName)), variablePermuted = rep(NA, length(variablesName)))
-  Coefs <- list()
-  perm.data <- list()
-  #create empty plot for AUC 
-  plot(NA, ylim=c(0,1), xlim=c(0,1))
-  legend("bottomright", title ="Variable Permutated", legend=variablesName, col=c(1:length(variablesName)), lty=1, lwd=2)
+  perm.auc <- matrix(NA, nrow=perm, ncol=length(variablesName)) #place to save AUC of models based on different permuation
   
   for (i in 1:length(variablesName)){
     print(c(i,variablesName[i])) #let us know where the simulation is at. 
-    
-  #if statments to permute data as needed ----
-    if(i==1){
-      #run full model
-      permuted.data <- traindata
-    }else if(i==length(variablesName)){
-        #permute all variables; using loop so can I can use same sampling method (apply statement coherced data into weird format)
-        # temp.data <- dplyr::select(traindata, variables) %>%
-        #   dplyr::sample_frac() 
-        # permuted.data <- cbind(case=traindata$case, tmp.data)
-        
-        #bug: treating colnames as colnumber in fun but not when ran in console. :(   
-        permuted.data <- traindata
-        for( j in 1:length(variables)){
-          vari <- variables[j]
-          permuted.data[,vari] <- sample(permuted.data[,vari],dim(permuted.data)[1],FALSE) #permute the col named included in vari (ie. variable.names)
-        }   
-      } else {
-     #permute single variable
-    permuted.data <- traindata
-    permuted.data[,variablesName[i]] <- sample(permuted.data[,variablesName[i]],dim(permuted.data)[1],FALSE) #permute the col named included in vari (ie. variable.names)
-    } 
-    
-    print("data permuted")
-    
-  #Set up parallel cores to return 2 lists: 1) predictions, 2) coef of model ----
-    cores.to.use <- cores #change dep on computer
-    iterations <- no.iterations #number of low bias models to make
-    
-    #create class to combine multiple results
-    multiResultClass <- function(predictions = NULL,coefs = NULL)
-    {
-      me <- list(
-        predictions = predictions,
-        coefs = coefs
-      )
+    VarToPerm <- i
+    for (k in 1:perm){
+    #if statments to permute data as needed, replaced with permuteddata fnc ----
+        permuted.data <- permute.fnc(formula=formula, trainingdata= traindata, i=VarToPerm)  #permute variable of interest
+        print("data permuted")
       
-      ## Set the name for the class
-      class(me) <- append(class(me),"multiResultClass")
-      return(me)
+    #Set up parallel cores to return 2 lists: 1) predictions, 2) coef of model ----
+      cores.to.use <- cores #change dep on computer
+      iterations <- no.iterations #number of low bias models to make
+      
+      #create class to combine multiple results
+      multiResultClass <- function(predictions = NULL,coefs = NULL)
+      {
+        me <- list(
+          predictions = predictions,
+          coefs = coefs
+        )
+        
+        ## Set the name for the class
+        class(me) <- append(class(me),"multiResultClass")
+        return(me)
+      }
+      
+      
+      cl <- makeCluster(cores.to.use)
+      registerDoParallel(cl)
+      
+      trainModel <- foreach(j=1:iterations) %dopar% {
+        result <- multiResultClass()
+        output1 <- bag.fnc(form.x.y=formula,training= permuted.data ,new.data=traindata)
+        result$predictions <-output1[[1]]
+        result$coefs <- output1[[2]]
+        return(result)
+      }
+      
+      stopCluster(cl)
+      print("model ran")
+      #pull out data in usable fashion
+      trainingPreds <- do.call(cbind,(lapply(trainModel, '[[', 1)))
+      #trainingCoefs <- do.call(cbind,(lapply(trainModel, '[[', 2)))
+      
+      output.preds<- apply(trainingPreds, 1, mean)
+      preds <- prediction(output.preds, traindata$case) #other projects have used dismo::evaluate instead. Not sure if is makes a difference. 
+      
+      #matrix of AUC to return
+      perm.auc[k,i] <- unlist(performance(preds, "auc")@y.values)
+      
     }
-    
-    
-    cl <- makeCluster(cores.to.use)
-    registerDoParallel(cl)
-    
-    trainModel <- foreach(i=1:iterations) %dopar% {
-      result <- multiResultClass()
-      output1 <- bag.fnc(form.x.y=formula,training= permuted.data ,new.data=traindata)
-      result$predictions <-output1[[1]]
-      result$coefs <- output1[[2]]
-      return(result)
-    }
-    
-    stopCluster(cl)
-    print("model ran")
-    #pull out data in usable fashion
-    trainingPreds <- do.call(cbind,(lapply(trainModel, '[[', 1)))
-    trainingCoefs <- do.call(cbind,(lapply(trainModel, '[[', 2)))
-    
-    output.preds<- apply(trainingPreds, 1, mean)
-    preds <- prediction(output.preds, traindata$case)
-    
-    perf2 <- performance(preds, "tpr", "fpr")
-    plot(perf2, add=TRUE, col=i)
-    
-    #matrix of AUC to return
-    train.auc$auc[i] <- unlist(performance(preds, "auc")@y.values)
-    train.auc$variablePermuted[i] <- variablesName[i]
-    
-    #list of coefs
-    Coefs[[i]] <- trainingCoefs
-    
   }
+  #calculate relative importance
+  perm.auc.mean <- apply(perm.auc,2,mean)
+  perm.auc.sd <- apply(perm.auc, 2, sd)
+  delta.auc <- perm.auc.mean[1] - perm.auc.mean[-c(1, length(perm.auc.mean))] #change in AUC from base model only for single variable permutation
+  rel.import <- delta.auc/max(delta.auc) # normalized relative change in AUC from base model only for single variable permutation
+  
+  #Output for relative importance
+  relative.import <- as.data.frame(cbind(Permutated=variables,RelImport=rel.import))
+    #plot it for fun
+  barplot(rel.import, names.arg = variables)
+  #Output for mean and sd of permutations for all permutations (non, single var, and all var)
+  mean.auc <- as.data.frame(cbind(Model=variablesName,meanAUC=perm.auc.mean, sdAUC=perm.auc.sd))
+  
+  #Output of AUC for each permutation
+  colnames(perm.auc) <- variablesName
+  
   #return training coefs and AUC for each iteration
-  return(list(train.auc, Coefs))
+  #return(list(train.auc, Coefs))
+  return(list(rel.import, mean.auc,perm.auc))
 }
 
 
@@ -253,25 +277,33 @@ The model is ran for 100 iterations with a subset of the cases. The subset consi
 
 ### Permutating variables for importance   
 
+  New permutation of data for each of the 100 bagged models. 
 Variable importance will be based on change in AUC when variable is permutated. Starting with the all the variables, we will permute one and calculate the AUC on the training data. The baseline AUC was calculated by permuting all the variables. The population density ($Log_{10}$ transformed) seems to be the most important predictor of any YF cases in a municipality. This is expected and doesn't add any intuition to the system. 
     *permutation results variable, why? 
         Expect this when model perf poor, but our AUC is relatively high meaning that perm should always have neg impact
         Does this mean model is overfit; how to tell? (k-folds CV with dif train/test)
         Why the 1:10 proportion. What is risk if we increase, how to know if we have too many pres in balanced data
+        
+        #rescale AUC for importan  
 ```{r kitchen sink variable importance}
 #drop one covar importance
 glm.formula <- as.formula("case~  NDVI+NDVIScale+ 
                           popLog10+
-                          RF+RFsqrt+RFScale+
+                          RFsqrt+RFScale+
                           tempMean+tempScale+
-                          fireNum+fireDen+fireDenSqrt+fireDenScale+
+                          fireDenSqrt+fireDenScale+
                           spRich+primProp") 
 
 
-PermFullModel <- permOneVar(formula = glm.formula,traindata = training.data, cores=3, no.iterations = 100 )
+PermFullModel1 <- permOneVar(formula = glm.formula,traindata = training.data, cores=3, no.iterations = 10, perm = 10 )
 
-PermFullAUC <- PermFullModel[[1]]
-PermFullAUC[order(PermFullAUC$auc),]
+PermFullAUC1 <- PermFullModel[[2]]
+PermFullAUC1[,2] <- round(as.numeric(as.character(PermFullAUC1[,2])),digits=3)
+PermFullAUC1[,3] <- round(as.numeric(as.character(PermFullAUC1[,3])),digits=3)
+
+PermFullAUC1[order(PermFullAUC1$meanAUC),]
+
+
 ```
 
 Drop variables that have higher AUC than full model when permuted. 
@@ -284,6 +316,7 @@ glm.formula2 <- as.formula("case~  NDVI+NDVIScale+
                           spRich+primProp") 
 
 PermTrimModel2 <- permOneVar(formula = glm.formula2,traindata = training.data, cores=3, no.iterations = 100 )
+PermTrimAUC3 <- PermTrimModel2[[1]]
 
 ```
 
