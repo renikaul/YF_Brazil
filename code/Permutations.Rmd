@@ -1,0 +1,352 @@
+---
+title: "Permutations"
+author: "Kaul"
+date: "12/6/2017"
+output: 
+  html_document:
+    toc: true
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, eval=TRUE, warning = FALSE)
+library(gplots)
+
+```
+
+#Further exploring permutations 
+
+## Permutation Methods 
+
+The methods for the workflow have not changed with the exception of increasing the number of bags from 100 to 1000. This analysis explores different variable combinations. Permutation3, the *final* model was permuted a total of 100 times (instead of the standard 10). 
+
+
+### Permutation 1: Popless
+  Drop One model exploration showed that population was the main explanatory variable. However, the models with population permutated (100bags, 10 perm) did not have a large drop in AUC. For this reason, we should explore model permutations after dropping population. 
+  
+  
+  
+```{r Popless}
+#drop one covar importance
+glm.formula.popless <- as.formula("case~  NDVI+NDVIScale+ 
+                          RFsqrt+RFScale+
+                          tempMean+tempScale+
+                          fireDenSqrt+fireDenScale+
+                          spRich+primProp") 
+
+PoplessVariables <- trimws(unlist(strsplit(as.character(glm.formula.popless)[3], "+", fixed = T)), which = "both")
+#increased number of bagged models to 1000 from 100
+#PermPoplessModel <- permOneVar(formula = glm.formula.popless,traindata = training.data, cores=20, no.iterations = 1000, perm = 10 ) 
+```
+
+The stdev around the AUC for the fully permutated model is reassuring. The model performance is slightly impacted by removing population. The order of relative importance for the environmental covariates hasn't changed.  
+```{r Popless plots, fig.width=15, fig.height=10, echo=FALSE,warning = FALSE}
+
+PermPoplessModel <- readRDS("../data_out/PermPoplessModel.rds")
+
+PermPoplessAUC <- PermPoplessModel[[2]]
+PermPoplessAUC[,2] <- round(as.numeric(as.character(PermPoplessAUC[,2])),digits=3)
+PermPoplessAUC[,3] <- round(as.numeric(as.character(PermPoplessAUC[,3])),digits=3)
+
+PermPoplessAUC[order(PermPoplessAUC$meanAUC),]
+
+PermPoplessRelImp <- PermPoplessModel[[1]]
+barplot(PermPoplessRelImp, names.arg = PoplessVariables, cex.axis = .75)
+
+plotCI(x=c(1:length(PermPoplessAUC$Model)),y=PermPoplessAUC$meanAUC, uiw=PermPoplessAUC$sdAUC, gap=0, xaxt="n", xlab="Permuted Variable", ylab="Mean AUC (10 permutations; 1000 bags)")
+axis(1, at=c(1:length(PermPoplessAUC$Model)), labels=PermPoplessAUC$Model)
+
+```
+
+### Permutation 2: Single flavor 
+
+Is the second environmental covariate really adding anything to the model? The more important of the two flavors of each covariate (based on Permutation 1) were used to build a low variable model. All fire covariates were removed as well. 
+
+```{r single flavor}
+#permute one covar importance, single flavor (SF) of each covariate
+glm.formula.SF <- as.formula("case~  NDVIScale+ 
+                          RFsqrt+
+                          tempMean+
+                          spRich") 
+
+SingleVariables <- trimws(unlist(strsplit(as.character(glm.formula.SF)[3], "+", fixed = T)), which = "both")
+
+#PermSFModel <- permOneVar(formula = glm.formula.SF,traindata = training.data, cores=20, no.iterations = 1000, perm = 10 ) #increased number of bagged models to 1000 from 100
+```
+
+Again, the model performance isn't strongly impacted by removing variables. However, the all permutated model has a slighted elevated mean AUC and larger error.
+
+```{r single flavor plots, fig.width=15, fig.height=10, echo=FALSE}
+PermSFModel <- readRDS("../data_out/PermSFModel.rds")
+
+PermSFAUC <- PermSFModel[[2]]
+PermSFAUC[,2] <- round(as.numeric(as.character(PermSFAUC[,2])),digits=3)
+PermSFAUC[,3] <- round(as.numeric(as.character(PermSFAUC[,3])),digits=3)
+
+PermSFAUC[order(PermSFAUC$meanAUC),]
+
+PermSFRelImp <- PermSFModel[[1]]
+barplot(PermSFRelImp, names.arg = SingleVariables, cex.axis = .75)
+
+plotCI(x=c(1:length(PermSFAUC$Model)),y=PermSFAUC$meanAUC, uiw=PermSFAUC$sdAUC, gap=0, xaxt="n", xlab="Permuted Variable", ylab="Mean AUC (10 permutations; 1000 bags)")
+axis(1, at=c(1:length(PermSFAUC$Model)), labels=PermSFAUC$Model)
+
+```
+
+### Permutation 3: Single flavor with population
+
+Before running this model, we felt like this *should* be the final model. That along with the variation of the all permutated model of Permuation 2 we increased the number of permutations was increased from 10 to 100. 
+
+```{r single flavor plus pop}
+#permute one covar importance, single flavor (SF) of each covariate
+glm.formula.SFP <- as.formula("case~  popLog10+ 
+                          NDVIScale+ 
+                          RFsqrt+
+                          tempMean+
+                          spRich") 
+
+SFPVariables <- trimws(unlist(strsplit(as.character(glm.formula.SFP)[3], "+", fixed = T)), which = "both")
+
+#PermSFPModel <- permOneVar(formula = glm.formula.SFP,traindata = training.data, cores=20, no.iterations = 1000, perm = 100 ) #increased number of bagged models to 1000 from 100
+```
+
+This code took about 3.5 days to run. The model AUC looks good. The variability around the all permutated model is still high. I wonder if this is expected in models with fewer variables? 
+
+```{r single flavor plue pop plots, fig.width=15, fig.height=10, echo=FALSE}
+PermSFPModel <- readRDS("../data_out/PermSFPModel.rds")
+
+PermSFPAUC <- PermSFPModel[[2]]
+PermSFPAUC[,2] <- round(as.numeric(as.character(PermSFPAUC[,2])),digits=3)
+PermSFPAUC[,3] <- round(as.numeric(as.character(PermSFPAUC[,3])),digits=3)
+
+PermSFPAUC[order(PermSFPAUC$meanAUC),]
+
+PermSFPRelImp <- PermSFPModel[[1]]
+barplot(PermSFPRelImp, names.arg = SFPVariables, cex.axis = .75, ylab="Relative Importance")
+
+```
+
+
+****
+#Meeting with John Dec 6th
+
+## Variable Permutations Methods
+
+Within the training dataset each variable was permuted 10 times. These permutated datasets were then used to make a logistic model bagged 100 times. The bagged model was used to predict on the entire (unbalanced) training dataset. The AUC for each permuted dataset of a given variable was then averaged. This mean AUC was subtracted from the base model AUC (delta AUC). The delta AUC was rescaled max(delta AUC) to yield variable importance. This whole process took roughly 4 hours using 20 cores of the high memory machine. 
+ 
+```{r load data}
+PermFullModel <- readRDS("../data_out/PermFullModel.rds")
+```
+
+## Variable Importance
+
+The population size is the most importance variable. 
+```{r RelImp, fig.width=15, fig.height=10}
+#model
+glm.formula <- as.formula("case~  
+                                NDVI+NDVIScale+
+                                popLog10+
+                                RFsqrt+RFScale+
+                                tempMean+tempScale+
+                                fireDenSqrt+fireDenScale+
+                                spRich+primProp") 
+
+variables <- trimws(unlist(strsplit(as.character(glm.formula)[3], "+", fixed = T)), which = "both")
+variablesName <- c("full model", variables, "all permutated")
+
+#Plot relative Importance  
+RelImp <- PermFullModel[[1]]
+names(RelImp) <- variables
+barplot(RelImp)
+
+#rank relative importance
+sort(RelImp)
+```
+
+## Absolute AUC
+
+All variables were permuted simultaneously to get at the baseline AUC of the model approach. It is roughly 0.5 but has wide variability. 
+
+```{r AUC, fig.width=15, fig.height=10}
+AUC <- PermFullModel[[2]]
+AUC$meanAUC <- as.numeric(as.character(AUC$meanAUC))#stupid format
+AUC$sdAUC <- as.numeric(as.character(AUC$sdAUC))
+
+AUC[order(AUC$meanAUC, decreasing = TRUE),]
+library(gplots)
+    plotCI(x=c(1:length(AUC$Model)),y=AUC$meanAUC, uiw=AUC$sdAUC, gap=0, xaxt="n", xlab="Permuted Variable", ylab="Mean AUC (10 permutations)")
+    axis(1, at=c(1:length(AUC$Model)), labels=AUC$Model)
+
+```
+
+## Variable Key
+
+- case :reporting of any YF cases (0,1)
+
+- NDVI : NDVI for that month
+- NDVIScale : NDVI rescaled to max value for that muni and calendar month
+- popLog10 : population density 
+- RFsqrt : mean hourly rainfall sqrt transformed
+- RFScale : mean hourly rainfall rescaled to max value for that muni and calendar month
+- tempMean : mean monthly air temperature 
+- tempScale : mean monthly air temperature rescaled to max value for that muni and calendar month
+- fireDenSqrt : number of fires oberserved in month divided by muniArea sqrt transformed
+- firesDenScale : number of fires oberserved in month divided by muniArea rescaled to max value for that muni and calendar month. NA values converted to zero. 
+- spRich : number of non-human primates by species with ranges based on IUCN {0-22}
+- primProp : sum of each municipalities relative area that is both agricultural and falls within a primate genus range. {0,9} Missing for 2014
+
+## Code to run permutations
+
+```{r, eval=FALSE}
+# Bagging ----
+bagging<-function(form.x.y,training,new.data){
+  # modified JP's bagging function 12/1/17 RK 
+  # form.x.y the formula for model to use
+  # training dataframe containing training data (presence and abs)
+  # new.data new data for logreg model to predict onto
+  
+  # returns predictions based on logreg model for new data and coefficients of model
+  #0. load packages
+  library(dplyr)
+  #1. Create subset of data with fixed number of pres and abs
+  training.pres <- dplyr::filter(training, case==1) #pull out just present points
+  training.abs <- dplyr::filter(training, case==0)  #pull out just absence points
+  training_positions.p <- sample(nrow(training.pres),size=10) #randomly choose 10 present point rows
+  training_positions.b <- sample(nrow(training.abs),size=100) #randomly choose 100 absence point rows  
+  train_pos.p<-1:nrow(training.pres) %in% training_positions.p #presence 
+  train_pos.b<-1:nrow(training.abs) %in% training_positions.b #background
+  #2. Build logreg model with subset of data    
+  glm_fit<-glm(form.x.y,data=rbind(training.pres[train_pos.p,],training.abs[train_pos.b,]),family=binomial(logit))
+  #3. Pull out model coefs  
+  glm.coef <- coef(glm_fit)
+  #4. Use model to predict (0,1) on whole training data   
+  predictions <- predict(glm_fit,newdata=new.data,type="response")
+  return(list(predictions, glm.coef))
+}
+
+# Permute Variable based on loop iteration of PermOneVar ----
+permutedata=function(formula = glm.formula,trainingdata, i){
+  # glm.formula:
+  # training : training data with pres and abs
+  # cores : number of cores to use for parallel; default to 2
+  # no.iterations : number of low bias models to make; default to 100
+  
+  #parse out variables from formula object 
+  variables <- trimws(unlist(strsplit(as.character(formula)[3], "+", fixed = T)), which = "both")
+  variablesName <- c("full model", variables, "all permutated")
+  
+  #if statments to permute data as needed ----
+    if(i==1){
+      #run full model
+      permuted.data <- trainingdata
+    }else if(i==length(variablesName)){
+      #permute all variables; using loop so can I can use same sampling method (apply statement coherced data into weird format)
+      # temp.data <- dplyr::select(traindata, variables) %>%
+      #   dplyr::sample_frac() 
+      # permuted.data <- cbind(case=traindata$case, tmp.data)
+      
+      #bug: treating colnames as colnumber in fun but not when ran in console. :(   
+      permuted.data <- trainingdata
+      for( j in 1:length(variables)){
+        vari <- variables[j]
+        permuted.data[,vari] <- sample(permuted.data[,vari],dim(permuted.data)[1],FALSE) #permute the col named included in vari (ie. variable.names)
+      }   
+    } else {
+      #permute single variable
+      permuted.data <- trainingdata
+      permuted.data[,variablesName[i]] <- sample(permuted.data[,variablesName[i]],dim(permuted.data)[1],FALSE) #permute the col named included in vari (ie. variable.names)
+    } 
+    
+    return(permuted.data)
+}
+  
+
+permOneVar=function(formula = glm.formula, bag.fnc=bagging,permute.fnc=permutedata, traindata = training,  cores=2, no.iterations= 100, perm=10){
+  # glm.formula:
+  # training : training data with pres and abs
+  # cores : number of cores to use for parallel; default to 2
+  # no.iterations : number of low bias models to make; default to 100
+  library(dplyr)
+  library(doParallel)
+  
+  #parse out variables from formula object 
+  variables <- trimws(unlist(strsplit(as.character(formula)[3], "+", fixed = T)), which = "both")
+  variablesName <- c("full model", variables, "all permutated")
+  
+  #make objects for outputs to be saved in
+  perm.auc <- matrix(NA, nrow=perm, ncol=length(variablesName)) #place to save AUC of models based on different permuation
+  
+  for (j in 1:length(variablesName)){
+    print(c(j,variablesName[j])) #let us know where the simulation is at. 
+    VarToPerm <- j
+    for (k in 1:perm){
+    #if statments to permute data as needed, replaced with permuteddata fnc ----
+        permuted.data <- permute.fnc(formula=formula, trainingdata= traindata, i=VarToPerm)  #permute variable of interest
+        print(c(j,k))
+      
+    #Set up parallel cores to return 2 lists: 1) predictions, 2) coef of model ----
+      cores.to.use <- cores #change dep on computer
+      iterations <- no.iterations #number of low bias models to make
+      
+      #create class to combine multiple results
+      multiResultClass <- function(predictions = NULL,coefs = NULL)
+      {
+        me <- list(
+          predictions = predictions,
+          coefs = coefs
+        )
+        
+        ## Set the name for the class
+        class(me) <- append(class(me),"multiResultClass")
+        return(me)
+      }
+      
+      
+      cl <- makeCluster(cores.to.use)
+      registerDoParallel(cl)
+      
+      trainModel <- foreach(i=1:iterations) %dopar% {
+        result <- multiResultClass()
+        output1 <- bag.fnc(form.x.y=formula,training= permuted.data ,new.data=traindata)
+        result$predictions <-output1[[1]]
+        #result$coefs <- output1[[2]]
+        return(result)
+      }
+      
+      stopCluster(cl)
+      #aggregate data from clusters ----
+      #pull out data in usable fashion
+      trainingPreds <- do.call(cbind,(lapply(trainModel, '[[', 1)))
+      #trainingCoefs <- do.call(cbind,(lapply(trainModel, '[[', 2)))
+      
+      output.preds<- apply(trainingPreds, 1, mean)
+      preds <- prediction(output.preds, traindata$case) #other projects have used dismo::evaluate instead. Not sure if is makes a difference. 
+      
+      #matrix of AUC to return
+      perm.auc[k,j] <- unlist(performance(preds, "auc")@y.values)
+      
+    }
+  }
+  #calculate relative importance
+  perm.auc.mean <- apply(perm.auc,2,mean)
+  perm.auc.sd <- apply(perm.auc, 2, sd)
+  delta.auc <- perm.auc.mean[1] - perm.auc.mean[-c(1, length(perm.auc.mean))] #change in AUC from base model only for single variable permutation
+  rel.import <- delta.auc/max(delta.auc) # normalized relative change in AUC from base model only for single variable permutation
+  
+  #Output for relative importance
+  relative.import <- as.data.frame(cbind(Permutated=variables,RelImport=rel.import))
+    #plot it for fun
+  barplot(rel.import, names.arg = variables)
+  #Output for mean and sd of permutations for all permutations (non, single var, and all var)
+  mean.auc <- as.data.frame(cbind(Model=variablesName,meanAUC=perm.auc.mean, sdAUC=perm.auc.sd))
+  
+  #Output of AUC for each permutation
+  colnames(perm.auc) <- variablesName
+  
+  #return training coefs and AUC for each iteration
+  #return(list(train.auc, Coefs))
+  return(list(rel.import, mean.auc,perm.auc))
+}
+
+
+```
+
