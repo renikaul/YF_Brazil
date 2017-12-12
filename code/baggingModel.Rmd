@@ -187,7 +187,7 @@ baggedlogistic=function(formula = glm.formula, bag.fnc=bagging,traindata = train
       train.auc <- unlist(performance(preds, "auc")@y.values)
       
     #Build data frame for plotting ----
-      plotPreds <- cbind(muni.no=traindata$muni.no, case=traindata$case, prediction=output.preds)
+      plotPreds <- cbind(muni.no=traindata$muni.no,month.no=traindata$month.no, case=traindata$case, prediction=output.preds)
   
   #return AUC, mean predictions to plot, all predictions, all training coefs
   return(list(train.auc, plotPreds , trainingPreds, trainingCoefs))
@@ -447,7 +447,11 @@ saveRDS(PermSFPModel, file="../data_out/PermSFPModel.rds")
 
 PredictSFPModel <- baggedlogistic(formula= glm.formula.SFP, traindata = training.data, cores=20, no.iterations = 1000) 
 
-saveRDS(PredictSFPModel, file="../data_out/PredictSFPModel.rds")
+#parse it out to save to github
+SFPPredPlot <- PredictSFPModel[[2]]
+saveRDS(SFPPredPlot, file="../data_out/Predictions/SFPPredPlot.rds")
+#save the whole thing locally
+saveRDS(PredictSFPModel, file="../data_out/Predictions/PredictSFPModel.rds")
 ```
 
 ```{r}
