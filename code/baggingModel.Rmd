@@ -135,6 +135,65 @@ bagging<-function(form.x.y,training,new.data){
   return(list(predictions, glm.coef))
 }
 
+#Bagged model in parallel ----
+# Permute One Variable at a time ----
+baggedlogistic=function(formula = glm.formula, bag.fnc=bagging,traindata = training,  cores=2, no.iterations= 100){
+  # glm.formula:
+  # training : training data with pres and abs
+  # cores : number of cores to use for parallel; default to 2
+  # no.iterations : number of low bias models to make; default to 100
+  library(dplyr)
+  library(doParallel)
+  
+    #Set up parallel cores to return 2 lists: 1) predictions, 2) coef of model ----
+      cores.to.use <- cores #change dep on computer
+      iterations <- no.iterations #number of low bias models to make
+      
+      #create class to combine multiple results
+      multiResultClass <- function(predictions = NULL,coefs = NULL)
+      {
+        me <- list(
+          predictions = predictions,
+          coefs = coefs
+        )
+        
+        ## Set the name for the class
+        class(me) <- append(class(me),"multiResultClass")
+        return(me)
+      }
+      
+      
+      cl <- makeCluster(cores.to.use)
+      registerDoParallel(cl)
+      
+      trainModel <- foreach(i=1:iterations) %dopar% {
+        result <- multiResultClass()
+        output1 <- bag.fnc(form.x.y=formula,training= traindata ,new.data=traindata)
+        result$predictions <-output1[[1]]
+        result$coefs <- output1[[2]]
+        return(result)
+      }
+      
+      stopCluster(cl)
+      #aggregate data from clusters ----
+      #pull out data in usable fashion
+      trainingPreds <- do.call(cbind,(lapply(trainModel, '[[', 1)))
+      trainingCoefs <- do.call(cbind,(lapply(trainModel, '[[', 2)))
+      
+    #Calculate AUC of bagged model ----  
+      output.preds<- apply(trainingPreds, 1, mean)
+      preds <- prediction(output.preds, traindata$case) #other projects have used dismo::evaluate instead. Not sure if is makes a difference. 
+      #AUC to return
+      train.auc <- unlist(performance(preds, "auc")@y.values)
+      
+    #Build data frame for plotting ----
+      plotPreds <- cbind(muni.no=traindata$muni.no, case=traindata$case, prediction=output.preds)
+  
+  #return AUC, mean predictions to plot, all predictions, all training coefs
+  return(list(train.auc, plotPreds , trainingPreds, trainingCoefs))
+}
+
+
 # Permute Variable based on loop iteration of PermOneVar ----
 permutedata=function(formula = glm.formula,trainingdata, i){
   # glm.formula:
@@ -171,7 +230,7 @@ permutedata=function(formula = glm.formula,trainingdata, i){
     return(permuted.data)
 }
   
-
+# Permute One Variable at a time ----
 permOneVar=function(formula = glm.formula, bag.fnc=bagging,permute.fnc=permutedata, traindata = training,  cores=2, no.iterations= 100, perm=10){
   # glm.formula:
   # training : training data with pres and abs
@@ -384,9 +443,12 @@ barplot(PermSFPRelImp, names.arg = SFPVariables, cex.axis = .75, ylab="Relative 
 saveRDS(PermSFPModel, file="../data_out/PermSFPModel.rds")
 ```
 
+```{r single flavor plus pop predictions}
 
+PredictSFPModel <- baggedlogistic(formula= glm.formula.SFP, traindata = training.data, cores=20, no.iterations = 1000) 
 
-
+saveRDS(PredictSFPModel, file="../data_out/PredictSFPModel.rds")
+```
 
 ```{r}
 glm.formula2 <- as.formula("case~  NDVI+NDVIScale+ 
