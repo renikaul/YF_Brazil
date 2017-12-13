@@ -14,6 +14,8 @@ library(lubridate)
 library(raster)
 library(stringr)
 library(dplyr)
+library(doParallel)
+library(foreach)
 ```
 
 This document creates a gif of the predictions from the bagging model.
@@ -43,7 +45,7 @@ theme_map <- function(...) {
     axis.title.x = element_blank(),
     axis.title.y = element_blank(),
     # panel.grid.minor = element_line(color = "#ebebe5", size = 0.2),
-    panel.grid.major = element_line(color = "#ebebe5", size = 0.2),
+    # panel.grid.major = element_line(color = "#ebebe5", size = 0.2),
     panel.grid.minor = element_blank(),
     plot.background = element_rect(fill = "#f5f5f2", color = NA), 
     panel.background = element_rect(fill = "#f5f5f2", color = NA), 
@@ -56,7 +58,7 @@ theme_map <- function(...) {
 ```
 
 
-```{r create plotting function, eval = F}
+```{r create plotting function, eval = T}
 plotFunction <- function(monthIteration){
   #set title
   mapTitle <- paste("Model predictions for", month(monthIteration %% 12, label = T), (2001 + monthIteration %/% 12), sep = " ")
@@ -67,6 +69,14 @@ plotFunction <- function(monthIteration){
   # now we join the thematic data
   map_data <- brazFortified %>% 
   left_join(subset2plot, by = "muni.no")
+  
+  #get single symbol for each case
+  case_data <- map_data %>%
+    filter(case==1) %>%
+    filter(!is.na(lat)) %>%
+    group_by(muni.no) %>%
+    #get centroid
+    summarise(long=mean(long, na.rm = T), lat = mean(lat, na.rm = T))
   
   p <-ggplot() +
     # municipality polygons
@@ -80,9 +90,9 @@ plotFunction <- function(monthIteration){
                                    group = group), 
               color = "gray25", size = 0.1) +
     # add shape for cases
-    geom_point(data = map_data[map_data$case==1,], 
+    geom_point(data = case_data, 
                aes(x = long, y = lat), 
-               shape = 23, size = 1, col = "green") +
+               shape = 23, size = 2, fill = "green", col = "black") +
     coord_equal() +
     scale_color_manual(values = caseColor) +
     scale_fill_viridis(option = "magma", direction = -1, discrete = F,
@@ -111,7 +121,8 @@ plotFunction <- function(monthIteration){
 }
 ```
 
-```{r, eval = F}
+```{r, eval = T}
+Sys.time()
 for (i in 1:168){
   #wrap in try catch because of image device failings
   tryCatch({
@@ -120,15 +131,14 @@ for (i in 1:168){
   p <- plotFunction(monthIteration = i)
   print(p)
   dev.off()
-  # add a bunch of this becuase my image device is broke :(
-  #dev.off()
-  #dev.off()
   })
 }
-
+Sys.time()
 ```
-You will then need to use image Magick to combine into one giant gif.
+You will then need to use image Magick to combine into one giant gif. One day I will figure out how to call bash from R and then make it run from here.
 
+cd into `figures/GIFplots`
+CMDLINE: `convert -delay 100 *.png \ predictionsAll.gif`
 
 Try it using `gganimate`. This runs faster, but makes lower quality plots (resolution wise).
 
