@@ -10,7 +10,8 @@ output:
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE, eval=TRUE, warning = FALSE)
 library(gplots)
-
+library(ggplot2)
+library(dplyr)
 ```
 
 #Further exploring permutations 
@@ -350,3 +351,34 @@ permOneVar=function(formula = glm.formula, bag.fnc=bagging,permute.fnc=permuteda
 
 ```
 
+# Exploring Predictions and Results
+
+## Map of Predictions over time
+
+Map of predictions and known cases by month (created via `mappingPredictions.Rmd`). This is only on the training data (hence the blank municipalities), and includes known true cases as green diamonds.
+
+![Animation of predictions](figures/GIFplots/predictionsAll.gif)
+
+## Ranking of Predictions
+
+We want to explore how the predictions rank, noting where known positives fall out. This plot plots until the lowest ranked known positive, plus a little more past that (10% of oringal included). Because there are 622720 predictions, plotting them all would be uninterpretable.
+
+```{r}
+predictions <- as.data.frame(readRDS("../data_out/Predictions/SFPPredPlot.rds"))
+
+minTrue <- min(predictions$prediction[predictions$case == 1])
+predRank <- predictions %>%
+  filter(prediction>minTrue) %>%
+  arrange(desc(prediction))
+
+predRank$index <- seq.int(nrow(predRank))
+
+ggplot(data = predRank[predRank$case == 0,], aes(y = prediction, x = index)) +
+  geom_point(color = "gray20") +
+  geom_point(data = predRank[predRank$case == 1,], aes(y = prediction, x = index), color = "maroon") +
+  ylab("Prediction")+
+  xlab("Rank order")+
+  theme_bw()
+```
+
+The lowest prediction for a known case is `r minTrue`. `r nrow(predRank)` instances fall above this, out of a total of `r nrow(predictions)`.
