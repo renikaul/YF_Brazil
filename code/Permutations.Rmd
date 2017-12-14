@@ -361,8 +361,7 @@ Map of predictions and known cases by month (created via `mappingPredictions.Rmd
 
 ## Ranking of Predictions
 
-We want to explore how the predictions rank, noting where known positives fall out. This plot plots until the lowest ranked known positive, plus a little more past that (10% of oringal included). Because there are 622720 predictions, plotting them all would be uninterpretable.
-
+We want to explore how the predictions rank, noting where known positives fall out. This plot plots until the lowest ranked known positive. 
 ```{r}
 predictions <- as.data.frame(readRDS("../data_out/Predictions/SFPPredPlot.rds"))
 
@@ -378,7 +377,21 @@ ggplot(data = predRank[predRank$case == 0,], aes(y = prediction, x = index)) +
   geom_point(data = predRank[predRank$case == 1,], aes(y = prediction, x = index), color = "maroon") +
   ylab("Prediction")+
   xlab("Rank order")+
-  theme_bw()
+  theme_bw() +
+  ggtitle("Rank Order of Training Data")
+
+truePos <- predictions[predictions$case==1,]
+
+bgPreds <- predictions[predictions$case==0,]
 ```
 
-The lowest prediction for a known case is `r minTrue`. `r nrow(predRank)` instances fall above this, out of a total of `r nrow(predictions)`.
+The lowest prediction for a known case is `r round(minTrue,3)`. `r nrow(predRank)` instances fall above this, out of a total of `r nrow(predictions)`. The mean value given to true positives is `r round(mean(truePos$prediction),3)` \pm `r round(sd(truePos$prediction),3)` *sd*, compared to `r round(mean(bgPreds$prediction),3)` \pm `r round(sd(bgPreds$prediction),3)` *sd* for the background points.
+
+Histograms of the predictions are as follows:
+
+```{r}
+hist(truePos$prediction, main = "Predictions on True Positives")
+
+hist(bgPreds$prediction, main = "Predictions on Background")
+```
+
