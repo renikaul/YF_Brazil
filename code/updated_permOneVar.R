@@ -1,8 +1,5 @@
 # Main function ----
 permOneVar=function(formula = glm.formula, bag.fnc=bagging,permute.fnc=permutedata, traindata = training, cores=2, no.iterations= 100, perm=10){
-  # Spencer: Why is there an argument for the bagging function if the function is
-  # already in the local environment? Can't it just be accessed by calling its name
-  # inside permOneVar()? Same for the permutedata() function.
   
   # glm.formula:
   # training : training data with pres and abs
@@ -48,18 +45,12 @@ permOneVar=function(formula = glm.formula, bag.fnc=bagging,permute.fnc=permuteda
     }
     stopCluster(cl)
     
-    print("length(results)")
-    print(length(results))
-    print("length(results[[1]])")
-    print(length(results[[1]]))
     paste_all_pred <- function(x) {
       indices <- seq(from = 1, to = length(results[[1]]), by = 2)
       return(results[[x]][indices])
     }
     
-    blah <- unlist(sapply(1:perm, paste_all_pred))
-    print("length(blah)")
-    print(length(blah))
+    all_preds <- unlist(sapply(1:perm, paste_all_pred))
     
     
     #aggregate data from clusters ----
@@ -67,8 +58,7 @@ permOneVar=function(formula = glm.formula, bag.fnc=bagging,permute.fnc=permuteda
     
     # Set number of columns to the number of iterations times the number of permutations.
     col_length <- no.iterations*perm
-    trainingPreds <- matrix(blah, ncol = col_length)
-    print(dim(trainingPreds))
+    trainingPreds <- matrix(all_preds, ncol = col_length)
     #trainingCoefs <- do.call(cbind,(lapply(trainModel, '[[', 2)))
     
     output.preds<- apply(trainingPreds, 1, mean)
