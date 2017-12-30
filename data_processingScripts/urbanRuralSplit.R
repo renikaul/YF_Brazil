@@ -38,3 +38,4 @@ percUrban <- urbanAll %>%
   group_by(muni.no) %>%
   summarise_all(mean)
 
+write.csv(percUrban, "../data_raw/environmental/percentUrban.csv")
