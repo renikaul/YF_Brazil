@@ -31,6 +31,10 @@ library(dplyr)
 library(gplots)
 library(ROCR)
 library(pROC)
+library(rgdal)
+library(rgeos)
+library(BalancedSampling)
+library(scatterplot3d)
 
 #2. Load data-----------------------------
 
@@ -193,3 +197,58 @@ saveRDS(final.data, file="../data_clean/FinalData.rds")
 
 #index of data to create training and testing
 save(test.pres.inds, test.bg.inds, file="IndexForDataSplit.RData")
+
+#7. Split the data spatially and temporally (from #4)----------------------
+
+#get lat long coordinates for positive cases
+brazil <- readOGR("../data_clean", "BRAZpolygons")
+muni.centroids <- data.frame(muni_no = brazil@data$muni_no, gCentroid(brazil, byid = T)@coords)
+colnames(muni.centroids) <- c("muni.no", "x", "y")
+
+all.pres <- filter(final.data, case==1)
+all.bg <- filter(final.data, case==0)
+
+#calculate index to split presence on based on x, y, and month.no
+pres.meta <- all.pres %>%
+  left_join(muni.centroids, by = "muni.no") %>%
+  select(muni.no, month.no, x, y)
+N <- nrow(pres.meta) # size of all data
+n <- ceiling(0.33*N) # sample size, testing data = 30%
+p <- rep(n/N,N) # base inclusion probability 
+X <- as.matrix(pres.meta[2:4])
+set.seed(8675309)
+test.pres.inds <- lcube(p, X, cbind(p))
+
+## visualize randomness to check
+# s <- test.pres.inds
+# randPlot <- scatterplot3d(x = X[,1], y = X[,2], z = X[,3])
+# randPlot$points3d(x = X[s,1], y = X[s,2], z = X[s,3], col = "black", pch = 19)
+# #multiple 2d
+# plot(X[,1], X[,2])
+# points(X[s,1],X[s,2], pch=19); # plot sample
+# plot(X[,1], X[,3])
+# points(X[s,1],X[s,3], pch=19); # plot sample
+# plot(X[,2], X[,3])
+# points(X[s,2],X[s,3], pch=19); # plot sample
+
+#split testing
+test.pres <- all.pres[test.pres.inds,]
+train.pres <- all.pres[-test.pres.inds,]
+
+#split training (not stratified at all because there are so many)
+#Split background data
+test.bg.inds <- base::sample(nrow(all.bg), ceiling(nrow(all.bg)/3))
+test.bg <- all.bg[test.bg.inds,]
+train.bg <- all.bg[-test.bg.inds,]
+
+#combine background and presence into full training and testing data
+training <- rbind(train.pres, train.bg)
+testing <- rbind(test.pres, test.bg)
+
+#8. Save data with spatial and temporal stratification---------------------------
+#individual training and testing data
+saveRDS(training, file="../data_clean/TrainingDataSpat.rds")
+saveRDS(testing, file="../data_clean/TestingDataSpat.rds")
+
+#index of data to create training and testing
+save(test.pres.inds, test.bg.inds, file="IndexForDataSplitSpat.RData")
