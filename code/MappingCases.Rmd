@@ -17,7 +17,7 @@ library(RColorBrewer)
 
 ```{r}
 YF <- readRDS("../data_clean/YFcases/YFlong.rds")
-brazil <- readOGR("../data_processingScripts/municipios_2010", "municipios_2010")
+brazil <- readOGR("../data_clean", "BRAZpolygons")
 
 ### correct ibg codes (like FIPS)
 # the ibg codes in the shapefile have an extra digit at the end, so we just subset the first six digits from the shapefile
