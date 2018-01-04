@@ -18,10 +18,10 @@ bagging<-function(form.x.y,training,new.data){
   #2. Build logreg model with subset of data    
   glm_fit<-glm(form.x.y,data=rbind(training.pres[train_pos.p,],training.abs[train_pos.b,]),family=binomial(logit))
   #3. Pull out model coefs  
-  glm.coef <- coef(glm_fit)
+  #glm.coef <- coef(glm_fit)
   #4. Use model to predict (0,1) on whole training data   
   predictions <- predict(glm_fit,newdata=new.data,type="response")
-  return(list(predictions, glm.coef))
+  return(predictions)
 }
 
 # Permute Variable based on loop iteration of PermOneVar ----
@@ -61,9 +61,9 @@ permutedata=function(formula = glm.formula,trainingdata, i){
 }
 
 
-
 # Models with permutated variables ----
 permOneVar=function(formula = glm.formula, bag.fnc=bagging,permute.fnc=permutedata, traindata = training, cores=2, no.iterations= 100, perm=10){
+  #cores should be =< perm
   
   # glm.formula: full formula for the model to use
   # traindata : training data with pres and abs
@@ -74,25 +74,6 @@ permOneVar=function(formula = glm.formula, bag.fnc=bagging,permute.fnc=permuteda
   library(dplyr)
   library(doParallel)
   library(ROCR)
-  
-  #useful functions----
-  #create class to combine multiple results
-  multiResultClass <- function(predictions = NULL,coefs = NULL)
-  {
-    me <- list(
-      predictions = predictions,
-      coefs = coefs
-    )
-    
-    ## Set the name for the class
-    class(me) <- append(class(me),"multiResultClass")
-    return(me)
-  }
-  #organize results from different cores
-  paste_all_pred <- function(x) {
-    indices <- seq(from = 1, to = length(results[[1]]), by = 2)
-    return(results[[x]][indices])
-  }
   
   #make some local objects----
   cores.to.use <- cores
@@ -110,36 +91,24 @@ permOneVar=function(formula = glm.formula, bag.fnc=bagging,permute.fnc=permuteda
     
     cl <- makeCluster(cores.to.use)
     registerDoParallel(cl)
-    
     results <- foreach(i = 1:perm) %dopar% {
+      #permute data
       permuted.data <- permute.fnc(formula = formula, trainingdata = traindata, i = VarToPerm)
-      
-      list_of_lists <- replicate(n = no.iterations, expr = bag.fnc(form.x.y = formula, training = permuted.data,
-                                                        new.data = traindata))
-    }
-    stopCluster(cl)
-    
-    all_preds <- unlist(sapply(1:perm, paste_all_pred)) #all predictions for perm variable
-    
-    
-    #aggregate data from clusters to calculate AUC for each bagged model from each unique perm data----
-    col_length <- no.iterations*perm
-    trainingPreds <- matrix(all_preds, ncol = col_length) #each col is the predictions of a single lowbias model
-    
-    #calculate mean prediction for model over all no.iterations for a given dataset
-    for ( k in 1:perm){
-      top <- 1 + ((k-1)*no.iterations)
-      bottom <- no.iterations + ((k-1)*no.iterations)
-      tmpPred <- trainingPreds[,c(top:bottom)]
-      output.preds<- apply(tmpPred, 1, mean) 
+      #create model and prediction no.iterations times
+      matrix_of_predictions <- replicate(n = no.iterations, expr = bag.fnc(form.x.y = formula, training = permuted.data, new.data = traindata))
+      #calculate mean prediction 
+      output.preds<- apply(matrix_of_predictions, 1, mean) 
+      rm(matrix_of_predictions)
       preds <- ROCR::prediction(output.preds, traindata$case) #other projects have used dismo::evaluate instead. Not sure if is makes a difference. 
-      
-      #matrix of AUC to return
-      perm.auc[k,j] <- unlist(performance(preds, "auc")@y.values)
+      #AUC to return
+      perm.auc <- unlist(ROCR::performance(preds, "auc")@y.values)
+      }
+    
+    stopCluster(cl)
+    #matrix of AUC to return
+      perm.auc[,j] <- unlist(results)
     }
-      
-  }
-  
+    
   #calculate relative importance ----
   perm.auc.mean <- apply(perm.auc,2,mean)
   perm.auc.sd <- apply(perm.auc, 2, sd)
