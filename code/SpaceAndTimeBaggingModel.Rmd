@@ -1,0 +1,102 @@
+---
+title: "Permutation based variable selection on spatial and temporal training data"
+author: "Evans and Kaul"
+date: "January 3, 2018"
+output: 
+  html_document:
+    toc: true
+    toc_depth: 3
+    toc_float: true
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, message = FALSE, warning = FALSE, eval = FALSE)
+```
+
+# Outline
+
+This document will re-create the permutation variable selection scheme outlined in `baggingModel.Rmd`. The difference is the training/testing data has been stratified *both* temporally and spatially.  
+
+```{r load packages}
+library(dplyr)
+library(gplots)
+library(parallel)
+library(doParallel)
+library(ROCR)
+library(pROC)
+```
+
+## Data
+
+The dataset used has multiple flavors of the same environmental variables. The explanation of column names are below:
+
+* case :reporting of any YF cases (0,1)
+* NumCase :number of reported YF cases 
+* NDVI : NDVI for that month
+* NDVIScale : NDVI rescaled to max value for that muni and calendar month
+* muniArea : km2
+* popLog10 : population density 
+* RF : mean hourly rainfall
+* RFsqrt : mean hourly rainfall sqrt transformed
+* RFScale : mean hourly rainfall rescaled to max value for that muni and calendar month
+* tempMean : mean monthly air temperature 
+* tempScale : mean monthly air temperature rescaled to max value for that muni and calendar month
+* fireNum : number of fires oberserved in month
+* fireDen : number of fires oberserved in month divided by muniArea
+* fireDenSqrt : number of fires oberserved in month divided by muniArea sqrt transformed
+* firesDenScale : number of fires oberserved in month divided by muniArea rescaled to max value for that muni and calendar month. NA values converted to zero. 
+* spRich : number of non-human primates by species with ranges based on IUCN {0-22}
+* primProp : sum of each municipalities relative area that is both agricultural and falls within a primate genus range. {0,9} Missing for 2014
+* muni.no : unique number to identify municipality
+* month.no : numbered month of observation {1,168}
+* muni.name : character string name
+* month : abbrevated calendar month name
+* cal.month : calendar month {1,12}
+* year : year {2001,2014}
+
+## Processing Environmental Covariates
+
+   All of the processesing is now done in `GiantDataFrameMaker.R`. 
+Infected municipalities were 70/30 split into training and testing data, stratified by year and latitude/longitude. Background data was also split 70/30.  
+
+```{r}
+training.data <- readRDS("../data_clean/TrainingDataSpat.rds")
+
+```   
+
+
+## Model
+
+```{r bagging functions, eval=TRUE}
+source("functions/baggingWperm.R")
+
+#simple bagging function
+bagging
+
+#permute single variable
+permutedata
+
+#Main function to explore variable importance 
+permOneVar
+
+```
+  
+
+```{r train model}
+glm.formula <- as.formula("case~  NDVI+NDVIScale+
+                          popLog10+
+                          RF+RFsqrt+RFScale+
+                          tempMean+tempScale+
+                          fireNum+fireDen+fireDenSqrt+fireDenScale+
+                          spRich+primProp") 
+```
+
+The model is ran for 1000 iterations with a subset of the cases. The subset consists of 10 presences (of the 39 training) and 100 background (of the ~300,000) observations. Each iteration of the model is used to predict on the whole training dataset. This is used to calculate AUC.
+
+```{r kitchen sink}
+Sys.time()
+PermFullModel <- permOneVar(formula = glm.formula,traindata = training.data, cores = 20, no.iterations = 100, perm = 10)
+Sys.time()
+
+```
+
