@@ -74,6 +74,8 @@ permOneVar=function(formula = glm.formula, bag.fnc=bagging,permute.fnc=permuteda
   library(dplyr)
   library(doParallel)
   library(ROCR)
+  
+  #useful functions----
   #create class to combine multiple results
   multiResultClass <- function(predictions = NULL,coefs = NULL)
   {
@@ -86,19 +88,25 @@ permOneVar=function(formula = glm.formula, bag.fnc=bagging,permute.fnc=permuteda
     class(me) <- append(class(me),"multiResultClass")
     return(me)
   }
+  #organize results from different cores
+  paste_all_pred <- function(x) {
+    indices <- seq(from = 1, to = length(results[[1]]), by = 2)
+    return(results[[x]][indices])
+  }
   
+  #make some local objects----
+  cores.to.use <- cores
   #parse out variables from formula object 
   variables <- trimws(unlist(strsplit(as.character(formula)[3], "+", fixed = T)), which = "both")
   variablesName <- c("full model", variables, "all permutated")
   
-  #make objects for outputs to be saved in
+  #make objects for outputs to be saved in ----
   perm.auc <- matrix(NA, nrow=perm, ncol=length(variablesName)) #place to save AUC of models based on different permuation
   
+  #loop through permutations for each variable ----
   for (j in 1:length(variablesName)){
     print(c(j,variablesName[j])) #let us know where the simulation is at. 
     VarToPerm <- j
-    
-    cores.to.use <- cores
     
     cl <- makeCluster(cores.to.use)
     registerDoParallel(cl)
@@ -110,11 +118,6 @@ permOneVar=function(formula = glm.formula, bag.fnc=bagging,permute.fnc=permuteda
                                                         new.data = traindata))
     }
     stopCluster(cl)
-    
-    paste_all_pred <- function(x) {
-      indices <- seq(from = 1, to = length(results[[1]]), by = 2)
-      return(results[[x]][indices])
-    }
     
     all_preds <- unlist(sapply(1:perm, paste_all_pred)) #all predictions for perm variable
     
@@ -133,11 +136,11 @@ permOneVar=function(formula = glm.formula, bag.fnc=bagging,permute.fnc=permuteda
       
       #matrix of AUC to return
       perm.auc[k,j] <- unlist(performance(preds, "auc")@y.values)
-      
     }
       
   }
-  #calculate relative importance
+  
+  #calculate relative importance ----
   perm.auc.mean <- apply(perm.auc,2,mean)
   perm.auc.sd <- apply(perm.auc, 2, sd)
   delta.auc <- perm.auc.mean[1] - perm.auc.mean[-c(1, length(perm.auc.mean))] #change in AUC from base model only for single variable permutation
@@ -162,8 +165,7 @@ permOneVar=function(formula = glm.formula, bag.fnc=bagging,permute.fnc=permuteda
 #training.data <- readRDS("../../data_clean/TrainingData.rds") #load data
 
 #define function for model
-#glm.formula <- as.formula("case~  NDVI+NDVIScale+
-                          popLog10") 
+#glm.formula <- as.formula("case~  NDVI+NDVIScale+popLog10") 
 
 #Create 10 permuted datasets for each variable, fit model bagged 100 times, predict on full dataset, save AUC
 #PermTestModel <- permOneVar(formula = glm.formula,traindata = training.data, cores=2, no.iterations = 5, perm = 3)
