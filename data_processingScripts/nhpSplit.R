@@ -3,6 +3,10 @@
 ## This document splits the municipalities based on the range of non-human primates. This will result in two 
 ## contiguous geographic areas that we will model seperately to examine if different processes are at work.
 
+# We chose to split based on species richness becuase we noticed that the initial predictions had seasonality in the SE
+# corner of the country, but not in the NW corner. The only static (i.e. non-seasonal) variable in the model was species
+# richness, which was also the second most important variable. We then chose to split the municipalities spatially
+# based on the species richness, following natural breaks in the data.
 
 ## 1. Load Packages --------
 # set wd to source file
@@ -10,6 +14,8 @@ library(rgdal)
 library(dplyr)
 library(ggplot2)
 library(viridis)
+library(rgeos)
+library(sf)
 
 ## 2. Load Data ------------
 
@@ -19,48 +25,88 @@ library(viridis)
 test.data <- readRDS("../data_clean/TestingDataSpat.rds")
 train.data <- readRDS("../data_clean/TrainingDataSpat.rds")
 
-#nhp maps
-primates <- readOGR("../data_raw/environmental/NHPdata", "primateSpecies")
-primGenus <- readOGR("../data_raw/environmental/NHPdata", "primateGenus")
 #municipality shapefile
-munis <- readOGR("../data_clean", "BRAZpolygons")
-#fortify for ggplot2
-brazFortified <- fortify(munis, region = "muni_no") %>% 
-  mutate(muni.no = as.numeric(id))
+munis <- st_read("../data_clean", "BRAZpolygons")
+
 #primateRichness by municipality
 primRichness <- readRDS("../data_clean/environmental/primRichness.rds")
 
-#all data
-all.data <- readRDS("../data_clean/FinalData.rds")
-pop2001 <- all.data %>%
-  filter(year==2001) %>%
-  select(popLog10, muni.no) %>%
-  group_by(muni.no) %>%
-  slice(1) %>%
-  ungroup()
-
 ## 3. Maps of Species Richness ------
 
-primateMap <- left_join(brazFortified, primRichness, by = "muni.no")
-popMap <- left_join(brazFortified, pop2001, by = "muni.no")
-
-ggplot() +
-  geom_polygon(data = popMap, aes(fill = popLog10,
-                                  x = long,
-                                  y = lat,
-                                  group = group)) +
-  scale_fill_viridis()
+primateMap <- munis %>%
+  select(muni.no = muni_no) %>%
+  left_join(primRichness, by = "muni.no") #NA is pinto bandiera that doesn't exist
 
 ggplot() +
   # municipality polygons
-  geom_polygon(data = primateMap, aes(fill = spRich, 
-                                    x = long, 
-                                    y = lat, 
-                                    group = group)) +
-  geom_polygon(data = primateMap[primateMap$spRich>=6,], aes(
-                                                           x = long, 
-                                                           y = lat, 
-                                                           group = group),
-fill = "orange") +
+  geom_sf(data = primateMap, aes(fill = spRich), color = NA) +
+  #color those with 6 or more species orange
+  geom_sf(data = primateMap[primateMap$spRich>=6,], fill = "orange", color = NA) +
   scale_fill_viridis()
 
+# 4. Get nhp split index -----
+
+# add splitting variable to initial map
+primateMap$primSplit <- "less"
+primateMap$primSplit[primateMap$spRich>=6] <- "above5"
+
+
+# create dissolved polygon
+manySpecies <- primateMap %>%
+  group_by(primSplit) %>%
+  summarize() %>%
+  filter(primSplit == "above5") %>%
+  ungroup() %>%
+  st_cast("POLYGON") %>%
+  #select contiguous polygon only
+  slice(3)
+
+
+#buffer the manySpecies polygon to get rid of holes
+speciesBuffer <- st_buffer(manySpecies, dist = units::set_units(0.001, degree))
+
+#need to buffer again as a polygons object
+speciesBuffer2 <- as(speciesBuffer, 'Spatial')
+speciesNoHole <- SpatialPolygons(list(Polygons(list(speciesBuffer2@polygons[[1]]@Polygons[[1]]),ID=1)))
+proj4string(speciesNoHole) <- CRS("+init=epsg:4326")
+speciesBuffer <- as(speciesNoHole, "sf")
+#holes may be okay, trying to see what falls in it
+within <- munis[st_contains(speciesBuffer, munis)[[1]],]
+
+#create index of the split
+primateMap$trueSplit <- "less"
+primateMap$trueSplit[primateMap$muni.no %in% within$muni_no] <- "above5"
+#manually fix those along the coast that aren't included but are true holes
+manualFix <- c(140070, 140060, 140050, 140045, 140040, 140023, 110007, 110006, 110005, 110003)
+primateMap$trueSplit[primateMap$muni.no %in% manualFix] <- "above5"
+
+
+ggplot() +
+  # municipality polygons
+  geom_sf(data = primateMap, aes(fill = trueSplit), color = NA) 
+
+#save index
+indexSplit <- primateMap %>%
+  select(muni.no, above5split = trueSplit) %>%
+  st_set_geometry(NULL)
+
+saveRDS(indexSplit, "../data_clean/environmental/twoModelSplit.rds")
+
+# 5. Split training and testing data -----
+
+highNHP <- filter(indexSplit, above5split == "above5")
+test.data.lowNHP <- filter(test.data, !(muni.no %in% highNHP$muni.no)) #33 cases
+test.data.highNHP <- filter(test.data, (muni.no %in% highNHP$muni.no)) #6 cases
+
+train.data.lowNHP <- filter(train.data, !(muni.no %in% highNHP$muni.no))  #62 cases
+train.data.highNHP <- filter(train.data, (muni.no %in% highNHP$muni.no)) #only 16 cases
+
+#70/30 split seems to be kept relatively well
+
+# save new datasets
+
+saveRDS(test.data.lowNHP, "../data_clean/TestingDataLowNHP.rds")
+saveRDS(test.data.highNHP, "../data_clean/TestingDataHighNHP.rds")
+
+saveRDS(train.data.lowNHP, "../data_clean/TrainingDataLowNHP.rds")
+saveRDS(train.data.highNHP, "../data_clean/TrainingDataHighNHP.rds")
