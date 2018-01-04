@@ -1,5 +1,14 @@
 # YF_Brazil
-   Target journal: BMC Medicine [Special Issue](https://bmcmedicine.biomedcentral.com/articles/collections/spatialepidemiology?sap-outbound-id=): Spatial epidemiology and infectious diseases **Due Feb 28th**
+   Target journal: BMC Medicine [Special Issue](https://bmcmedicine.biomedcentral.com/articles/collections/spatialepidemiology?sap-outbound-id=): Spatial epidemiology and infectious diseases **Due Feb 28th** (see [BMC Medicine ms requirements](https://bmcmedicine.biomedcentral.com/submission-guidelines/preparing-your-manuscript/research-articles)
+   
+ # Timeline for 28th submission deadline
+ 
+ **Jan. 15th**: Meet and prepare results, figure sketches, overall thesis, and CARS intro for John
+ 
+ **Jan. 17th**: Data done. Send summary to John
+ 
+ **Feb. 14th**: Manuscript draft to John
+ 
    
 # What are the areas most at risk of YF sylvatic spillover in Brazil and does this location change with season?
 
