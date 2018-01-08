@@ -39,3 +39,15 @@ Ltraining.data <- readRDS("../data_clean/TrainingDataLowNHP.rds")
 LPermFullModel <- permOneVar(formula = glm.formula,traindata = Ltraining.data, cores = 10, no.iterations = 500, perm = 10, viz = FALSE)
 
 saveRDS(LPermFullModel, "../data_out/TwoModelSoln/LPermFullModel.rds")
+
+
+LPermFullAUC <- LPermFullModel[[2]]
+LPermFullAUC[,2] <- round(as.numeric(as.character(LPermFullAUC[,2])),digits=3)
+LPermFullAUC[,3] <- round(as.numeric(as.character(LPermFullAUC[,3])),digits=3)
+
+LPermFullAUC[order(LPermFullAUC$meanAUC),]
+
+RelImp <- LPermFullModel[[1]]
+Variables <- trimws(unlist(strsplit(as.character(glm.formula)[3], "+", fixed = T)), which = "both")
+
+barplot(RelImp, names.arg = Variables, cex.axis = .75)

@@ -1,0 +1,102 @@
+---
+title: "TwoModelVariableSelection"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r load packages}
+#load packages
+library(dplyr)
+library(gplots)
+library(parallel)
+library(doParallel)
+library(ROCR)
+library(pROC)
+
+#source functions
+source("functions/baggingWperm.R")
+
+#Return AUC Quick
+RankImp=function(x){
+PermSFAUC <- x[[2]]
+PermSFAUC[,2] <- round(as.numeric(as.character(PermSFAUC[,2])),digits=3)
+PermSFAUC[,3] <- round(as.numeric(as.character(PermSFAUC[,3])),digits=3)
+return(PermSFAUC[order(PermSFAUC$meanAUC),])}
+
+#load data
+## High NHP
+Htraining.data <- readRDS("../data_clean/TrainingDataHighNHP.rds")
+## Low NHP
+Ltraining.data <- readRDS("../data_clean/TrainingDataLowNHP.rds")
+```
+
+# Full Model----
+
+```{r Kitchen sink}
+glm.formula <- as.formula("case~  NDVI+NDVIScale+
+                          popLog10+
+                          RF+RFsqrt+RFScale+
+                          tempMean+tempScale+
+                          fireNum+fireDen+fireDenSqrt+fireDenScale+
+                          spRich+primProp") 
+
+## High NHP
+#load data
+Htraining.data <- readRDS("../data_clean/TrainingDataHighNHP.rds")
+HPermFullModel <- permOneVar(formula = glm.formula,traindata = Htraining.data, cores = 10, no.iterations = 500, perm = 10, viz = FALSE)
+saveRDS(HPermFullModel, "../data_out/TwoModelSoln/HPermFullModel.rds")
+
+## Low NHP
+#load data
+Ltraining.data <- readRDS("../data_clean/TrainingDataLowNHP.rds")
+LPermFullModel <- permOneVar(formula = glm.formula,traindata = Ltraining.data, cores = 10, no.iterations = 500, perm = 10, viz = FALSE)
+saveRDS(LPermFullModel, "../data_out/TwoModelSoln/LPermFullModel.rds")
+```
+
+```{r drop Pop}
+#drop one covar importance
+glm.formula.popless <- as.formula("case~  NDVI+NDVIScale+ 
+                          RFsqrt+RFScale+
+                          tempMean+tempScale+
+                          fireDenSqrt+fireDenScale+
+                          spRich+primProp") 
+
+PoplessVariables <- trimws(unlist(strsplit(as.character(glm.formula.popless)[3], "+", fixed = T)), which = "both")
+
+#High NHP
+HPermPoplessModel <- permOneVar(formula = glm.formula.popless,traindata = Htraining.data, cores=10, no.iterations = 500, perm = 10, title="High" ) 
+saveRDS(HPermPoplessModel, "../data_out/TwoModelSoln/HPermPoplessModel.rds")
+
+
+#Low NHP
+
+Sys.time()
+LPermPoplessModel <- permOneVar(formula = glm.formula.popless,traindata = Ltraining.data, cores=10, no.iterations = 500, perm = 10 , title="Low")
+Sys.time()
+saveRDS(LPermPoplessModel, "../data_out/TwoModelSoln/LPermPoplessModel.rds")
+
+
+```
+
+*Maybe they diverge here*
+
+```{r single flavor}
+#permute one covar importance, single flavor (SF) of each covariate
+glm.formula.SF <- as.formula("case~  NDVIScale+ 
+                          RFsqrt+
+                          tempMean+
+                          spRich") 
+
+SingleVariables <- trimws(unlist(strsplit(as.character(glm.formula.SF)[3], "+", fixed = T)), which = "both")
+
+HPermSFModel <- permOneVar(formula = glm.formula.SF,traindata = Htraining.data, cores=10, no.iterations = 500, perm = 10, title="High" ) 
+
+LPermSFModel <- permOneVar(formula = glm.formula.SF,traindata = Ltraining.data, cores=10, no.iterations = 500, perm = 10 , title="Low") 
+
+saveRDS(HPermSFModel, file="../data_out/TwoModelSoln/HPermSFModel.rds")
+saveRDS(LPermSFModel, file="../data_out/TwoModelSoln/LPermSFModel.rds")
+
+```
