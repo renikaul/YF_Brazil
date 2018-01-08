@@ -95,8 +95,94 @@ The model is ran for 1000 iterations with a subset of the cases. The subset cons
 
 ```{r kitchen sink}
 Sys.time()
-PermFullModel <- permOneVar(formula = glm.formula,traindata = training.data, cores = 20, no.iterations = 100, perm = 10)
+PermFullModel <- permOneVar(formula = glm.formula,traindata = training.data, cores = 10, no.iterations = 500, perm = 10)
 Sys.time()
 
+
+PermFullAUC <- PermFullModel[[2]]
+PermFullAUC[,2] <- round(as.numeric(as.character(PermFullAUC[,2])),digits=3)
+PermFullAUC[,3] <- round(as.numeric(as.character(PermFullAUC[,3])),digits=3)
+
+PermFullAUC[order(PermFullAUC$meanAUC),]
+
+saveRDS(PermFullModel, "../data_out/SpaceAndTimeSplit/PermFullModel500.rds")
+```
+
+```{r drop Pop}
+#drop one covar importance
+glm.formula.popless <- as.formula("case~  NDVI+NDVIScale+ 
+                          RFsqrt+RFScale+
+                          tempMean+tempScale+
+                          fireDenSqrt+fireDenScale+
+                          spRich+primProp") 
+
+PoplessVariables <- trimws(unlist(strsplit(as.character(glm.formula.popless)[3], "+", fixed = T)), which = "both")
+
+Sys.time()
+PermPoplessModel <- permOneVar(formula = glm.formula.popless,traindata = training.data, cores=10, no.iterations = 500, perm = 10 ) #increased number of bagged models to 1000 from 100
+Sys.time()
+saveRDS(PermPoplessModel, "../data_out/SpaceAndTimeSplit/PermPoplessModel500.rds")
+
+PermPoplessAUC <- PermPoplessModel[[2]]
+PermPoplessAUC[,2] <- round(as.numeric(as.character(PermPoplessAUC[,2])),digits=3)
+PermPoplessAUC[,3] <- round(as.numeric(as.character(PermPoplessAUC[,3])),digits=3)
+
+PermPoplessAUC[order(PermPoplessAUC$meanAUC),]
+
+PermPoplessRelImp <- PermPoplessModel[[1]]
+barplot(PermPoplessRelImp, names.arg = PoplessVariables, cex.axis = .75)
+
+
+```
+
+```{r single flavor}
+#permute one covar importance, single flavor (SF) of each covariate
+glm.formula.SF <- as.formula("case~  NDVIScale+ 
+                          RFsqrt+
+                          tempMean+
+                          spRich") 
+
+SingleVariables <- trimws(unlist(strsplit(as.character(glm.formula.SF)[3], "+", fixed = T)), which = "both")
+
+Sys.time()
+PermSFModel <- permOneVar(formula = glm.formula.SF,traindata = training.data, cores=10, no.iterations = 500, perm = 10 ) #increased number of bagged models to 1000 from 100
+Sys.time()
+
+PermSFAUC <- PermSFModel[[2]]
+PermSFAUC[,2] <- round(as.numeric(as.character(PermSFAUC[,2])),digits=3)
+PermSFAUC[,3] <- round(as.numeric(as.character(PermSFAUC[,3])),digits=3)
+
+PermSFAUC[order(PermSFAUC$meanAUC),]
+
+PermSFRelImp <- PermSFModel[[1]]
+barplot(PermSFRelImp, names.arg = SingleVariables, cex.axis = .75)
+
+saveRDS(PermSFModel, file="../data_out/SpaceAndTimeSplit/PermSFModel500.rds")
+```
+
+```{r single flavor plus pop}
+#permute one covar importance, single flavor (SF) of each covariate
+glm.formula.SFP <- as.formula("case~  popLog10+ 
+                          NDVIScale+ 
+                          RFsqrt+
+                          tempMean+
+                          spRich") 
+
+SFPVariables <- trimws(unlist(strsplit(as.character(glm.formula.SFP)[3], "+", fixed = T)), which = "both")
+
+Sys.time()
+PermSFPModel <- permOneVar(formula = glm.formula.SFP,traindata = training.data, cores=10, no.iterations = 500, perm = 100 ) #increased number of bagged models to 1000 from 100
+Sys.time()
+
+PermSFPAUC <- PermSFPModel[[2]]
+PermSFPAUC[,2] <- round(as.numeric(as.character(PermSFPAUC[,2])),digits=3)
+PermSFPAUC[,3] <- round(as.numeric(as.character(PermSFPAUC[,3])),digits=3)
+
+PermSFPAUC[order(PermSFPAUC$meanAUC),]
+
+PermSFPRelImp <- PermSFPModel[[1]]
+barplot(PermSFPRelImp, names.arg = SFPVariables, cex.axis = .75, ylab="Relative Importance")
+
+saveRDS(PermSFPModel, file="../data_out/SpaceAndTimeSplit/Perm100SFPModel500.rds")
 ```
 
