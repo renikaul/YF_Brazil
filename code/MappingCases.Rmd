@@ -1,7 +1,7 @@
 ---
 title: "Mapping YF Cases"
 author: "Michelle Evans"
-date: "7/2/2017"
+date: ""
 output: html_document
 ---
 
@@ -12,17 +12,14 @@ library(rgdal)
 library(dplyr)
 library(leaflet)
 library(RColorBrewer)
+library(sf)
 ```
 
 
 ```{r}
 YF <- readRDS("../data_clean/YFcases/YFlong.rds")
-brazil <- readOGR("../data_clean", "BRAZpolygons")
+brazil <- st_read("../data_clean", "BRAZpolygons")
 
-### correct ibg codes (like FIPS)
-# the ibg codes in the shapefile have an extra digit at the end, so we just subset the first six digits from the shapefile
-
-brazil@data$muni.no <- as.numeric(as.character(substr(brazil@data$codigo_ibg,1,6)))
 ```
 
 # Map of Number of Cases per Muni from 2001-2014
@@ -30,23 +27,24 @@ brazil@data$muni.no <- as.numeric(as.character(substr(brazil@data$codigo_ibg,1,6
 ```{r}
 # calculate total cases per muni
 totCase <- YF %>%
-  filter(cal.month<13) %>%
   group_by(muni.no) %>%
-  summarise(totalCases=sum(case, na.rm=T))
+  filter(!is.na(case)) %>%
+  summarise(totalCases=sum(case, na.rm=T), totalMonths = n_distinct(month.no))
+  
 
 # add to shapefile
-brazilYF <- merge(brazil, totCase, by="muni.no")
+brazilYF <- merge(brazil, totCase, by.y="muni.no", by.x = "muni_no", all.x = T)
 ```
 
 ```{r}
 #create color palette
-colpal <- colorNumeric("Set1", domain = c(1,44))
+colpal <- colorBin("YlOrRd", domain = c(1,21), bins = c(1,2,3,4,5,10,15,21))
 #create popups
-casePop <- paste0(brazilYF@data$nome, 
-                      "<br><strong>", brazilYF@data$totalCases,
+casePop <- paste0(brazilYF$muni_name, 
+                      "<br><strong>", brazilYF$totalCases,
                   "</strong> Cases from 2001-2014.")
 leaflet(data=brazilYF) %>%
-  addPolygons(color = "#444444", weight = 1, smoothFactor = 0.5,
+  addPolygons(color = "#444444", weight = 0.1, smoothFactor = 0.5,
     opacity = 1.0, fillOpacity = 0.75,
     fillColor = ~colpal(totalCases),
     highlightOptions = highlightOptions(color = "white", weight = 2,
@@ -55,25 +53,53 @@ leaflet(data=brazilYF) %>%
   addProviderTiles(providers$CartoDB.Positron)
 ```
 
-#Map of the Spread of YF
+# Map of the Number of Positive Months 
 
-This map will have a different color for each year.
+For John in Jan 2018, we want a map that has points that denote the number of positive months by their size, with the municipalities colored based on which model they are in (low vs. high NHP richness).
+
+Create map theme:
+
+```{r create map theme}
+theme_map <- function(...) {
+  theme_minimal() +
+  theme(
+    axis.line = element_blank(),
+    axis.text.x = element_blank(),
+    axis.text.y = element_blank(),
+    axis.ticks = element_blank(),
+    axis.title.x = element_blank(),
+    axis.title.y = element_blank(),
+    # panel.grid.minor = element_line(color = "#ebebe5", size = 0.2),
+    # panel.grid.major = element_line(color = "#ebebe5", size = 0.2),
+    panel.grid.minor = element_blank(),
+    plot.background = element_rect(fill = NA, color = NA), 
+    panel.background = element_rect(fill = "gray80", color = NA), 
+    legend.background = element_rect(fill = NA, color = NA),
+    panel.border = element_blank(),
+    ...
+  )
+}
+
+```
+
+```{r load split index}
+indexSplit <- readRDS("../data_clean/environmental/twoModelSplit.rds")
+
+brazilYF <- merge(brazilYF, indexSplit, by.x = "muni_no", by.y = "muni.no")
+```
+
+```{r calculate centroids for circles}
+brazCnt <- data.frame(st_coordinates(st_centroid(brazilYF)), muni.no = brazilYF$muni_no, totalMonths = brazilYF$totalMonths)
+```
+
 
 ```{r}
-#merge years with cases to shapefile
-yearCase <- YF %>%
-  select(-muni) %>%
-  filter(cal.month<13) %>%
-  filter(case>0) %>%
-  #get the last time they had a case
-  group_by(muni.no) %>%
-  filter(month.no==max(month.no))
-
-brazilYFtime <- merge(brazil, yearCase, by="muni.no", all.y=T)
-
-yearColor <- colorBin(palette= "RdYlBu", domain=c(2001,2014))
-
-
-
+ggplot() +
+  # municipality polygons colored by NHP
+  geom_sf(data = brazilYF, aes(fill = above5split), color = NA) +
+  scale_fill_manual(values = c("honeydew1", "navajowhite1"), labels = c("High NHP", "Low NHP"), name = "Which primate model?")+
+  geom_point(data = brazCnt, aes(size = totalMonths, x= X, y = Y), alpha = 0.5, fill = "dodgerblue", color = "black",pch=21) +
+  scale_size_area(name = "Number of months with cases")
+  theme_map()
 ```
 
