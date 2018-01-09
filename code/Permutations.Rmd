@@ -12,8 +12,82 @@ knitr::opts_chunk$set(echo = TRUE, eval=TRUE, warning = FALSE, cache=TRUE)
 library(gplots)
 library(ggplot2)
 library(dplyr)
+library(sf)
 ```
 
+#Comparing variable importance of one model vs two models
+
+## Methods 
+
+John suggested we explore the possibility of two types of point processes for yellow fever spillover in Brazil. We split the country into two region- the northwest with high primate diversity ($\geq 6$ of 22) and the remaining portion with low primate diversity. A threshold of 6 species produced the most contiguous region of high primate diversity. The previous iterations of this work was using a temporially balanced split for training and testing data. This split was redone to create a balanced split in 3 dimensions (x space, y space and time). The newly space and time balanced data for the whole country (used for the one model approach) was then split into high and low non-human primate diversity regions (used for the two model approach).
+
+Models consisted of 500 bags and 10 permutations unless otherwise stated. This bag/permutation scheme was a based on computational time and memory. 
+
+
+```{r space and time map}
+
+YF <- readRDS("../data_clean/YFcases/YFlong.rds")
+brazil <- st_read("../data_clean", "BRAZpolygons")
+
+# calculate total cases per muni
+totCase <- YF %>%
+  group_by(muni.no) %>%
+  filter(!is.na(case)) %>%
+  summarise(totalCases=sum(case, na.rm=T), totalMonths = n_distinct(month.no))
+  
+
+# add to shapefile
+brazilYF <- merge(brazil, totCase, by.y="muni.no", by.x = "muni_no", all.x = T)
+
+theme_map <- function(...) {
+  theme_minimal() +
+  theme(
+    axis.line = element_blank(),
+    axis.text.x = element_blank(),
+    axis.text.y = element_blank(),
+    axis.ticks = element_blank(),
+    axis.title.x = element_blank(),
+    axis.title.y = element_blank(),
+    # panel.grid.minor = element_line(color = "#ebebe5", size = 0.2),
+    # panel.grid.major = element_line(color = "#ebebe5", size = 0.2),
+    panel.grid.minor = element_blank(),
+    plot.background = element_rect(fill = NA, color = NA), 
+    panel.background = element_rect(fill = "gray80", color = NA), 
+    legend.background = element_rect(fill = NA, color = NA),
+    panel.border = element_blank(),
+    ...
+  )
+}
+
+#load data
+indexSplit <- readRDS("../data_clean/environmental/twoModelSplit.rds")
+
+brazilYF <- merge(brazilYF, indexSplit, by.x = "muni_no", by.y = "muni.no")
+
+#r calculate centroids for circles
+brazCnt <- data.frame(st_coordinates(st_centroid(brazilYF)), muni.no = brazilYF$muni_no, totalMonths = brazilYF$totalMonths)
+
+#map
+ggplot() +
+  # municipality polygons colored by NHP
+  geom_sf(data = brazilYF, aes(fill = above5split), color = NA) +
+  scale_fill_manual(values = c("honeydew1", "navajowhite1"), labels = c("High NHP", "Low NHP"), name = "Which primate model?")+
+  geom_point(data = brazCnt, aes(size = totalMonths, x= X, y = Y), alpha = 0.5, fill = "dodgerblue", color = "black",pch=21) +
+  scale_size_area(name = "Number of months with cases")+
+  theme_map()
+
+```
+
+## Effect of Spatially Balanced Split on Single Point Process Model
+
+
+## Rank Order of Variable Importance
+
+```{r}
+#load all the data 
+PermPoplessModel <- readRDS("../data_out/PermPoplessModel.rds")
+
+```
 #Further exploring permutations 
 
 ## Permutation Methods 

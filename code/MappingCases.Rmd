@@ -99,7 +99,7 @@ ggplot() +
   geom_sf(data = brazilYF, aes(fill = above5split), color = NA) +
   scale_fill_manual(values = c("honeydew1", "navajowhite1"), labels = c("High NHP", "Low NHP"), name = "Which primate model?")+
   geom_point(data = brazCnt, aes(size = totalMonths, x= X, y = Y), alpha = 0.5, fill = "dodgerblue", color = "black",pch=21) +
-  scale_size_area(name = "Number of months with cases")
+  scale_size_area(name = "Number of months with cases") +
   theme_map()
 ```
 
