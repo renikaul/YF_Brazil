@@ -80,14 +80,32 @@ ggplot() +
 
 ## Effect of Spatially Balanced Split on Single Point Process Model
 
+https://datascience.blog.wzb.eu/2016/09/27/parallel-coordinate-plots-for-discrete-and-categorical-data-in-r-a-comparison/
+
+```{r}
+#load all the data 
+STPermFullModel <- readRDS("../data_out/SpaceAndTimeSplit/PermFullModel500.rds")
+STPermPoplessModel <- readRDS("../data_out/SpaceAndTimeSplit/PermPoplessModel500.rds")
+STPermSFModel <- readRDS("../data_out/SpaceAndTimeSplit/PermSFModel500.rds")
+
+#Temperal split
+TPermFullModel <- readRDS("../data_out/TempSplit/PermFullModel.rds")
+TPermPoplessModel <- readRDS("../data_out/TempSplit/PermPoplessModel.rds")
+
+```
+
 
 ## Rank Order of Variable Importance
 
 ```{r}
-#load all the data 
-PermPoplessModel <- readRDS("../data_out/PermPoplessModel.rds")
+HFullModel <- readRDS("../data_out/TwoModelSoln/HPermFullModel.rds")
+LFullModel <- readRDS("../data_out/TwoModelSoln/LPermFullModel.rds")
+
+HPoplessModel <- readRDS("../data_out/TwoModelSoln/HPermPoplessModel.rds")
+LPoplessModel <- readRDS("../data_out/TwoModelSoln/LPermPoplessModel.rds")
 
 ```
+
 #Further exploring permutations 
 
 ## Permutation Methods 
