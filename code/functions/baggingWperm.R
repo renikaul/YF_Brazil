@@ -128,7 +128,7 @@ permOneVar=function(formula = glm.formula, bag.fnc=bagging,permute.fnc=permuteda
   
   #return training coefs and AUC for each iteration
   #return(list(train.auc, Coefs))
-  return(list(rel.import, mean.auc,perm.auc))
+  return(list(relative.import, mean.auc,perm.auc))
 }
 
 # Min working script ---- 
