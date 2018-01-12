@@ -7,6 +7,7 @@ output: html_document
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
+
 ```{r load packages}
 #load packages
 library(dplyr)
@@ -33,14 +34,16 @@ Htraining.data <- readRDS("../data_clean/TrainingDataHighNHP.rds")
 Ltraining.data <- readRDS("../data_clean/TrainingDataLowNHP.rds")
 ```
 
-# Full Model----
+# Full Model
+
+
 
 ```{r Kitchen sink}
 glm.formula <- as.formula("case~  NDVI+NDVIScale+
                           popLog10+
                           RF+RFsqrt+RFScale+
                           tempMean+tempScale+
-                          fireNum+fireDen+fireDenSqrt+fireDenScale+
+                          fireDenSqrt+fireDenScale+
                           spRich+primProp") 
 
 ## High NHP
@@ -56,6 +59,17 @@ LPermFullModel <- permOneVar(formula = glm.formula,traindata = Ltraining.data, c
 saveRDS(LPermFullModel, "../data_out/TwoModelSoln/LPermFullModel.rds")
 ```
 
+```{r kitchen sink predictions}
+
+hPredFull <-  BaggedModeles(form.x.y = glm.formula, training = Htraining.data, new.data = Htraining.data, no.iterations = 500)
+lPredFull <-  BaggedModeles(form.x.y = glm.formula, training = Ltraining.data, new.data = Ltraining.data, no.iterations = 500)
+
+save(hPredFull,lPredFull, file = "../data_out/Predictions/TwoModel/fullPredictions.RData")
+
+
+```
+
+# Popless 
 ```{r drop Pop}
 #drop one covar importance
 glm.formula.popless <- as.formula("case~  NDVI+NDVIScale+ 
@@ -81,22 +95,13 @@ saveRDS(LPermPoplessModel, "../data_out/TwoModelSoln/LPermPoplessModel.rds")
 
 ```
 
-*Maybe they diverge here*
+```{r popless predictions}
 
-```{r single flavor}
-#permute one covar importance, single flavor (SF) of each covariate
-glm.formula.SF <- as.formula("case~  NDVIScale+ 
-                          RFsqrt+
-                          tempMean+
-                          spRich") 
 
-SingleVariables <- trimws(unlist(strsplit(as.character(glm.formula.SF)[3], "+", fixed = T)), which = "both")
+hPredPopless <-  BaggedModeles(form.x.y = glm.formula.popless, training = Htraining.data, new.data = Htraining.data, no.iterations = 500)
+lPredPopless <-  BaggedModeles(form.x.y = glm.formula.popless, training = Ltraining.data, new.data = Ltraining.data, no.iterations = 500)
 
-HPermSFModel <- permOneVar(formula = glm.formula.SF,traindata = Htraining.data, cores=10, no.iterations = 500, perm = 10, title="High" ) 
-
-LPermSFModel <- permOneVar(formula = glm.formula.SF,traindata = Ltraining.data, cores=10, no.iterations = 500, perm = 10 , title="Low") 
-
-saveRDS(HPermSFModel, file="../data_out/TwoModelSoln/HPermSFModel.rds")
-saveRDS(LPermSFModel, file="../data_out/TwoModelSoln/LPermSFModel.rds")
+save(hPredPopless,lPredPopless, file = "../data_out/Predictions/TwoModel/poplessPredictions.RData")
 
 ```
+
