@@ -25,7 +25,7 @@ bagging<-function(form.x.y,training,new.data){
 }
 
 # Bagging with predictions 
-BaggedModeles = function(form.x.y, training, new.data, no.iterations= 100, bag.fnc=bagging){
+BaggedModel = function(form.x.y, training, new.data, no.iterations= 100, bag.fnc=bagging){
   #make a matrix of predictions 
   matrix.of.predictions <- replicate(n = no.iterations, expr = bag.fnc(form.x.y, training, new.data))
   #calculate mean prediction 
