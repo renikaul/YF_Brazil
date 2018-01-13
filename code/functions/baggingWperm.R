@@ -1,4 +1,4 @@
-# Bagging ----
+# Single Bagged Model ----
 bagging<-function(form.x.y,training,new.data){
   # modified JP's bagging function 12/1/17 RK 
   # form.x.y the formula for model to use
@@ -23,6 +23,21 @@ bagging<-function(form.x.y,training,new.data){
   predictions <- predict(glm_fit,newdata=new.data,type="response")
   return(predictions)
 }
+
+# Bagging with predictions 
+BaggedModeles = function(form.x.y, training, new.data, no.iterations= 100, bag.fnc=bagging){
+  #make a matrix of predictions 
+  matrix.of.predictions <- replicate(n = no.iterations, expr = bag.fnc(form.x.y, training, new.data))
+  #calculate mean prediction 
+  output.preds<- apply(matrix.of.predictions, 1, mean) 
+  #add identifiers to predictions
+  preds <- cbind(muni.no=new.data$muni.no, month.no=new.data$month.no,case=new.data$case,prediction=output.preds) 
+  
+  return(preds)
+  }
+
+
+
 
 # Permute Variable based on loop iteration of PermOneVar ----
 permutedata=function(formula = glm.formula,trainingdata, i){
@@ -99,7 +114,7 @@ permOneVar=function(formula = glm.formula, bag.fnc=bagging,permute.fnc=permuteda
       matrix_of_predictions <- replicate(n = no.iterations, expr = bag.fnc(form.x.y = formula, training = permuted.data, new.data = traindata))
       #calculate mean prediction 
       output.preds<- apply(matrix_of_predictions, 1, mean) 
-      rm(matrix_of_predictions)
+      #rm(matrix_of_predictions) doesn't really free up any memory until cluster is stopped. 
       preds <- ROCR::prediction(output.preds, traindata$case) #other projects have used dismo::evaluate instead. Not sure if is makes a difference. 
       #AUC to return
       perm.auc <- unlist(ROCR::performance(preds, "auc")@y.values)
