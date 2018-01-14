@@ -37,8 +37,6 @@ BaggedModel = function(form.x.y, training, new.data, no.iterations= 100, bag.fnc
   }
 
 
-
-
 # Permute Variable based on loop iteration of PermOneVar ----
 permutedata=function(formula = glm.formula,trainingdata, i){
   # glm.formula:
@@ -78,7 +76,7 @@ permutedata=function(formula = glm.formula,trainingdata, i){
 
 # Models with permutated variables ----
 permOneVar=function(formula = glm.formula, bag.fnc=bagging,permute.fnc=permutedata, traindata = training, cores=2, no.iterations= 100, perm=10, 
-                    viz=TRUE){
+                    viz=TRUE, title= "NA"){
   #cores should be =< perm
   
   # glm.formula: full formula for the model to use
@@ -134,7 +132,7 @@ permOneVar=function(formula = glm.formula, bag.fnc=bagging,permute.fnc=permuteda
   #Output for relative importance
   relative.import <- as.data.frame(cbind(Permutated=variables,RelImport=rel.import))
   #plot it for fun
-  if(viz==TRUE){barplot(rel.import, names.arg = variables)}
+  if(viz==TRUE){barplot(rel.import, names.arg = variables, main= title)}
   #Output for mean and sd of permutations for all permutations (non, single var, and all var)
   mean.auc <- as.data.frame(cbind(Model=variablesName,meanAUC=perm.auc.mean, sdAUC=perm.auc.sd))
   

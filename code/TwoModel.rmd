@@ -4,7 +4,7 @@ output: html_document
 ---
 
 ```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE)
+knitr::opts_chunk$set(echo = TRUE, cache=TRUE)
 ```
 
 
@@ -49,20 +49,20 @@ glm.formula <- as.formula("case~  NDVI+NDVIScale+
 ## High NHP
 #load data
 Htraining.data <- readRDS("../data_clean/TrainingDataHighNHP.rds")
-HPermFullModel <- permOneVar(formula = glm.formula,traindata = Htraining.data, cores = 10, no.iterations = 500, perm = 10, viz = FALSE)
+HPermFullModel <- permOneVar(formula = glm.formula,traindata = Htraining.data, cores = 10, no.iterations = 500, perm = 10, viz = TRUE, title="High NHP Full Model")
 saveRDS(HPermFullModel, "../data_out/TwoModelSoln/HPermFullModel.rds")
 
 ## Low NHP
 #load data
 Ltraining.data <- readRDS("../data_clean/TrainingDataLowNHP.rds")
-LPermFullModel <- permOneVar(formula = glm.formula,traindata = Ltraining.data, cores = 10, no.iterations = 500, perm = 10, viz = FALSE)
+LPermFullModel <- permOneVar(formula = glm.formula,traindata = Ltraining.data, cores = 10, no.iterations = 500, perm = 10, viz = TRUE, title="Low NHP Full Model")
 saveRDS(LPermFullModel, "../data_out/TwoModelSoln/LPermFullModel.rds")
 ```
 
 ```{r kitchen sink predictions}
 
-hPredFull <-  BaggedModeles(form.x.y = glm.formula, training = Htraining.data, new.data = Htraining.data, no.iterations = 500)
-lPredFull <-  BaggedModeles(form.x.y = glm.formula, training = Ltraining.data, new.data = Ltraining.data, no.iterations = 500)
+hPredFull <-  BaggedModel(form.x.y = glm.formula, training = Htraining.data, new.data = Htraining.data, no.iterations = 500)
+lPredFull <-  BaggedModel(form.x.y = glm.formula, training = Ltraining.data, new.data = Ltraining.data, no.iterations = 500)
 
 save(hPredFull,lPredFull, file = "../data_out/Predictions/TwoModel/fullPredictions.RData")
 
@@ -81,14 +81,14 @@ glm.formula.popless <- as.formula("case~  NDVI+NDVIScale+
 PoplessVariables <- trimws(unlist(strsplit(as.character(glm.formula.popless)[3], "+", fixed = T)), which = "both")
 
 #High NHP
-HPermPoplessModel <- permOneVar(formula = glm.formula.popless,traindata = Htraining.data, cores=10, no.iterations = 500, perm = 10, title="High" ) 
+HPermPoplessModel <- permOneVar(formula = glm.formula.popless,traindata = Htraining.data, cores=10, no.iterations = 500, perm = 10,viz=TRUE, title="High NHP, Popless" ) 
 saveRDS(HPermPoplessModel, "../data_out/TwoModelSoln/HPermPoplessModel.rds")
 
 
 #Low NHP
 
 Sys.time()
-LPermPoplessModel <- permOneVar(formula = glm.formula.popless,traindata = Ltraining.data, cores=10, no.iterations = 500, perm = 10 , title="Low")
+LPermPoplessModel <- permOneVar(formula = glm.formula.popless,traindata = Ltraining.data, cores=10, no.iterations = 500, perm = 10 ,viz=TRUE, title="Low NHP, Popless")
 Sys.time()
 saveRDS(LPermPoplessModel, "../data_out/TwoModelSoln/LPermPoplessModel.rds")
 
@@ -98,10 +98,84 @@ saveRDS(LPermPoplessModel, "../data_out/TwoModelSoln/LPermPoplessModel.rds")
 ```{r popless predictions}
 
 
-hPredPopless <-  BaggedModeles(form.x.y = glm.formula.popless, training = Htraining.data, new.data = Htraining.data, no.iterations = 500)
-lPredPopless <-  BaggedModeles(form.x.y = glm.formula.popless, training = Ltraining.data, new.data = Ltraining.data, no.iterations = 500)
+hPredPopless <-  BaggedModel(form.x.y = glm.formula.popless, training = Htraining.data, new.data = Htraining.data, no.iterations = 500)
+lPredPopless <-  BaggedModel(form.x.y = glm.formula.popless, training = Ltraining.data, new.data = Ltraining.data, no.iterations = 500)
 
 save(hPredPopless,lPredPopless, file = "../data_out/Predictions/TwoModel/poplessPredictions.RData")
 
 ```
 
+# Removing 2014 data
+
+The 2014 data is missing primate proportion (primProp : sum of each municipalities relative area that is both agricultural and falls within a primate genus range. {0,9}). This wasn't an issue when were exploring a single flavor approach to the model, but in the two point process approach different covariates are important so we've decided to not do any variable selection. Since glms only work on complete cases, this means that we have to drop 2014 data (1 case). 
+
+```{r trimming the training data}
+hTrimTrain <-  Htraining.data %>%
+                filter(year <2014)
+
+
+lTrimTrain <-  Ltraining.data %>%
+                filter(year <2014)
+
+```
+
+## Kitchen Sink
+
+```{r trimmed Kitchen sink }
+glm.formula <- as.formula("case~  NDVI+NDVIScale+
+                          popLog10+
+                          RF+RFsqrt+RFScale+
+                          tempMean+tempScale+
+                          fireDenSqrt+fireDenScale+
+                          spRich+primProp") 
+
+## High NHP
+#load data
+hPermFull <- permOneVar(formula = glm.formula,traindata = hTrimTrain, cores = 10, no.iterations = 500, perm = 10, viz = TRUE, title="High NHP Full Model")
+saveRDS(hPermFullModel, "../data_out/TwoModelSoln/Trim2014/HPermFullModel.rds")
+
+## Low NHP
+#load data
+lPermFullModel <- permOneVar(formula = glm.formula,traindata = lTrimTrain, cores = 10, no.iterations = 500, perm = 10, viz = TRUE, title="Low NHP Full Model")
+saveRDS(lPermFullModel, "../data_out/TwoModelSoln/LPermFullModel.rds")
+```
+
+```{r trimmed kitchen sink predictions}
+
+hPredFull <-  BaggedModel(form.x.y = glm.formula, training = hTrimTrain, new.data = hTrimTrain, no.iterations = 500)
+lPredFull <-  BaggedModel(form.x.y = glm.formula, training = lTrimTrain, new.data = lTrimTrain, no.iterations = 500)
+
+save(hPredFull,lPredFull, file = "../data_out/Predictions/TwoModel/Trim2014/fullPredictions.RData")
+```
+
+
+# Popless 
+```{r trimmed drop Pop}
+#drop one covar importance
+glm.formula.popless <- as.formula("case~  NDVI+NDVIScale+ 
+                          RFsqrt+RFScale+
+                          tempMean+tempScale+
+                          fireDenSqrt+fireDenScale+
+                          spRich+primProp") 
+
+#High NHP
+hPermPoplessModel <- permOneVar(formula = glm.formula.popless,traindata = hTrimTrain, cores=10, no.iterations = 500, perm = 10,viz=TRUE, title="High NHP, Popless" ) 
+saveRDS(hPermPoplessModel, "../data_out/TwoModelSoln/Trim2014/HPermPoplessModel.rds")
+
+
+#Low NHP
+lPermPoplessModel <- permOneVar(formula = glm.formula.popless,traindata = lTrimTrain, cores=10, no.iterations = 500, perm = 10 ,viz=TRUE, title="Low NHP, Popless")
+saveRDS(lPermPoplessModel, "../data_out/TwoModelSoln/Trim2014/LPermPoplessModel.rds")
+
+
+```
+
+```{r trimmed popless predictions}
+
+
+hPredPopless <-  BaggedModel(form.x.y = glm.formula.popless, training = hTrimTrain, new.data = hTrimTrain, no.iterations = 500)
+lPredPopless <-  BaggedModel(form.x.y = glm.formula.popless, training = lTrimTrain, new.data = lTrimTrain, no.iterations = 500)
+
+save(hPredPopless,lPredPopless, file = "../data_out/Predictions/TwoModel/Trim2014/poplessPredictions.RData")
+
+```
