@@ -80,7 +80,6 @@ permutedata
 permOneVar
 
 ```
-  
 
 ```{r train model}
 glm.formula <- as.formula("case~  NDVI+NDVIScale+
@@ -184,5 +183,64 @@ PermSFPRelImp <- PermSFPModel[[1]]
 barplot(PermSFPRelImp, names.arg = SFPVariables, cex.axis = .75, ylab="Relative Importance")
 
 saveRDS(PermSFPModel, file="../data_out/SpaceAndTimeSplit/Perm100SFPModel500.rds")
+```
+
+
+## Model with complete cases (dropping 2014)
+
+The primate proportion variable DNE for 2014 (land use data not available), since we'd like to use primprop in the 2 model approach we've dropped the 2014 data (single case).   
+
+
+```{r trim data}
+
+trainTrim <-training.data %>% filter(year <2014)
+
+```
+
+# Full Model
+
+
+
+```{r trim Kitchen sink}
+glm.formula <- as.formula("case~  NDVI+NDVIScale+
+                          popLog10+
+                          RF+RFsqrt+RFScale+
+                          tempMean+tempScale+
+                          fireDenSqrt+fireDenScale+
+                          spRich+primProp") 
+
+PermFullModel <- permOneVar(formula = glm.formula,traindata = trainTrim, cores = 10, no.iterations = 500, perm = 10, viz = TRUE, title="Full Model")
+saveRDS(PermFullModel, "../data_out/SpaceAndTimeSplit/Trim2014/Perm10FullModel500.rds")
+
+```
+
+```{r trim kitchen sink predictions}
+
+PredFull <-  BaggedModel(form.x.y = glm.formula, training = trainTrim, new.data = trainTrim, no.iterations = 500)
+
+saveRDS(PredFull, file = "../data_out/Predictions/SpaceAndTime/Trim2014/fullPredictions.rds")
+
+
+```
+
+# Popless 
+```{r trim drop Pop}
+#drop one covar importance
+glm.formula.popless <- as.formula("case~  NDVI+NDVIScale+ 
+                          RFsqrt+RFScale+
+                          tempMean+tempScale+
+                          fireDenSqrt+fireDenScale+
+                          spRich+primProp") 
+permPoplessModel <- permOneVar(formula = glm.formula.popless,traindata = trainTrim, cores=10, no.iterations = 500, perm = 10,viz=TRUE, title="Popless Model" ) 
+saveRDS(permPoplessModel, "../data_out/SpaceAndTimeSplit/Trim2014/Perm10PoplessModel500.rds")
+
+```
+
+```{r trim popless predictions}
+
+PredPopless <-  BaggedModel(form.x.y = glm.formula.popless, training = trainTrim, new.data = trainTrim, no.iterations = 500)
+
+saveRDS(PredPopless, file = "../data_out/Predictions/SpaceAndTime/Trim2014/poplessPredictions.rds")
+
 ```
 
