@@ -130,7 +130,7 @@ permOneVar=function(formula = glm.formula, bag.fnc=bagging,permute.fnc=permuteda
   rel.import <- delta.auc/max(delta.auc) # normalized relative change in AUC from base model only for single variable permutation
   
   #Output for relative importance
-  relative.import <- as.data.frame(cbind(Permutated=variables,RelImport=rel.import))
+  relative.import <- as.data.frame(cbind(Variable=variables,varImp=rel.import))
   #plot it for fun
   if(viz==TRUE){barplot(rel.import, names.arg = variables, main= title)}
   #Output for mean and sd of permutations for all permutations (non, single var, and all var)
