@@ -137,7 +137,7 @@ saveRDS(hPermFullModel, "../data_out/TwoModelSoln/Trim2014/HPermFullModel.rds")
 ## Low NHP
 #load data
 lPermFullModel <- permOneVar(formula = glm.formula,traindata = lTrimTrain, cores = 10, no.iterations = 500, perm = 10, viz = TRUE, title="Low NHP Full Model")
-saveRDS(lPermFullModel, "../data_out/TwoModelSoln/LPermFullModel.rds")
+saveRDS(lPermFullModel, "../data_out/TwoModelSoln/Trim2014/LPermFullModel.rds")
 ```
 
 ```{r trimmed kitchen sink predictions}
