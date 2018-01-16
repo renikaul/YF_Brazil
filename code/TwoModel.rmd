@@ -1,6 +1,8 @@
 ---
 title: "TwoModelVariableSelection"
-output: html_document
+output: 
+  html_document: 
+    toc: yes
 ---
 
 ```{r setup, include=FALSE}
@@ -105,6 +107,8 @@ save(hPredPopless,lPredPopless, file = "../data_out/Predictions/TwoModel/popless
 
 ```
 
+***
+
 # Removing 2014 data
 
 The 2014 data is missing primate proportion (primProp : sum of each municipalities relative area that is both agricultural and falls within a primate genus range. {0,9}). This wasn't an issue when were exploring a single flavor approach to the model, but in the two point process approach different covariates are important so we've decided to not do any variable selection. Since glms only work on complete cases, this means that we have to drop 2014 data (1 case). 
@@ -132,12 +136,12 @@ glm.formula <- as.formula("case~  NDVI+NDVIScale+
 ## High NHP
 #load data
 hPermFull <- permOneVar(formula = glm.formula,traindata = hTrimTrain, cores = 10, no.iterations = 500, perm = 10, viz = TRUE, title="High NHP Full Model")
-saveRDS(hPermFullModel, "../data_out/TwoModelSoln/Trim2014/HPermFullModel.rds")
+saveRDS(hPermFull, "../data_out/TwoModelSoln/Trim2014/HPermFullModel.rds")
 
 ## Low NHP
 #load data
-lPermFullModel <- permOneVar(formula = glm.formula,traindata = lTrimTrain, cores = 10, no.iterations = 500, perm = 10, viz = TRUE, title="Low NHP Full Model")
-saveRDS(lPermFullModel, "../data_out/TwoModelSoln/Trim2014/LPermFullModel.rds")
+lPermFull <- permOneVar(formula = glm.formula,traindata = lTrimTrain, cores = 10, no.iterations = 500, perm = 10, viz = TRUE, title="Low NHP Full Model")
+saveRDS(lPermFull, "../data_out/TwoModelSoln/Trim2014/LPermFullModel.rds")
 ```
 
 ```{r trimmed kitchen sink predictions}
