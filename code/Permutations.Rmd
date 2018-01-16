@@ -5,6 +5,7 @@ date: "12/6/2017"
 output: 
   html_document:
     toc: true
+    toc_float: true
 ---
 
 ```{r setup, include=FALSE}
@@ -88,157 +89,18 @@ library(gplots)
 ## Code to run permutations
 
 ```{r, eval=FALSE}
-# Bagging ----
-bagging<-function(form.x.y,training,new.data){
-  # modified JP's bagging function 12/1/17 RK 
-  # form.x.y the formula for model to use
-  # training dataframe containing training data (presence and abs)
-  # new.data new data for logreg model to predict onto
-  
-  # returns predictions based on logreg model for new data and coefficients of model
-  #0. load packages
-  library(dplyr)
-  #1. Create subset of data with fixed number of pres and abs
-  training.pres <- dplyr::filter(training, case==1) #pull out just present points
-  training.abs <- dplyr::filter(training, case==0)  #pull out just absence points
-  training_positions.p <- sample(nrow(training.pres),size=10) #randomly choose 10 present point rows
-  training_positions.b <- sample(nrow(training.abs),size=100) #randomly choose 100 absence point rows  
-  train_pos.p<-1:nrow(training.pres) %in% training_positions.p #presence 
-  train_pos.b<-1:nrow(training.abs) %in% training_positions.b #background
-  #2. Build logreg model with subset of data    
-  glm_fit<-glm(form.x.y,data=rbind(training.pres[train_pos.p,],training.abs[train_pos.b,]),family=binomial(logit))
-  #3. Pull out model coefs  
-  glm.coef <- coef(glm_fit)
-  #4. Use model to predict (0,1) on whole training data   
-  predictions <- predict(glm_fit,newdata=new.data,type="response")
-  return(list(predictions, glm.coef))
-}
+source("functions/baggingWperm.R")
+#foundational bagging function
+bagging
 
-# Permute Variable based on loop iteration of PermOneVar ----
-permutedata=function(formula = glm.formula,trainingdata, i){
-  # glm.formula:
-  # training : training data with pres and abs
-  # cores : number of cores to use for parallel; default to 2
-  # no.iterations : number of low bias models to make; default to 100
-  
-  #parse out variables from formula object 
-  variables <- trimws(unlist(strsplit(as.character(formula)[3], "+", fixed = T)), which = "both")
-  variablesName <- c("full model", variables, "all permutated")
-  
-  #if statments to permute data as needed ----
-    if(i==1){
-      #run full model
-      permuted.data <- trainingdata
-    }else if(i==length(variablesName)){
-      #permute all variables; using loop so can I can use same sampling method (apply statement coherced data into weird format)
-      # temp.data <- dplyr::select(traindata, variables) %>%
-      #   dplyr::sample_frac() 
-      # permuted.data <- cbind(case=traindata$case, tmp.data)
-      
-      #bug: treating colnames as colnumber in fun but not when ran in console. :(   
-      permuted.data <- trainingdata
-      for( j in 1:length(variables)){
-        vari <- variables[j]
-        permuted.data[,vari] <- sample(permuted.data[,vari],dim(permuted.data)[1],FALSE) #permute the col named included in vari (ie. variable.names)
-      }   
-    } else {
-      #permute single variable
-      permuted.data <- trainingdata
-      permuted.data[,variablesName[i]] <- sample(permuted.data[,variablesName[i]],dim(permuted.data)[1],FALSE) #permute the col named included in vari (ie. variable.names)
-    } 
-    
-    return(permuted.data)
-}
-  
+#To create permute data 
+permutedata
 
-permOneVar=function(formula = glm.formula, bag.fnc=bagging,permute.fnc=permutedata, traindata = training,  cores=2, no.iterations= 100, perm=10){
-  # glm.formula:
-  # training : training data with pres and abs
-  # cores : number of cores to use for parallel; default to 2
-  # no.iterations : number of low bias models to make; default to 100
-  library(dplyr)
-  library(doParallel)
-  
-  #parse out variables from formula object 
-  variables <- trimws(unlist(strsplit(as.character(formula)[3], "+", fixed = T)), which = "both")
-  variablesName <- c("full model", variables, "all permutated")
-  
-  #make objects for outputs to be saved in
-  perm.auc <- matrix(NA, nrow=perm, ncol=length(variablesName)) #place to save AUC of models based on different permuation
-  
-  for (j in 1:length(variablesName)){
-    print(c(j,variablesName[j])) #let us know where the simulation is at. 
-    VarToPerm <- j
-    for (k in 1:perm){
-    #if statments to permute data as needed, replaced with permuteddata fnc ----
-        permuted.data <- permute.fnc(formula=formula, trainingdata= traindata, i=VarToPerm)  #permute variable of interest
-        print(c(j,k))
-      
-    #Set up parallel cores to return 2 lists: 1) predictions, 2) coef of model ----
-      cores.to.use <- cores #change dep on computer
-      iterations <- no.iterations #number of low bias models to make
-      
-      #create class to combine multiple results
-      multiResultClass <- function(predictions = NULL,coefs = NULL)
-      {
-        me <- list(
-          predictions = predictions,
-          coefs = coefs
-        )
-        
-        ## Set the name for the class
-        class(me) <- append(class(me),"multiResultClass")
-        return(me)
-      }
-      
-      
-      cl <- makeCluster(cores.to.use)
-      registerDoParallel(cl)
-      
-      trainModel <- foreach(i=1:iterations) %dopar% {
-        result <- multiResultClass()
-        output1 <- bag.fnc(form.x.y=formula,training= permuted.data ,new.data=traindata)
-        result$predictions <-output1[[1]]
-        #result$coefs <- output1[[2]]
-        return(result)
-      }
-      
-      stopCluster(cl)
-      #aggregate data from clusters ----
-      #pull out data in usable fashion
-      trainingPreds <- do.call(cbind,(lapply(trainModel, '[[', 1)))
-      #trainingCoefs <- do.call(cbind,(lapply(trainModel, '[[', 2)))
-      
-      output.preds<- apply(trainingPreds, 1, mean)
-      preds <- prediction(output.preds, traindata$case) #other projects have used dismo::evaluate instead. Not sure if is makes a difference. 
-      
-      #matrix of AUC to return
-      perm.auc[k,j] <- unlist(performance(preds, "auc")@y.values)
-      
-    }
-  }
-  #calculate relative importance
-  perm.auc.mean <- apply(perm.auc,2,mean)
-  perm.auc.sd <- apply(perm.auc, 2, sd)
-  delta.auc <- perm.auc.mean[1] - perm.auc.mean[-c(1, length(perm.auc.mean))] #change in AUC from base model only for single variable permutation
-  rel.import <- delta.auc/max(delta.auc) # normalized relative change in AUC from base model only for single variable permutation
-  
-  #Output for relative importance
-  relative.import <- as.data.frame(cbind(Permutated=variables,RelImport=rel.import))
-    #plot it for fun
-  barplot(rel.import, names.arg = variables)
-  #Output for mean and sd of permutations for all permutations (non, single var, and all var)
-  mean.auc <- as.data.frame(cbind(Model=variablesName,meanAUC=perm.auc.mean, sdAUC=perm.auc.sd))
-  
-  #Output of AUC for each permutation
-  colnames(perm.auc) <- variablesName
-  
-  #return training coefs and AUC for each iteration
-  #return(list(train.auc, Coefs))
-  return(list(rel.import, mean.auc,perm.auc))
-}
+#To determine variable importance
+permOneVar
 
-
+#To make predictions
+BaggedModel
 ```
 
 ****
@@ -361,7 +223,7 @@ barplot(PermSFPRelImp, names.arg = SFPVariables, cex.axis = .75, ylab="Relative 
 
 Map of predictions and known cases by month (created via `mappingPredictions.Rmd`). This is only on the training data (hence the blank municipalities), and includes known true cases as green diamonds.
 
-<!-- ![Animation of predictions](figures/GIFplots/predictionsAll.gif) -->
+![Animation of predictions](figures/GIFplots/predictionsAll.gif)
 
 ### Ranking of Predictions
 
@@ -417,7 +279,7 @@ hist(bgPreds$prediction, main = "Predictions on Background")
 
 ## Methods 
 
-John suggested we explore the possibility of two different point processes for yellow fever spillover in Brazil. We split the country into two region- the northwest with high primate diversity ($\geq 6$ of 22) and the remaining portion with low primate diversity. A threshold of 6 species produced the most contiguous region of high primate diversity. The previous iterations of this work was using a temporially balanced split for training and testing data. This split was redone to create a balanced split in 3 dimensions (x space, y space and time). The newly space and time balanced data for the whole country (used for the one model approach) was then split into high and low non-human primate diversity regions (used for the two model approach).
+John suggested we explore the possibility of two different point processes for yellow fever spillover in Brazil. We split the country into two region- the northwest with high primate diversity ($\geq 6$ of 22) and the remaining portion with low primate diversity. A threshold of 6 species produced the most contiguous region of high primate diversity. The previous iterations of this work was using a temporially balanced split for training and testing data. This split was redone to create a balanced split in 3 dimensions (x space, y space and time). The newly space and time balanced data for the whole country (used for the one model approach) was then split into high and low non-human primate diversity regions (used for the two model approach). The 2014 data was removed due to missing primProp values (landuse data not available).
 
 Models consisted of 500 bags and 10 permutations unless otherwise stated. This bag/permutation scheme was a based on computational time and memory. 
 
@@ -481,13 +343,14 @@ ggplot() +
 ## Rank Order of Variable Importance
 
 Models were built using all of the covariates (`full.formula`) and just environmental covariates (`popless.formula`). If there is a single point process, we'd expect the rank order of variable importance to be the same in the full, low NHP, and high NHP model. If there are two seperate point processes we'd expect the full model and the low NHP model to be similar, while the high NHP to be different. This is because the much larger low NHP process is overwhelming the high NHP point process in the full model. 
+
 ```{r formula, echo=TRUE}
 
 full.formula <- as.formula("case~  NDVI+NDVIScale+
                           popLog10+
                           RF+RFsqrt+RFScale+
                           tempMean+tempScale+
-                          fireNum+fireDen+fireDenSqrt+fireDenScale+
+                          fireDenSqrt+fireDenScale+
                           spRich+primProp") 
 
 
@@ -498,20 +361,17 @@ full.formula <- as.formula("case~  NDVI+NDVIScale+
                           spRich+primProp") 
 ```
 
+### Model with all variables
 
 ```{r full models, echo=FALSE}
 
 #Return Quick Rank Importance
-RankImp=function(x, formula){
-  #variable names
-  variables <- trimws(unlist(strsplit(as.character(formula)[3], "+", fixed = T)), which = "both")
+RankImp=function(x){
   #pull out Relative Importance
-  varImp <- x[[1]]
-  #match relative importance and variable name
-  RI <- data.frame("Variable"=variables, varImp=varImp)  
+  RI <- x[[1]]
   #order and add rank
   RI <- RI %>%
-  dplyr::arrange(-varImp) %>%
+  dplyr::arrange(desc(varImp)) %>%
   dplyr::mutate(varRank=1:dim(RI)[1])
   
   return(RI)
@@ -523,37 +383,32 @@ RankAUC=function(x){
 PermSFAUC <- x[[2]]
 PermSFAUC[,2] <- round(as.numeric(as.character(PermSFAUC[,2])),digits=3)
 PermSFAUC[,3] <- round(as.numeric(as.character(PermSFAUC[,3])),digits=3)
-PermSFAUC <- PermSFAUC[order(PermSFAUC$meanAUC),]
-PermSFAUC$Rank <- c(0:(dim(PermSFAUC)[1]-1))
+#PermSFAUC <- PermSFAUC[order(PermSFAUC$meanAUC),]
+#PermSFAUC$Rank <- c(0:(dim(PermSFAUC)[1]-1))
 return(PermSFAUC)
 }
 
 
-FullModel <- readRDS("../data_out/SpaceAndTimeSplit/PermFullModel500.rds")
-HFullModel <- readRDS("../data_out/TwoModelSoln/HPermFullModel.rds")
-LFullModel <- readRDS("../data_out/TwoModelSoln/LPermFullModel.rds")
+FullModel <- readRDS("../data_out/SpaceAndTimeSplit/Trim2014/Perm10FullModel500.rds")
+HFullModel <- readRDS("../data_out/TwoModelSoln/Trim2014/HPermFullModel.rds") 
+LFullModel <- readRDS("../data_out/TwoModelSoln/Trim2014/LPermFullModel.rds")
 
-Full <- RankImp(FullModel, full.formula)
-HFull <- RankImp(HFullModel, full.formula)
-LFull <- RankImp(LFullModel, full.formula)
+
+Full <- RankImp(FullModel)
+HFull <- RankImp(HFullModel)
+LFull <- RankImp(LFullModel)
 
 RankFull <- rbind(Full,LFull, HFull)
 RankFull$Model <- factor(c(rep("Full", dim(Full)[1]),
-                           rep("Low NHP", dim(Full)[1]),
-                           rep("High NHP", dim(Full)[1])),
+                           rep("Low NHP", dim(LFull)[1]),
+                           rep("High NHP", dim(HFull)[1])),
                          levels=c("Full", "Low NHP", "High NHP"))
 #order the variable levels
 RankFull <- within(RankFull,
                     Variable <- factor(Variable, 
-                      levels = c("popLog10", "spRich", "tempMean","RFsqrt","RF","fireDen","primProp","NDVIScale","fireDenSqrt","tempScale","RFScale","fireNum","NDVI","fireDenScale")))
+                      levels = c( "spRich", "popLog10", "RFsqrt","NDVIScale","tempMean","RF","primProp", "fireDenScale", "fireDenSqrt","tempScale","NDVI")))
 
-
-VariRankFull <-  Full %>%
-              select(c(Variable, SingleModel=varRank)) %>%
-              dplyr::left_join(LFull %>%
-                                 select(c(Variable, LowNHP=varRank)), by="Variable") %>%
-               dplyr::left_join(HFull %>%
-                                 select(c(Variable, HighNHP=varRank)), by="Variable") 
+RankFull$varImp <- as.numeric(as.character(RankFull$varImp))
 
 #Relative Imp Plots
 
@@ -563,13 +418,6 @@ b <- ggplot(RankFull, aes(Variable, varImp)) +
     ylab("Relative Importance") + xlab("variable") +
     theme(axis.text.x=element_text(angle=45, hjust=1))
 
-ggplotly(b)
-```
-
-If there is no change in the rank order the coordinate plot should be relatively flat. This is the case between the full and low and NHP models 
-
-```{r cord plot, echo=FALSE}
-
 #cord plot business
 y_levels <- levels(RankFull$Variable)
 
@@ -578,70 +426,156 @@ p <- ggplot(RankFull, aes(x = Model, y = varRank, group = Variable)) +   # group
   scale_y_discrete(limits = levels(RankFull$Variable)) +
   ylab("Rank Importance (1 is most important)") +
   theme(legend.position = "none")
+```
+
+The absolute AUC values for the full model, low NHP, and high NHP are `r RankAUC(FullModel)[1,2]`, `r RankAUC(LFullModel)[1,2]`,`r RankAUC(HFullModel)[1,2]`,respectively. If there is no change in the rank order the coordinate plot should be relatively flat. This is the case between the full and low and NHP models 
+
+
+```{r  plot, echo=FALSE}
+
+ggplotly(b)
+
 
 ggplotly(p)
 
 ```
 
 
-```{r, , echo=FALSE,eval=FALSE}
+```{r full model true positives, echo=FALSE}
+#quick sort and index function
+IdSort=function(x, mod="NA"){
+  if(!is.data.frame(x)){x <- as.data.frame(x)}
+  xSort <- x %>%
+           arrange(desc(prediction)) %>%
+           mutate(Model=mod, index=c(1:dim(x)[1]))
+  return(xSort)
+}
 
+
+load("../data_out/Predictions/TwoModel/Trim2014/fullPredictions.RData")
+hPFull<- IdSort(hPredFull,mod="High NHP")
+lPFull<- IdSort(lPredFull,mod="Low NHP")
+#build dataset for easy plotting
+fullPred <- rbind(hPFull, lPFull)
+ggplot(data = fullPred, aes(y = prediction, x = index)) +
+  geom_point(color = "gray80") +
+  geom_point(data = fullPred[fullPred$case == 1,], aes(y = prediction, x = index), color = "maroon") +
+  ylab("Prediction")+
+  xlab("Rank order")+
+  facet_wrap(~Model, scales="free_x")+
+  ggtitle("Rank Order of ALL Training Data")
+
+```
+
+### Popless Model
+
+
+```{r popless model , echo=FALSE}
+
+PoplessModel <- readRDS("../data_out/SpaceAndTimeSplit/Trim2014/Perm10PoplessModel500.rds")
 HPoplessModel <- readRDS("../data_out/TwoModelSoln/HPermPoplessModel.rds")
 LPoplessModel <- readRDS("../data_out/TwoModelSoln/LPermPoplessModel.rds")
+
+Popless <- RankImp(PoplessModel)
 HPopless <- RankImp(HPoplessModel)
 LPopless <- RankImp(LPoplessModel)
 
 
 
+RankPop <- rbind(Popless,LPopless, HPopless)
+RankPop$Model <- factor(c(rep("Full", dim(Popless)[1]),
+                           rep("Low NHP", dim(LPopless)[1]),
+                           rep("High NHP", dim(HPopless)[1])),
+                         levels=c("Full", "Low NHP", "High NHP"))
+#order the variable levels
+RankPop <- within(RankPop,
+                    Variable <- factor(Variable, 
+                      levels = c( "spRich","NDVIScale","tempMean","RFsqrt","primProp","tempScale","NDVI", "fireDenScale", "fireDenSqrt")))
 
-VariRankPopless <-  STPopless %>%
-              select(c(Model, SingleModel=Rank)) %>%
-              dplyr::left_join(LPopless %>%
-                                 select(c(Model, LowNHP=Rank)), by="Model") %>%
-              dplyr::left_join(HPopless %>%
-                                 select(c(Model, HighNHP=Rank)), by="Model")
+RankPop$varImp <- as.numeric(as.character(RankPop$varImp))
 
-library(GGally)
+#Relative Imp Plots
 
-ggparcoord(VariRankPopless, columns = 2:4, groupColumn = 'Model', scale = 'globalminmax')+
-  xlab("Rank")
+b <- ggplot(RankPop, aes(Variable, varImp)) + 
+    geom_bar(stat="identity") +
+    facet_grid(Model~.) +
+    ylab("Relative Importance") + xlab("variable") +
+    theme(axis.text.x=element_text(angle=45, hjust=1))
 
-popless.variables <- trimws(unlist(strsplit(as.character(popless.formula)[3], "+", fixed = T)), which = "both")
+p<- ggplot(RankPop, aes(x = Model, y = varRank, group = Variable)) +   # group = id is important!
+  geom_path(aes(color = Variable),lineend = 'round', linejoin = 'round') +
+  scale_y_discrete(limits = levels(RankPop$Variable)) +
+  ylab("Rank Importance (1 is most important)") +
+  theme(legend.position = "none")
 
 
 ```
 
-## Effect of Spatially Balanced Split on Single Point Process Model
 
-https://datascience.blog.wzb.eu/2016/09/27/parallel-coordinate-plots-for-discrete-and-categorical-data-in-r-a-comparison/
-
-```{r compare balance splits, eval=FALSE}
-#load all the data 
-STPermFullModel <- readRDS("../data_out/SpaceAndTimeSplit/PermFullModel500.rds")
-STPermPoplessModel <- readRDS("../data_out/SpaceAndTimeSplit/PermPoplessModel500.rds")
-STFull<- RankImp(STPermFullModel)
-STPopless<- RankImp(STPermPoplessModel)
+The absolute AUC values for the full model, low NHP, and high NHP are `r RankAUC(PoplessModel)[1,2]`, `r RankAUC(LPoplessModel)[1,2]`,`r RankAUC(HPoplessModel)[1,2]`,respectively.
 
 
+```{r popless  plot, echo=FALSE}
 
-STPermSFModel <- readRDS("../data_out/SpaceAndTimeSplit/PermSFModel500.rds")
-
-#Temperal split
-PermFullModel <- readRDS("../data_out/TempSplit/PermFullModel.rds")
-PermPoplessModel <- readRDS("../data_out/TempSplit/PermPoplessModel.rds")
-
-STFull<- RankImp(STPermFullModel)
-Full <- RankImp(PermFullModel)
-STPopless<- RankImp(STPermPoplessModel)
-STSF <- RankImp(STPermSFModel)
+ggplotly(b)
 
 
-#This is the important chunck of the code 
-VariRank <-  STFull %>%
-              select(c(Model, STFull=Rank)) %>%
-              dplyr::left_join(Full %>% select(c(Model, TFull=Rank)), by="Model")
+ggplotly(p)
 
 ```
+
+
+```{r popless model true positives, echo=FALSE}
+
+
+load("../data_out/Predictions/TwoModel/Trim2014/poplessPredictions.RData")
+hPFull<- IdSort(hPredPopless,mod="High NHP")
+lPFull<- IdSort(lPredPopless,mod="Low NHP")
+#build dataset for easy plotting
+fullPred <- rbind(hPFull, lPFull)
+ggplot(data = fullPred, aes(y = prediction, x = index)) +
+  geom_point(color = "gray80") +
+  geom_point(data = fullPred[fullPred$case == 1,], aes(y = prediction, x = index), color = "maroon") +
+  ylab("Prediction")+
+  xlab("Rank order")+
+  facet_wrap(~Model, scales="free_x")+
+  ggtitle("Rank Order of ALL Training Data")
+
+```
+
+*****
+
+<!-- ## Effect of Spatially Balanced Split on Single Point Process Model -->
+
+<!-- https://datascience.blog.wzb.eu/2016/09/27/parallel-coordinate-plots-for-discrete-and-categorical-data-in-r-a-comparison/ -->
+
+<!-- ```{r compare balance splits, eval=FALSE} -->
+<!-- #load all the data  -->
+<!-- STPermFullModel <- readRDS("../data_out/SpaceAndTimeSplit/PermFullModel500.rds") -->
+<!-- STPermPoplessModel <- readRDS("../data_out/SpaceAndTimeSplit/PermPoplessModel500.rds") -->
+<!-- STFull<- RankImp(STPermFullModel) -->
+<!-- STPopless<- RankImp(STPermPoplessModel) -->
+
+
+
+<!-- STPermSFModel <- readRDS("../data_out/SpaceAndTimeSplit/PermSFModel500.rds") -->
+
+<!-- #Temperal split -->
+<!-- PermFullModel <- readRDS("../data_out/TempSplit/PermFullModel.rds") -->
+<!-- PermPoplessModel <- readRDS("../data_out/TempSplit/PermPoplessModel.rds") -->
+
+<!-- STFull<- RankImp(STPermFullModel) -->
+<!-- Full <- RankImp(PermFullModel) -->
+<!-- STPopless<- RankImp(STPermPoplessModel) -->
+<!-- STSF <- RankImp(STPermSFModel) -->
+
+
+<!-- #This is the important chunck of the code  -->
+<!-- VariRank <-  STFull %>% -->
+<!--               select(c(Model, STFull=Rank)) %>% -->
+<!--               dplyr::left_join(Full %>% select(c(Model, TFull=Rank)), by="Model") -->
+
+<!-- ``` -->
 
 
 
