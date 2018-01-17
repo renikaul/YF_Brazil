@@ -14,14 +14,20 @@ library(lubridate)
 library(raster)
 library(stringr)
 library(dplyr)
-library(doParallel)
-library(foreach)
 ```
 
 This document creates a gif of the predictions from the bagging model.
 
+# Load data
+
 ```{r load data}
-predictions <- readRDS("../data_out/Predictions/SFPPredPlot.rds")
+#one model
+predOneModel <- readRDS("../data_out/Predictions/SpaceAndTime/Trim2014/fullPredictions.rds")
+
+#two model
+predTwoModel <- load("../data_out/Predictions/TwoModel/Trim2014/fullPredictions.RData")
+predHighNHP <- hPredFull
+predLowNHP <- lPredFull
 
 brazil <- readOGR("../data_clean", "BRAZpolygons")
 #fortify for ggplot2
@@ -33,6 +39,7 @@ brazOutline <- getData('GADM', country ='BRA', level = 0)
 outlineFortify <- fortify(brazOutline, region = "OBJECTID") 
 ```
 
+#Mapping Theme
 
 ```{r create map theme}
 theme_map <- function(...) {
@@ -57,8 +64,9 @@ theme_map <- function(...) {
 
 ```
 
+# Plot Using ImageMagick Directly
 
-```{r create plotting function, eval = T}
+```{r create plotting function, eval = F}
 plotFunction <- function(monthIteration){
   #set title
   mapTitle <- paste("Model predictions for", month(monthIteration %% 12, label = T), (2001 + monthIteration %/% 12), sep = " ")
@@ -121,7 +129,7 @@ plotFunction <- function(monthIteration){
 }
 ```
 
-```{r, eval = T}
+```{r, eval = F}
 Sys.time()
 for (i in 1:168){
   #wrap in try catch because of image device failings
@@ -140,11 +148,14 @@ You will then need to use image Magick to combine into one giant gif. One day I 
 cd into `figures/GIFplots`
 CMDLINE: `convert -delay 100 *.png \ predictionsAll.gif`
 
+# Plot w/ gganimate
+
 Try it using `gganimate`. This runs faster, but makes lower quality plots (resolution wise).
 
-Create the plot.
+## One Model
+Create the plot. Remember to use a machine with >8 gb RAM.
 ```{r}
-preds <- as.data.frame(predictions)
+preds <- as.data.frame(predOneModel)
 
 #create month levels so they plot in order
 month_levels <- paste(month(1:12, label = T), rep(2001:2014, each =12), sep = " ")
@@ -152,6 +163,76 @@ month_levels <- paste(month(1:12, label = T), rep(2001:2014, each =12), sep = " 
  # now we join the prediction data
   map_data <- brazFortified %>% 
   left_join(preds, by = c("muni.no")) %>%
+  filter(!is.na(month.no)) %>%
+  arrange(month.no) %>%
+  #create title/frame for gganimate
+  mutate(mapTitle = factor(paste(month(month.no %% 12, label = T), 
+                                 (2001 + month.no %/% 12), sep = " "), 
+                           levels = month_levels))
+  
+  monthOutline <- data.frame(mapTitle = unique(map_data$mapTitle), id = "1")
+  #join outline data too
+  outlineFortifyAnimate <- outlineFortify %>%
+    left_join(monthOutline, by = "id")
+  
+  p <- ggplot(data = map_data, aes(frame = mapTitle)) +
+    # municipality polygons
+    geom_polygon(data = map_data, aes(fill = prediction, 
+                                      x = long, 
+                                      y = lat, 
+                                      group = group)) +
+    # add outline of all of brazil
+    geom_path(data = outlineFortifyAnimate, aes(x = long,
+                                   y = lat,
+                                   group = group),
+              color = "gray25", size = 0.1) +
+    # add shape for cases
+    geom_point(data = map_data[map_data$case==1,], 
+               aes(x = long, y = lat), 
+               shape = 23, size = 1, col = "green") +
+    coord_equal() +
+    scale_color_manual(values = caseColor) +
+    scale_fill_viridis(option = "magma", direction = -1, discrete = F,
+                       na.value = "gray70", 
+                       guide = guide_colorbar(
+                                direction = "horizontal",
+                                barheight = unit(2, units = "mm"),
+                                barwidth = unit(50, units = "mm"),
+                                draw.ulim = F,
+                                title.position = 'top',
+                                # some shifting around
+                                title.hjust = 0.5,
+                                label.hjust = 0.5),
+                       limits = c(0,1)) +
+    # add the previously defined basic theme
+    theme_map() +
+    guides(color = F) +
+    labs(x = NULL, 
+         y = NULL, 
+         #title = mapTitle, 
+         subtitle = "True positive cases are noted by green diamonds.") +
+    ggtitle("Model predictions for ") +
+    theme(legend.position = "bottom")
+```
+
+Animate and save.
+```{r}
+gganimate(p, interval = 1.5, "figures/mapPredsOneModel.gif")
+```
+
+## Two Model
+
+Create the plot.
+
+```{r}
+predsTwoModel <- as.data.frame(rbind(predLowNHP, predHighNHP))
+
+#create month levels so they plot in order
+month_levels <- paste(month(1:12, label = T), rep(2001:2014, each =12), sep = " ")
+
+ # now we join the prediction data
+  map_data <- brazFortified %>% 
+  left_join(predsTwoModel, by = c("muni.no")) %>%
   filter(!is.na(month.no)) %>%
   arrange(month.no) %>%
   #create title/frame for gganimate
@@ -202,10 +283,5 @@ month_levels <- paste(month(1:12, label = T), rep(2001:2014, each =12), sep = " 
          subtitle = "True positive cases are noted by green diamonds.") +
     ggtitle("Model predictions for ") +
     theme(legend.position = "bottom")
-```
-
-Animate and save.
-```{r}
-gganimate(p, interval = 1.5, "figures/mapPredictionsAll.gif")
 ```
 
