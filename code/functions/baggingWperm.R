@@ -54,7 +54,9 @@ baggingTryCatch<-function(form.x.y,training,new.data){
   #1. Create subset of data with fixed number of pres and abs
   training.pres <- dplyr::filter(training, case==1) #pull out just present points
   training.abs <- dplyr::filter(training, case==0)  #pull out just absence points
+  attempt <- 0 #attempt counter
   repeat {
+    attempt <- attempt +1 #count attempt
     training_positions.p <- sample(nrow(training.pres),size=10) #randomly choose 10 present point rows
     training_positions.b <- sample(nrow(training.abs),size=100) #randomly choose 100 absence point rows  
     train_pos.p<-1:nrow(training.pres) %in% training_positions.p #presence 
@@ -65,12 +67,17 @@ baggingTryCatch<-function(form.x.y,training,new.data){
     #2b. test to if perfect sep   
     if(is.list(glm_fit)==TRUE){
       break
-    }  
+    }
+    #escape for stupid amounts of attempts
+    if(attempt > 100){
+      break
+    }
   }
   #3. Pull out model coefs  
   #glm.coef <- coef(glm_fit)
   #4. Use model to predict (0,1) on whole training data 
-  predictions <- predict(glm_fit,newdata=new.data,type="response")
+  if(is.list(glm_fit)==TRUE){predictions <- predict(glm_fit,newdata=new.data,type="response")}
+  if(attempt>100){predictions <- rep(NA, dim(new.data)[1])}
   return(predictions)
 }
 
@@ -126,6 +133,7 @@ permOneVar=function(formula = glm.formula, bag.fnc=bagging,permute.fnc=permuteda
   library(doParallel)
   library(ROCR)
   
+
   #make some local objects----
   cores.to.use <- cores
   #parse out variables from formula object 
@@ -159,23 +167,27 @@ permOneVar=function(formula = glm.formula, bag.fnc=bagging,permute.fnc=permuteda
     #matrix of AUC to return
       perm.auc[,j] <- unlist(results)
     }
-    
+  
+  #count number of permutations used to make stats
+  no.failed <- apply(perm.auc, 2, function(x) sum(is.na(x)))
+  no.suc.perm <- perm - no.failed  
+  
   #calculate relative importance ----
-  perm.auc.mean <- apply(perm.auc,2,mean)
-  perm.auc.sd <- apply(perm.auc, 2, sd)
+  perm.auc.mean <- apply(perm.auc,2,function(x) mean(x,na.rm=TRUE))
+  perm.auc.sd <- apply(perm.auc, 2, function(x) sd(x,na.rm=TRUE))
   delta.auc <- perm.auc.mean[1] - perm.auc.mean[-c(1, length(perm.auc.mean))] #change in AUC from base model only for single variable permutation
-  rel.import <- delta.auc/max(delta.auc) # normalized relative change in AUC from base model only for single variable permutation
+  rel.import <- delta.auc/max(delta.auc, na.rm = TRUE) # normalized relative change in AUC from base model only for single variable permutation
   
   #Output for relative importance
   relative.import <- as.data.frame(cbind(Variable=variables,varImp=rel.import))
   #plot it for fun
   if(viz==TRUE){barplot(rel.import, names.arg = variables, main= title)}
   #Output for mean and sd of permutations for all permutations (non, single var, and all var)
-  mean.auc <- as.data.frame(cbind(Model=variablesName,meanAUC=perm.auc.mean, sdAUC=perm.auc.sd))
+  mean.auc <- as.data.frame(cbind(Model=variablesName,meanAUC=perm.auc.mean, sdAUC=perm.auc.sd, perms=no.suc.perm))
   
   #Output of AUC for each permutation
   colnames(perm.auc) <- variablesName
-  
+
   #return training coefs and AUC for each iteration
   #return(list(train.auc, Coefs))
   return(list(relative.import, mean.auc,perm.auc))
