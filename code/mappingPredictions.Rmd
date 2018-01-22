@@ -22,7 +22,7 @@ This document creates a gif of the predictions from the bagging model.
 
 # Load data
 
-```{r load data}
+```{r load spatial  data}
 brazFortified <- st_read("../data_clean", "BRAZpolygons")
 brazFortified <- rename(brazFortified, muni.no = muni_no)
 
@@ -155,7 +155,7 @@ Create the plot. Remember to use a machine with >8 gb RAM.
 predOneModel <- readRDS("../data_out/Predictions/SpaceAndTime/Trim2014/fullPredictions.rds")
 ```
 
-```{r create dataframe to plot, eval = F}
+```{r create dataframe to plot, eval = T}
 preds <- as.data.frame(predOneModel)
 
 #create month levels so they plot in order
@@ -167,61 +167,55 @@ map_data <- brazFortified %>%
   filter(!is.na(month.no)) %>%
   arrange(month.no) %>%
   #create title/frame for gganimate
-  mutate(mapTitle = factor(paste(month(month.no %% 12, label = T), 
-                                 (2001 + month.no %/% 12), 
-                                 sep = " "), 
+  mutate(mapTitle = case_when(
+    month.no%%12 == 0 ~ factor(paste(month(12, label = T), 
+                                 (2001 + month.no %/% 12), sep = " "), 
+                           levels = month_levels),
+      TRUE            ~ factor(paste(month(month.no %% 12, label = T), 
+                                 (2001 + month.no %/% 12), sep = " "), 
                            levels = month_levels))
+  )
   
-# only need to do this once as map outline is the same
-monthOutline <- data.frame(mapTitle = unique(map_data$mapTitle),
-                           id = "1")
-  #join outline data too
-  outlineFortifyAnimate <- outlineFortify %>%
+monthOutline <- data.frame(mapTitle = unique(map_data$mapTitle), id = 1)
+#join outline data too
+outlineFortifyAnimate <- outlineFortify %>%
     left_join(monthOutline, by = "id")
+
+#calculate positives to plot
+positives <- st_centroid(filter(map_data, case >0))
 ```
 
 
 ```{r create plot, eval = F}
-  p <- ggplot(data = map_data, 
-              aes(frame = mapTitle)
-              ) +
-    # municipality polygons
-    geom_polygon(data = map_data, aes(fill = prediction, 
-                                      x = long, 
-                                      y = lat, 
-                                      group = group)) +
-    # add outline of all of brazil
-    geom_path(data = outlineFortifyAnimate, aes(x = long,
-                                   y = lat,
-                                   group = group),
-              color = "gray25", size = 0.1) +
-    # add shape for cases
-    geom_point(data = map_data[map_data$case==1,], 
-               aes(x = long, y = lat), 
-               shape = 23, size = 1, col = "green") +
-    coord_equal() +
-    scale_color_manual(values = caseColor) +
-    scale_fill_viridis(option = "magma", direction = -1, discrete = F,
-                       na.value = "gray70", 
-                       guide = guide_colorbar(
-                                direction = "horizontal",
-                                barheight = unit(2, units = "mm"),
-                                barwidth = unit(50, units = "mm"),
-                                draw.ulim = F,
-                                title.position = 'top',
-                                # some shifting around
-                                title.hjust = 0.5,
-                                label.hjust = 0.5),
-                       limits = c(0,1)) +
-    # add the previously defined basic theme
-    theme_map() +
-    guides(color = F) +
-    labs(x = NULL, 
-         y = NULL, 
-         #title = mapTitle, 
-         subtitle = "True positive cases are noted by green diamonds.") +
-    ggtitle("Model predictions for ") +
-    theme(legend.position = "bottom")
+ p <- ggplot() +
+  # add outline of all of brazil
+  geom_sf(data = outlineFortifyAnimate, aes(frame = mapTitle),
+          color = "gray25", size = 0.1) +
+  # municipality polygons
+  geom_sf(data = map_data, aes(fill = prediction, frame = mapTitle), color = NA) +
+  # add shape for cases
+  geom_sf(data = positives,
+          shape = 23, size = 3, col = "green", aes(frame = mapTitle)) +
+  coord_sf() +
+  scale_fill_viridis(option = "magma", direction = -1, discrete = F,
+                     na.value = "gray70", 
+                     guide = guide_colorbar(
+                       direction = "horizontal",
+                       barheight = unit(2, units = "mm"),
+                       barwidth = unit(50, units = "mm"),
+                       draw.ulim = F,
+                       title.position = 'top',
+                       # some shifting around
+                       title.hjust = 0.5,
+                       label.hjust = 0.5),
+                     limits = c(0,1)) +
+  # add the previously defined basic theme
+  theme_map() +
+  guides(color = F) +
+  labs(x = NULL, 
+       y = NULL) +
+  ggtitle("One Model predictions for ") +
+  theme(legend.position = "bottom")
 ```
 
 Animate and save.
@@ -234,7 +228,7 @@ gganimate(p, interval = 1.5, "figures/mapPredsOneModel.gif")
 Note that I drop the data from one model here becuase it takes up too much RAM.
 
 ```{r load two model data}
-rm(preds, predOneModel, map_data)
+rm(preds, predOneModel, map_data, p)
 #two model
 predTwoModel <- load("../data_out/Predictions/TwoModel/Trim2014/fullPredictions.RData")
 predHighNHP <- hPredFull
