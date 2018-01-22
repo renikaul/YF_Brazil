@@ -61,7 +61,6 @@ Infected municipalities were 70/30 split into training and testing data, stratif
 
 ```{r}
 training.data <- readRDS("../data_clean/TrainingDataSpat.rds")
-
 ```   
 
 
@@ -86,7 +85,7 @@ glm.formula <- as.formula("case~  NDVI+NDVIScale+
                           popLog10+
                           RF+RFsqrt+RFScale+
                           tempMean+tempScale+
-                          fireNum+fireDen+fireDenSqrt+fireDenScale+
+                          fireDenSqrt+fireDenScale+
                           spRich+primProp") 
 ```
 
@@ -243,4 +242,58 @@ PredPopless <-  BaggedModel(form.x.y = glm.formula.popless, training = trainTrim
 saveRDS(PredPopless, file = "../data_out/Predictions/SpaceAndTime/Trim2014/poplessPredictions.rds")
 
 ```
+
+
+
+## Models with perferct sep tossed and with complete cases (dropping 2014)
+
+The primate proportion variable DNE for 2014 (land use data not available), since we'd like to use primprop in the 2 model approach we've dropped the 2014 data (single case).   
+
+
+
+# Full Model
+
+```{r trim tryCatch Kitchen sink}
+glm.formula <- as.formula("case~  NDVI+NDVIScale+
+                          popLog10+
+                          RF+RFsqrt+RFScale+
+                          tempMean+tempScale+
+                          fireDenSqrt+fireDenScale+
+                          spRich+primProp") 
+
+PermFullModel <- permOneVar(formula = glm.formula,bag.fnc = baggingTryCatch,traindata = trainTrim, cores = 10, no.iterations = 500, perm = 10, viz = TRUE, title="Full Model")
+saveRDS(PermFullModel, "../data_out/SpaceAndTimeSplit/Trim2014/Perm10FullModel500TryCatch.rds")
+
+```
+
+```{r trim tryCatch kitchen sink predictions}
+
+PredFull <-  BaggedModel(form.x.y = glm.formula, bag.fnc = baggingTryCatch,training = trainTrim, new.data = trainTrim, no.iterations = 500)
+
+saveRDS(PredFull, file = "../data_out/Predictions/SpaceAndTime/Trim2014/fullPredictionsTryCatch.rds")
+
+
+```
+
+# Popless 
+```{r trim tryCatch drop Pop}
+#drop one covar importance
+glm.formula.popless <- as.formula("case~  NDVI+NDVIScale+ 
+                          RFsqrt+RFScale+
+                          tempMean+tempScale+
+                          fireDenSqrt+fireDenScale+
+                          spRich+primProp") 
+permPoplessModel <- permOneVar(formula = glm.formula.popless, bag.fnc =baggingTryCatch ,traindata = trainTrim, cores=10, no.iterations = 500, perm = 10,viz=TRUE, title="Popless Model" ) 
+saveRDS(permPoplessModel, "../data_out/SpaceAndTimeSplit/Trim2014/Perm10PoplessModel500TryCatch.rds")
+
+```
+
+```{r trim tryCatch popless predictions}
+
+PredPopless <-  BaggedModel(form.x.y = glm.formula.popless, training = trainTrim, new.data = trainTrim, no.iterations = 500, bag.fnc = baggingTryCatch)
+
+saveRDS(PredPopless, file = "../data_out/Predictions/SpaceAndTime/Trim2014/poplessPredictionsTryCatch.rds")
+
+```
+
 
