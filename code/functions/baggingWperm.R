@@ -37,6 +37,43 @@ BaggedModel = function(form.x.y, training, new.data, no.iterations= 100, bag.fnc
   }
 
 
+# Single Bagged Model with tryCatch----
+baggingTryCatch<-function(form.x.y,training,new.data){
+  # modified JP's bagging function 12/1/17 RK 
+  # form.x.y the formula for model to use
+  # training dataframe containing training data (presence and abs)
+  # new.data new data for logreg model to predict onto
+  
+  perfectSeparation <- function(w) {
+    if(grepl("fitted probabilities numerically 0 or 1 occurred", #text to match
+             as.character(w))) {} #output warning message, counter NA
+  }
+  # returns predictions based on logreg model for new data and coefficients of model
+  #0. load packages
+  library(dplyr)
+  #1. Create subset of data with fixed number of pres and abs
+  training.pres <- dplyr::filter(training, case==1) #pull out just present points
+  training.abs <- dplyr::filter(training, case==0)  #pull out just absence points
+  repeat {
+    training_positions.p <- sample(nrow(training.pres),size=10) #randomly choose 10 present point rows
+    training_positions.b <- sample(nrow(training.abs),size=100) #randomly choose 100 absence point rows  
+    train_pos.p<-1:nrow(training.pres) %in% training_positions.p #presence 
+    train_pos.b<-1:nrow(training.abs) %in% training_positions.b #background
+    #2. Build logreg model with subset of data    
+    glm_fit<-tryCatch(glm(form.x.y,data=rbind(training.pres[train_pos.p,],training.abs[train_pos.b,]),family=binomial(logit)), warning=perfectSeparation) # if this returns a warning the predictions errors out b/c glm_fit is NULL 
+    
+    #2b. test to if perfect sep   
+    if(is.list(glm_fit)==TRUE){
+      break
+    }  
+  }
+  #3. Pull out model coefs  
+  #glm.coef <- coef(glm_fit)
+  #4. Use model to predict (0,1) on whole training data 
+  predictions <- predict(glm_fit,newdata=new.data,type="response")
+  return(predictions)
+}
+
 # Permute Variable based on loop iteration of PermOneVar ----
 permutedata=function(formula = glm.formula,trainingdata, i){
   # glm.formula:
