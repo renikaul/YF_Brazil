@@ -135,8 +135,9 @@ glm.formula <- as.formula("case~  NDVI+NDVIScale+
 
 ## High NHP
 #load data
-hPermFull <- permOneVar(formula = glm.formula,traindata = hTrimTrain, cores = 10, no.iterations = 500, perm = 10, viz = TRUE, title="High NHP Full Model")
-saveRDS(hPermFull, "../data_out/TwoModelSoln/Trim2014/HPermFullModel.rds")
+hPermFull <- permOneVar(formula = glm.formula, bag.fnc = baggingTryCatch, traindata = hTrimTrain, cores = 10, no.iterations = 50, perm = 10, viz = TRUE, title="High NHP Full Model")
+
+hsaveRDS(hPermFull, "../data_out/TwoModelSoln/Trim2014/HPermFullModelTryCatch.rds")
 
 ## Low NHP
 #load data
@@ -181,5 +182,74 @@ hPredPopless <-  BaggedModel(form.x.y = glm.formula.popless, training = hTrimTra
 lPredPopless <-  BaggedModel(form.x.y = glm.formula.popless, training = lTrimTrain, new.data = lTrimTrain, no.iterations = 500)
 
 save(hPredPopless,lPredPopless, file = "../data_out/Predictions/TwoModel/Trim2014/poplessPredictions.RData")
+
+```
+
+
+***
+
+# Removing perfect sep models
+
+Some bags were returning the warning of perfect seperation. The `bagging` function was modified with `tryCatch` to toss any models with this warning message. 
+
+## Kitchen Sink
+
+```{r trimmed tryCatch Kitchen sink }
+glm.formula <- as.formula("case~  NDVI+NDVIScale+
+                          popLog10+
+                          RF+RFsqrt+RFScale+
+                          tempMean+tempScale+
+                          fireDenSqrt+fireDenScale+
+                          spRich+primProp") 
+
+## High NHP
+#load data
+hPermFull <- permOneVar(formula = glm.formula, bag.fnc = baggingTryCatch, traindata = hTrimTrain, cores = 10, no.iterations = 500, perm = 10, viz = TRUE, title="High NHP Full Model")
+
+saveRDS(hPermFull, "../data_out/TwoModelSoln/Trim2014/HPermFullModelTryCatch.rds")
+
+## Low NHP
+#load data
+lPermFull <- permOneVar(formula = glm.formula, bag.fnc = baggingTryCatch,traindata = lTrimTrain, cores = 10, no.iterations = 500, perm = 10, viz = TRUE, title="Low NHP Full Model")
+saveRDS(lPermFull, "../data_out/TwoModelSoln/Trim2014/LPermFullModelTryCatch.rds")
+```
+
+```{r trimmed tryCatch kitchen sink predictions}
+
+hPredFull <-  BaggedModel(form.x.y = glm.formula,bag.fnc = baggingTryCatch, training = hTrimTrain, new.data = hTrimTrain, no.iterations = 500)
+lPredFull <-  BaggedModel(form.x.y = glm.formula, bag.fnc = baggingTryCatch,training = lTrimTrain, new.data = lTrimTrain, no.iterations = 500)
+
+save(hPredFull,lPredFull, file = "../data_out/Predictions/TwoModel/Trim2014/fullPredictionsTryCatch.RData")
+```
+
+
+# Popless 
+```{r trimmed tryCatch drop Pop}
+#drop one covar importance
+glm.formula.popless <- as.formula("case~  NDVI+NDVIScale+ 
+                          RFsqrt+RFScale+
+                          tempMean+tempScale+
+                          fireDenSqrt+fireDenScale+
+                          spRich+primProp") 
+
+#High NHP
+hPermPoplessModel <- permOneVar(formula = glm.formula.popless,bag.fnc = baggingTryCatch,traindata = hTrimTrain, cores=10, no.iterations = 500, perm = 10,viz=TRUE, title="High NHP, Popless" ) 
+saveRDS(hPermPoplessModel, "../data_out/TwoModelSoln/Trim2014/HPermPoplessModelTryCatch.rds")
+
+
+#Low NHP
+lPermPoplessModel <- permOneVar(formula = glm.formula.popless,bag.fnc = baggingTryCatch,traindata = lTrimTrain, cores=10, no.iterations = 500, perm = 10 ,viz=TRUE, title="Low NHP, Popless")
+saveRDS(lPermPoplessModel, "../data_out/TwoModelSoln/Trim2014/LPermPoplessModelTryCatch.rds")
+
+
+```
+
+```{r trimmed tryCatch popless predictions}
+
+
+hPredPopless <-  BaggedModel(form.x.y = glm.formula.popless,bag.fnc = baggingTryCatch, training = hTrimTrain, new.data = hTrimTrain, no.iterations = 500)
+lPredPopless <-  BaggedModel(form.x.y = glm.formula.popless, bag.fnc = baggingTryCatch,training = lTrimTrain, new.data = lTrimTrain, no.iterations = 500)
+
+save(hPredPopless,lPredPopless, file = "../data_out/Predictions/TwoModel/Trim2014/poplessPredictionsTryCatch.RData")
 
 ```
