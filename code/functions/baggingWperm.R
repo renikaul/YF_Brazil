@@ -25,20 +25,46 @@ bagging<-function(form.x.y,training,new.data){
 }
 
 # Bagging with predictions 
-BaggedModel = function(form.x.y, training, new.data, no.iterations= 100, bag.fnc=bagging){
+BaggedModel = function(form.x.y, training, new.data, no.iterations= 100, bag.fnc=baggingTryCatch){
   #make a matrix of predictions 
-  matrix.of.predictions <- replicate(n = no.iterations, expr = bag.fnc(form.x.y, training, new.data))
+  list.of.models <- replicate(n = no.iterations, expr = bag.fnc(form.x.y, training, new.data, keep.model=TRUE), simplify = TRUE)
   #calculate mean prediction 
+  matrix.of.predictions <- matrix(NA, ncol=no.iterations, nrow = dim(new.data)[1])
+  for (i in 1:no.iterations){
+    tmp <- listOfModels[[i]]
+    matrix.of.predictions[,i] <- predict(tmp, newdata=new.data, type="response")
+  }
   output.preds<- apply(matrix.of.predictions, 1, mean) 
   #add identifiers to predictions
   preds <- cbind(muni.no=new.data$muni.no, month.no=new.data$month.no,case=new.data$case,prediction=output.preds) 
-  
-  return(preds)
+  return(list(list.of.models,preds))
   }
+
+# Making predictions from a bagged models (Bagged Model[[2]] output) ----
+baggedPredictions = function(list.of.models, new.data){
+  library(ROCR)
+  
+  matrix.of.predictions <- matrix(NA, ncol=length(list.of.models), nrow = dim(new.data)[1])
+  
+    for(i in 1:length(list.of.models)){
+    tmp <- listOfModels[[i]]
+    matrix.of.predictions[,i] <- predict(tmp, newdata=new.data, type="response")
+    }
+  #calculate mean value for each row
+  output.preds<- apply(matrix.of.predictions, 1, mean) 
+  #calculate model AUC
+  preds <- ROCR::prediction(output.preds, new.data$case) #other projects have used dismo::evaluate instead. Not sure if is makes a difference. 
+  #AUC to return
+  auc <- unlist(ROCR::performance(preds, "auc")@y.values)
+  
+  #add identifiers to predictions
+  preds <- cbind(muni.no=new.data$muni.no, month.no=new.data$month.no,case=new.data$case,prediction=output.preds) 
+  return(list(auc,preds))
+}
 
 
 # Single Bagged Model with tryCatch----
-baggingTryCatch<-function(form.x.y,training,new.data){
+baggingTryCatch<-function(form.x.y,training,new.data, keep.model=FALSE){
   # modified JP's bagging function 12/1/17 RK 
   # form.x.y the formula for model to use
   # training dataframe containing training data (presence and abs)
@@ -63,7 +89,6 @@ baggingTryCatch<-function(form.x.y,training,new.data){
     train_pos.b<-1:nrow(training.abs) %in% training_positions.b #background
     #2. Build logreg model with subset of data    
     glm_fit<-tryCatch(glm(form.x.y,data=rbind(training.pres[train_pos.p,],training.abs[train_pos.b,]),family=binomial(logit)), warning=perfectSeparation) # if this returns a warning the predictions errors out b/c glm_fit is NULL 
-    
     #2b. test to if perfect sep   
     if(is.list(glm_fit)==TRUE){
       break
@@ -73,13 +98,21 @@ baggingTryCatch<-function(form.x.y,training,new.data){
       break
     }
   }
-  #3. Pull out model coefs  
-  #glm.coef <- coef(glm_fit)
   #4. Use model to predict (0,1) on whole training data 
-  if(is.list(glm_fit)==TRUE){predictions <- predict(glm_fit,newdata=new.data,type="response")}
-  if(attempt>100){predictions <- rep(NA, dim(new.data)[1])}
-  return(predictions)
-}
+  if(is.list(glm_fit)==TRUE){
+        if(keep.model==TRUE){   #3. Return model too is keep.model is TRUE  
+          return(glm_fit)  
+        } else {
+          predictions <- predict(glm_fit,newdata=new.data,type="response")
+          return(predictions)
+        }
+    }  
+  #If model fails after 100 attempts return just NAs  
+  if(attempt>100){
+    predictions <- rep(NA, dim(new.data)[1])
+    return(predictions)
+    }
+  }
 
 # Permute Variable based on loop iteration of PermOneVar ----
 permutedata=function(formula = glm.formula,trainingdata, i){
@@ -116,7 +149,6 @@ permutedata=function(formula = glm.formula,trainingdata, i){
   
   return(permuted.data)
 }
-
 
 # Models with permutated variables ----
 permOneVar=function(formula = glm.formula, bag.fnc=bagging,permute.fnc=permutedata, traindata = training, cores=2, no.iterations= 100, perm=10, 
@@ -192,6 +224,8 @@ permOneVar=function(formula = glm.formula, bag.fnc=bagging,permute.fnc=permuteda
   #return(list(train.auc, Coefs))
   return(list(relative.import, mean.auc,perm.auc))
 }
+
+
 
 # Min working script ---- 
 #training.data <- readRDS("../../data_clean/TrainingData.rds") #load data

@@ -7,7 +7,56 @@ output: html_document
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
-set.seed(8675309)
+
+#load packages
+library(dplyr)
+library(gplots)
+library(parallel)
+library(doParallel)
+library(ROCR)
+library(pROC)
+
+#source functions
+source("functions/baggingWperm.R")
+
+#load the data and trim it
+
+#One Model Data
+one.training <- readRDS("../data_clean/TrainingDataSpat.rds")
+one.testing <- readRDS("../data_clean/TestingData.rds")
+
+one.trainTrim <- one.training %>% filter(year <2014)
+one.testTrim <- one.testing %>% filter(year <2014)
+
+one.data <- bind_rows(one.trainTrim, one.testTrim)
+
+#Two Model Data 
+
+##high
+high.training <- readRDS("../data_clean/TrainingDataHighNHP.rds")
+high.testing <- readRDS("../data_clean/TestingDataHighNHP.rds")
+
+high.trainTrim <- high.training %>% filter(year <2014)
+high.testTrim <- high.testing %>% filter(year <2014)
+
+high.data <- bind_rows(high.trainTrim, high.testTrim)
+
+##low
+low.training <- readRDS("../data_clean/TrainingDataLowNHP.rds")
+low.testing <- readRDS("../data_clean/TestingDataLowNHP.rds")
+
+low.trainTrim <- low.training %>% filter(year <2014)
+low.testTrim <- low.testing %>% filter(year <2014)
+
+low.data <- bind_rows(low.trainTrim, low.testTrim)
+
+#Model
+glm.formula <- as.formula("case~  NDVI+NDVIScale+
+                          popLog10+
+                          RF+RFsqrt+RFScale+
+                          tempMean+tempScale+
+                          fireDenSqrt+fireDenScale+
+                          spRich+primProp") 
 ```
 
 # Openning the testing data
@@ -17,7 +66,21 @@ set.seed(8675309)
 
 ```{r one model}
 
+#build model and predictions on training data
+one.model <-  BaggedModel(form.x.y = glm.formula, training = one.trainTrim, new.data = one.trainTrim, no.iterations = 500, bag.fnc = baggingTryCatch)
 
+list.of.one.models <- one.model[[1]]
+#predict on testing data
+one.test.pred <- baggedPredictions(list.of.one.models, one.testTrim)
+
+#test auc
+one.test.pred[[1]]
+
+#predictions for whole dataset
+one.model.prediction <- bind_rows(one.model[[2]], one.test.pred[[2]])
+
+#save all the things
+save(one.model, one.test.pred, one.model.prediction, file="../data_out/MS_results/OneModel.rda")
 ```
 
 
@@ -26,10 +89,41 @@ set.seed(8675309)
 ```{r two model High}
 
 
+#build model and predictions on training data
+high.model <-  BaggedModel(form.x.y = glm.formula, training = high.trainTrim, new.data = high.trainTrim, no.iterations = 500, bag.fnc = baggingTryCatch)
+
+list.of.high.models <- high.model[[1]]
+#predict on testing data
+high.test.pred <- baggedPredictions(list.of.high.models, high.testTrim)
+
+#test auc
+high.test.pred[[1]]
+
+#predictions for whole dataset
+high.model.prediction <- bind_rows(high.model[[2]], high.test.pred[[2]])
+
+#save all the things
+save(high.model, high.test.pred, high.model.prediction, file="../data_out/MS_results/HighModel.rda")
 ```
 
 
 ```{r two model Low}
 
+
+#build model and predictions on training data
+low.model <-  BaggedModel(form.x.y = glm.formula, training = low.trainTrim, new.data = low.trainTrim, no.iterations = 500, bag.fnc = baggingTryCatch)
+
+list.of.low.models <- low.model[[1]]
+#predict on testing data
+low.test.pred <- baggedPredictions(list.of.low.models, low.testTrim)
+
+#test auc
+low.test.pred[[1]]
+
+#predictions for whole dataset
+low.model.prediction <- bind_rows(low.model[[2]], low.test.pred[[2]])
+
+#save all the things
+save(low.model, low.test.pred, low.model.prediction, file="../data_out/MS_results/LowModel.rda")
 
 ```
