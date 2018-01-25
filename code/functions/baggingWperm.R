@@ -27,16 +27,17 @@ bagging<-function(form.x.y,training,new.data){
 # Bagging with predictions 
 BaggedModel = function(form.x.y, training, new.data, no.iterations= 100, bag.fnc=baggingTryCatch){
   #make a matrix of predictions 
-  list.of.models <- replicate(n = no.iterations, expr = bag.fnc(form.x.y, training, new.data, keep.model=TRUE), simplify = TRUE)
+  list.of.models <- replicate(n = no.iterations, expr = bag.fnc(form.x.y, training, new.data, keep.model=TRUE), simplify = FALSE)
   #calculate mean prediction 
   matrix.of.predictions <- matrix(NA, ncol=no.iterations, nrow = dim(new.data)[1])
   for (i in 1:no.iterations){
-    tmp <- listOfModels[[i]]
+    print(i)
+    tmp <- list.of.models[[i]]
     matrix.of.predictions[,i] <- predict(tmp, newdata=new.data, type="response")
   }
   output.preds<- apply(matrix.of.predictions, 1, mean) 
   #add identifiers to predictions
-  preds <- cbind(muni.no=new.data$muni.no, month.no=new.data$month.no,case=new.data$case,prediction=output.preds) 
+  preds <- as.data.frame(cbind(muni.no=new.data$muni.no, month.no=new.data$month.no,case=new.data$case,prediction=output.preds))
   return(list(list.of.models,preds))
   }
 
@@ -47,7 +48,7 @@ baggedPredictions = function(list.of.models, new.data){
   matrix.of.predictions <- matrix(NA, ncol=length(list.of.models), nrow = dim(new.data)[1])
   
     for(i in 1:length(list.of.models)){
-    tmp <- listOfModels[[i]]
+    tmp <- list.of.models[[i]]
     matrix.of.predictions[,i] <- predict(tmp, newdata=new.data, type="response")
     }
   #calculate mean value for each row
@@ -58,7 +59,7 @@ baggedPredictions = function(list.of.models, new.data){
   auc <- unlist(ROCR::performance(preds, "auc")@y.values)
   
   #add identifiers to predictions
-  preds <- cbind(muni.no=new.data$muni.no, month.no=new.data$month.no,case=new.data$case,prediction=output.preds) 
+  preds <- as.data.frame(cbind(muni.no=new.data$muni.no, month.no=new.data$month.no,case=new.data$case,prediction=output.preds))
   return(list(auc,preds))
 }
 

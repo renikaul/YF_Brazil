@@ -28,7 +28,7 @@ one.testing <- readRDS("../data_clean/TestingData.rds")
 one.trainTrim <- one.training %>% filter(year <2014)
 one.testTrim <- one.testing %>% filter(year <2014)
 
-one.data <- bind_rows(one.trainTrim, one.testTrim)
+#one.data <- bind_rows(one.trainTrim, one.testTrim)
 
 #Two Model Data 
 
@@ -77,10 +77,16 @@ one.test.pred <- baggedPredictions(list.of.one.models, one.testTrim)
 one.test.pred[[1]]
 
 #predictions for whole dataset
-one.model.prediction <- bind_rows(one.model[[2]], one.test.pred[[2]])
+#add col to tell if in training vs testing 
+one.model.prediction <- one.model[[2]] %>%
+                          bind_rows(one.test.pred[[2]]) %>%
+                          mutate(set=c(rep("train", dim(one.model[[2]])[1]), rep("test", dim(one.test.pred[[2]])[1])))
 
 #save all the things
-save(one.model, one.test.pred, one.model.prediction, file="../data_out/MS_results/OneModel.rda")
+saveRDS(one.model, file="../data_out/MS_results/OneModel/model.rds")
+saveRDS(one.test.pred, file="../data_out/MS_results/OneModel/testingPredictions.rds")
+saveRDS(one.model.prediction, file="../data_out/MS_results/OneModel/wholePredictions.rds")
+
 ```
 
 
@@ -100,10 +106,19 @@ high.test.pred <- baggedPredictions(list.of.high.models, high.testTrim)
 high.test.pred[[1]]
 
 #predictions for whole dataset
-high.model.prediction <- bind_rows(high.model[[2]], high.test.pred[[2]])
+#add col to tell if in training vs testing 
+high.model.prediction <- high.model[[2]] %>%
+                          bind_rows(high.test.pred[[2]]) %>%
+                          mutate(set=c(rep("train", dim(high.model[[2]])[1]), rep("test", dim(high.test.pred[[2]])[1])))
 
 #save all the things
-save(high.model, high.test.pred, high.model.prediction, file="../data_out/MS_results/HighModel.rda")
+saveRDS(high.model, file="../data_out/MS_results/HighModel/model.rds")
+saveRDS(high.test.pred, file="../data_out/MS_results/HighModel/testingPredictions.rds")
+saveRDS(high.model.prediction, file="../data_out/MS_results/HighModel/wholePredictions.rds")
+
+
+perf <- performance(p1,"tpr","fpr")
+plot(perf,colorize=TRUE)
 ```
 
 
@@ -121,9 +136,14 @@ low.test.pred <- baggedPredictions(list.of.low.models, low.testTrim)
 low.test.pred[[1]]
 
 #predictions for whole dataset
-low.model.prediction <- bind_rows(low.model[[2]], low.test.pred[[2]])
+#add col to tell if in training vs testing 
+low.model.prediction <- low.model[[2]] %>%
+                          bind_rows(low.test.pred[[2]]) %>%
+                          mutate(set=c(rep("train", dim(low.model[[2]])[1]), rep("test", dim(low.test.pred[[2]])[1])))
 
 #save all the things
-save(low.model, low.test.pred, low.model.prediction, file="../data_out/MS_results/LowModel.rda")
+saveRDS(low.model, file="../data_out/MS_results/LowModel/model.rds")
+saveRDS(low.test.pred, file="../data_out/MS_results/LowModel/testingPredictions.rds")
+saveRDS(low.model.prediction, file="../data_out/MS_results/LowModel/wholePredictions.rds")
 
 ```
