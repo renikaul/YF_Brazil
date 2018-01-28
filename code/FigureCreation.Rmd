@@ -145,55 +145,11 @@ theme_map <- function(...) {
     legend.background = element_rect(fill = NA, color = NA),
     strip.background = element_blank(),
     strip.text = element_blank(),
+    plot.margin = unit(c(0,5,0,5), unit = "pt"),
     ...
   )
 }
 ```
-
-
-```{r space plot function}
-spacePlot <- function(data.subset, withGuide=T){
-  p <- ggplot() +
-    geom_sf(data = braz.outline, color = "gray25", size = 0.1) +
-    geom_sf(data = data.subset, aes(fill = pred.var), color = NA) +
-    coord_sf(datum = NA)+
-    scale_fill_viridis(option = "magma", direction = -1, discrete = F,
-                     na.value = "gray70", 
-                     guide = guide_colorbar(
-                       title = "Variation",
-                       direction = "vertical",
-                       barheight = unit(35, units = "mm"),
-                       barwidth = unit(2, units = "mm"),
-                       draw.ulim = F,
-                       title.position = 'top',
-                       # some shifting around
-                       title.hjust = 0.5,
-                       label.hjust = 0.5,
-                       title.theme = element_text(size = 8, angle = 0),
-                       label.theme = element_text(size = 8, angle = 0)),
-                     limits = c(0,0.07)) +
-    theme_map()
-  
-  #drop guide if we want
-  if(withGuide==F){
-    p <- p +
-      guides(fill = F)
-  }
-  
-  return(p)
-}
-
-```
-
-
-```{r create individual space plots, eval = F}
-space.plot.1 <- spacePlot(data.subset = filter(var.all.models, model == "one.model"), withGuide = F)
-
-space.plot.2 <- spacePlot(data.subset = filter(var.all.models, model == "lowNHP"), withGuide = F)
-
-space.plot.3 <- spacePlot(data.subset = filter(var.all.models, model == "highNHP"))
-```
-
 
 ```{r facet}
 top.row <- ggplot() +
@@ -216,7 +172,8 @@ top.row <- ggplot() +
                        label.theme = element_text(size = 8, angle = 0)),
                      limits = c(0,0.07)) +
     theme_map() +
-  facet_wrap(~model, dir = "h")
+  facet_wrap(~model, dir = "h") +
+  panel_border()
 ```
 
 
@@ -224,47 +181,11 @@ top.row <- ggplot() +
 
 We plot a line for each year, with a detrended loess line in a darker color.
 
-```{r}
-timePlot <- function(data.subset, yLabel=T){
-  p <- ggplot(data = data.subset, aes(x = monthLabel, y = pred.mean)) +
-    geom_line(aes(group = year), color = "gray70")+
-    geom_smooth(aes(x = cal.month, y = pred.mean), se = F, color = "black") +
-    theme_base() +
-    ylab("Mean Prediction") +
-    xlab("") +
-    ylim(0,0.18) +
-    scale_x_discrete(breaks = c("Jan","Mar","May","Jul","Sep","Nov")) +
-    theme(
-      axis.title = element_text(size = 12),
-      axis.text = element_text(size = 10),
-      axis.text.x = element_text(size = 10, angle = 90, vjust=-0.1),
-      panel.background = element_blank()
-    )
-  
-  if(yLabel==F){
-    p <- p +
-      theme(
-        axis.title.y = element_blank()
-      )
-  }
-  return(p)
-  
-}
-```
-
-
-```{r}
-time.plot.1 <- timePlot(data.subset = filter(time.all.models, model == "one.model"))
-time.plot.2 <- timePlot(data.subset = filter(time.all.models, model == "lowNHP"), yLabel = F)
-time.plot.3 <-  timePlot(data.subset = filter(time.all.models, model == "highNHP"), yLabel = F)
-```
-
-
 ```{r try a facet}
 bottom.row <-  ggplot(data = time.all.models, aes(x = monthLabel, y = pred.mean)) +
     geom_line(aes(group = year), color = "gray70")+
     geom_smooth(aes(x = cal.month, y = pred.mean), se = F, color = "black") +
-    theme_base() +
+    theme_minimal() +
     ylab("Mean Prediction") +
     xlab("") +
     ylim(0,0.18) +
@@ -279,19 +200,12 @@ bottom.row <-  ggplot(data = time.all.models, aes(x = monthLabel, y = pred.mean)
       strip.text.x = element_blank(),
       axis.line = element_line(),
       panel.grid = element_blank(),
-      axis.line.y = element_line()
+      axis.line.y = element_line(),
+      axis.ticks.length = unit(0.5, "lines"),
+      axis.ticks = element_line()
     ) +
-  facet_wrap(~model)
-```
-
-```{r}
-time.plot <- ggplot(data = time.all.models, aes(x=monthLabel, y = pred.mean))+
-  geom_line(aes(group = year), color = "gray70")+
-  geom_smooth(se = F, color = "black")+
   facet_wrap(~model) +
-  theme_bw()
-
-time.plot
+  panel_border()
 ```
 
 ## Combine into one lattice plot
@@ -299,33 +213,15 @@ time.plot
 Use cowplot:
 
 ```{r}
-pdf(file = "figures/manuscript/Figure3.pdf", width = 6.69, height = 5, family = "sans")
-
-ggdraw()+
-  draw_plot(space.plot.1, x = 0, y = 0.5, width = 0.29, height = 0.5) +
-  draw_plot(space.plot.2, x = 0.3, y = 0.5, width = 0.29, height = 0.5) +
-  draw_plot(space.plot.3, x = 0.59, y = 0.5, width = 0.41, height = 0.5) +
-  draw_plot(time.plot.1, x = 0, y = 0, width = 0.32, height = 0.5) +
-  draw_plot(time.plot.2, x = 0.33, y = 0, width = 0.32, height = 0.5) +
-  draw_plot(time.plot.3, x = 0.66, y = 0, width = 0.32, height = 0.5) +
-  draw_plot_label(label = letters[1:6],
-                  x = c(0,0.3,0.59,0,0.3,0.59),
-                  y = c(1,1,1,0.5,0.5,0.5))
-
-dev.off()
-```
-
-Combining already faceted:
-
-```{r}
-pdf(file = "figures/manuscript/Figure3.pdf", width = 6.69, height = 5, family = "sans")
+pdf(file = "figures/manuscript/Figure3.pdf", width = 6.69, height = 4.75, family = "sans")
 
 ggdraw() +
   draw_plot(top.row, x = 0, y = 0.5, width = 1, height = 0.5) +
-  draw_plot(bottom.row, x = 0, y = 0, width = 1, height = 0.5) +
+  draw_plot(bottom.row, x = 0.02, y = 0, width = 0.98, height = 0.5) +
   draw_plot_label(label = letters[1:6],
-                  x = c(0,0.25,0.55,0,0.4,0.75),
-                  y = c(1,1,1,0.5,0.5,0.5))
+                  x = c(0.1,0.4,0.72,0.1,0.4,0.72),
+                  y = c(1,1,1,0.55,0.55,0.55), 
+                  size = 12)
 
 dev.off()
 ```
