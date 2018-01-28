@@ -138,11 +138,13 @@ theme_map <- function(...) {
     axis.ticks = element_blank(),
     axis.title.x = element_blank(),
     axis.title.y = element_blank(),
-    legend.position = "right",
+    legend.position = "left",
     panel.grid = element_blank(),
     plot.background = element_rect(fill = NA, color = NA), 
     panel.background = element_rect(fill = NA, color = NA), 
     legend.background = element_rect(fill = NA, color = NA),
+    strip.background = element_blank(),
+    strip.text = element_blank(),
     ...
   )
 }
@@ -183,7 +185,17 @@ spacePlot <- function(data.subset, withGuide=T){
 
 ```
 
-```{r try to facet}
+
+```{r create individual space plots, eval = F}
+space.plot.1 <- spacePlot(data.subset = filter(var.all.models, model == "one.model"), withGuide = F)
+
+space.plot.2 <- spacePlot(data.subset = filter(var.all.models, model == "lowNHP"), withGuide = F)
+
+space.plot.3 <- spacePlot(data.subset = filter(var.all.models, model == "highNHP"))
+```
+
+
+```{r facet}
 top.row <- ggplot() +
     geom_sf(data = braz.outline, color = "gray25", size = 0.1) +
     geom_sf(data = var.all.models, aes(fill = pred.var), color = NA) +
@@ -204,41 +216,9 @@ top.row <- ggplot() +
                        label.theme = element_text(size = 8, angle = 0)),
                      limits = c(0,0.07)) +
     theme_map() +
-  facet_wrap(~model)
-```
-
-
-```{r create individual space plots, eval = F}
-space.plot.1 <- spacePlot(data.subset = filter(var.all.models, model == "one.model"), withGuide = F)
-
-space.plot.2 <- spacePlot(data.subset = filter(var.all.models, model == "lowNHP"), withGuide = F)
-
-space.plot.3 <- spacePlot(data.subset = filter(var.all.models, model == "highNHP"))
-```
-
-
-```{r space plot faceted}
-space.plot <- ggplot() +
-  geom_sf(data = braz.outline, color = "gray25", size = 0.1) +
-  geom_sf(data = var.all.models, aes(fill = pred.var), color = NA) +
-  coord_sf()+
-    scale_fill_viridis(option = "magma", direction = -1, discrete = F,
-                     na.value = "gray70", 
-                     guide = guide_colorbar(
-                       direction = "horizontal",
-                       barheight = unit(2, units = "mm"),
-                       barwidth = unit(50, units = "mm"),
-                       draw.ulim = F,
-                       title.position = 'top',
-                       # some shifting around
-                       title.hjust = 0.5,
-                       label.hjust = 0.5),
-                     limits = c(0,0.07)) +
-  theme_map() +
   facet_wrap(~model, dir = "h")
-
-space.plot
 ```
+
 
 ### Over Time
 
@@ -273,6 +253,13 @@ timePlot <- function(data.subset, yLabel=T){
 ```
 
 
+```{r}
+time.plot.1 <- timePlot(data.subset = filter(time.all.models, model == "one.model"))
+time.plot.2 <- timePlot(data.subset = filter(time.all.models, model == "lowNHP"), yLabel = F)
+time.plot.3 <-  timePlot(data.subset = filter(time.all.models, model == "highNHP"), yLabel = F)
+```
+
+
 ```{r try a facet}
 bottom.row <-  ggplot(data = time.all.models, aes(x = monthLabel, y = pred.mean)) +
     geom_line(aes(group = year), color = "gray70")+
@@ -296,14 +283,6 @@ bottom.row <-  ggplot(data = time.all.models, aes(x = monthLabel, y = pred.mean)
     ) +
   facet_wrap(~model)
 ```
-
-
-```{r}
-time.plot.1 <- timePlot(data.subset = filter(time.all.models, model == "one.model"))
-time.plot.2 <- timePlot(data.subset = filter(time.all.models, model == "lowNHP"), yLabel = F)
-time.plot.3 <-  timePlot(data.subset = filter(time.all.models, model == "highNHP"), yLabel = F)
-```
-
 
 ```{r}
 time.plot <- ggplot(data = time.all.models, aes(x=monthLabel, y = pred.mean))+
@@ -331,6 +310,21 @@ ggdraw()+
   draw_plot(time.plot.3, x = 0.66, y = 0, width = 0.32, height = 0.5) +
   draw_plot_label(label = letters[1:6],
                   x = c(0,0.3,0.59,0,0.3,0.59),
+                  y = c(1,1,1,0.5,0.5,0.5))
+
+dev.off()
+```
+
+Combining already faceted:
+
+```{r}
+pdf(file = "figures/manuscript/Figure3.pdf", width = 6.69, height = 5, family = "sans")
+
+ggdraw() +
+  draw_plot(top.row, x = 0, y = 0.5, width = 1, height = 0.5) +
+  draw_plot(bottom.row, x = 0, y = 0, width = 1, height = 0.5) +
+  draw_plot_label(label = letters[1:6],
+                  x = c(0,0.25,0.55,0,0.4,0.75),
                   y = c(1,1,1,0.5,0.5,0.5))
 
 dev.off()
