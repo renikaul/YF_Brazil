@@ -95,7 +95,7 @@ baggingTryCatch<-function(form.x.y,training,new.data, keep.model=FALSE){
       break
     }
     #escape for stupid amounts of attempts
-    if(attempt > 100){
+    if(attempt > 250){
       break
     }
   }
@@ -109,7 +109,7 @@ baggingTryCatch<-function(form.x.y,training,new.data, keep.model=FALSE){
         }
     }  
   #If model fails after 100 attempts return just NAs  
-  if(attempt>100){
+  if(attempt>250){
     predictions <- rep(NA, dim(new.data)[1])
     return(predictions)
     }
@@ -149,7 +149,7 @@ permutedata=function(formula = glm.formula,trainingdata, i){
   } 
   
   return(permuted.data)
-}
+} 
 
 # Models with permutated variables ----
 permOneVar=function(formula = glm.formula, bag.fnc=bagging,permute.fnc=permutedata, traindata = training, cores=2, no.iterations= 100, perm=10, 
@@ -166,7 +166,7 @@ permOneVar=function(formula = glm.formula, bag.fnc=bagging,permute.fnc=permuteda
   library(doParallel)
   library(ROCR)
   
-
+  
   #make some local objects----
   cores.to.use <- cores
   #parse out variables from formula object 
@@ -189,19 +189,23 @@ permOneVar=function(formula = glm.formula, bag.fnc=bagging,permute.fnc=permuteda
       #create model and prediction no.iterations times
       matrix_of_predictions <- replicate(n = no.iterations, expr = bag.fnc(form.x.y = formula, training = permuted.data, new.data = traindata))
       #calculate mean prediction 
-      output.preds<- apply(matrix_of_predictions, 1, mean) 
-      #rm(matrix_of_predictions) doesn't really free up any memory until cluster is stopped. 
-      preds <- ROCR::prediction(output.preds, traindata$case) #other projects have used dismo::evaluate instead. Not sure if is makes a difference. 
-      #AUC to return
-      perm.auc <- unlist(ROCR::performance(preds, "auc")@y.values)
+      output.preds<- apply(matrix_of_predictions, 1, function(x) mean(x, na.rm=TRUE)) 
+      #prediction errors out if NA for output.preds so need to add alternative route for NA
+      if(anyNA(output.preds)==TRUE){
+        perm.auc <- NA
+      }else{
+        preds <- ROCR::prediction(output.preds, traindata$case) #other projects have used dismo::evaluate instead. Not sure if is makes a difference. 
+        #AUC to return
+        perm.auc <- unlist(ROCR::performance(preds, "auc")@y.values)
       }
+    }
     
     stopCluster(cl)
     #matrix of AUC to return
-      perm.auc[,j] <- unlist(results)
-    }
+    perm.auc[,j] <- unlist(results)
+  }
   
-  #count number of permutations used to make stats
+  #count number of permutations used to make stats 
   no.failed <- apply(perm.auc, 2, function(x) sum(is.na(x)))
   no.suc.perm <- perm - no.failed  
   
@@ -220,7 +224,7 @@ permOneVar=function(formula = glm.formula, bag.fnc=bagging,permute.fnc=permuteda
   
   #Output of AUC for each permutation
   colnames(perm.auc) <- variablesName
-
+  
   #return training coefs and AUC for each iteration
   #return(list(train.auc, Coefs))
   return(list(relative.import, mean.auc,perm.auc))
