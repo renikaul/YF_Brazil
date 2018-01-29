@@ -23,7 +23,7 @@ source("functions/baggingWperm.R")
 
 #One Model Data
 one.training <- readRDS("../data_clean/TrainingDataSpat.rds")
-one.testing <- readRDS("../data_clean/TestingData.rds")
+one.testing <- readRDS("../data_clean/TestingDataSpat.rds")
 
 one.trainTrim <- one.training %>% filter(year <2014)
 one.testTrim <- one.testing %>% filter(year <2014)
