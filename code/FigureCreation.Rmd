@@ -17,6 +17,11 @@ library(raster)
 library(viridis)
 library(cowplot)
 library(ggthemes)
+
+#fig 4
+library(sf)
+library(raster)
+library(ggplot2)
 ```
 
 This document creates the figures for:
@@ -229,9 +234,73 @@ dev.off()
 
 #Figure 4: Maps
 
-Choose maps at certain time points to represent spatial patterns.
+Choose maps at certain time points to represent spatial patterns. Don't know which time points as of yet. This will pair with the supplementary gif.
 
-Don't know which time points as of yet. This will pair with the supplementary gif.
+This map will consist of a 3 x 2 lattice, showing three characteristic time points (or mean over multiple months?) across the one and two-part model. The two-part model has each prediction rescaled to teh maximum of each respective model (i.e. low and high NHP). They are then plotted together, with a line denoting the spatial split between the models.
+
+## Load Data
+
+```{r}
+braz.map <- st_read("../data_clean", "BRAZpolygons")
+braz.map <- rename(braz.map, muni.no = muni_no)
+
+# NHP split index
+nhp.split <- readRDS("../data_clean/environmental/twoModelSplit.rds")
+nhp.split.map <- left_join(braz.map, nhp.split, by = "muni.no") %>%
+  group_by(above5split) %>%
+  summarize() %>%
+  st_buffer(0.01)
+
+# prediction data
+pred.one.model <- readRDS("../data_out/MS_results/OneModel/wholePredictions.rds")
+pred.highNHP <- readRDS("../data_out/MS_results/HighModel/wholePredictions.rds")
+pred.lowNHP <- readRDS("../data_out/MS_results/LowModel/wholePredictions.rds")
+```
+
+## Calculate Data for Plots
+
+Rescale low and high NHP data and combine into one dataframe.
+
+```{r}
+pred.lowNHP <- pred.lowNHP %>%
+  mutate(pred.scale = prediction/max(prediction)) %>%
+  mutate(model = "two.model")
+
+pred.highNHP <- pred.highNHP %>%
+    mutate(pred.scale = prediction/max(prediction)) %>%
+  mutate(model = "two.model")
+
+pred.one.model <- pred.one.model %>%
+  mutate(pred.scale = prediction/max(prediction)) %>%
+  mutate(model = "one.model")
+
+pred.all <- rbind(pred.lowNHP, pred.highNHP, pred.one.model) %>%
+  # get mean by calender month and muni
+  mutate(cal.month = month.no %% 12)
+
+pred.all$cal.month[pred.all$cal.month==0] <- 12
+
+pred.all.month <- pred.all %>%
+  group_by(muni.no, model, cal.month) %>%
+  summarise(mean.pred = mean(pred.scale))
+
+pred.map <- left_join(pred.all.month, braz.map, by = "muni.no")
+  
+```
+
+
+## Plot
+
+```{r}
+pdf(file = "figures/testFig4.pdf", width = 12, height = 12, family = "sans")
+ggplot(data = pred.map)+
+  geom_sf(aes(fill = mean.pred))+
+  facet_wrap(~cal.month+model)
+dev.off()
+```
+
+
+
 
 # Supp. Figure X: Gif of maps
 
