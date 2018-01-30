@@ -43,12 +43,13 @@ library(scatterplot3d)
     # muniArea
     # densitypop
     # PopDenLog
-pop <- readRDS("../data_clean/demographic/pop.rds")
+pop <- readRDS("../data_clean/demographic/pop.rds") 
 
 #log transformed variables
 # hist(rf$hourlyRainfallMean, main="hourly rainfall") #mean rainfall, exponential
 
 pop <- pop %>%
+    filter(year<2014) %>%
     mutate(popLog10 = log(densitypop)) 
     
 ## rainfall------------------------------ 
@@ -62,10 +63,11 @@ rf <- readRDS("../data_clean/environmental/allRainfall.rds")
 
 #scale to maximum value of muni
 rf <- rf %>%
+  filter(year<2014) %>%
   mutate(RF=hourlyRainfallMean) %>%
   mutate(RFsqrt=sqrt(hourlyRainfallMean)) %>%
-  group_by(muni.no) %>%
-  mutate(RFScale = hourlyRainfallMean/max(hourlyRainfallMean)) %>% #scale rainfall to muni
+  group_by(muni.no, cal.month) %>%
+  mutate(RFScale = hourlyRainfallMean/max(hourlyRainfallMean)) %>% #scale rainfall to muni and month
   ungroup()
 
 ## NDVI ------------------------------ 
@@ -76,6 +78,7 @@ ndvi <- readRDS("../data_clean/environmental/allNDVI.rds")
   #hist(ndvi$NDVI) #normal
 
 ndvi <- ndvi %>%
+  filter(year<2014) %>%
   group_by(muni.no, cal.month) %>%
   mutate(NDVIScale = NDVI/max(NDVI)) %>% #scale NDVI to muni and month
   ungroup()
@@ -87,6 +90,7 @@ temp <- readRDS("../data_clean/environmental/meanTemperature.rds")
   #hist(temp$tempMean)
 
 temp <- temp %>%
+  filter(year<2014) %>%
   group_by(muni.no, cal.month) %>%
   mutate(tempScale = tempMean/max(tempMean)) %>% #scale NDVI to muni and month
   ungroup()
@@ -105,6 +109,7 @@ fires <- readRDS("../data_clean/environmental/numFires.rds")
   #standard transformation really cannot correct for this extreme 
   
  fires <- fires %>%
+   filter(year<2014) %>%
    mutate(fireDenSqrt=sqrt(fireDens)) %>%
    mutate(fireNum=numFire) %>% #rename col
    mutate(fireDen=fireDens) %>% #remane col
@@ -118,6 +123,7 @@ cases <- readRDS("../data_clean/YFcases/YFlong.rds")
 cases[is.na(cases)] <- 0 #replace NA with zero  
 
 cases <- cases %>%
+  filter(year<2014) %>%
   #drop annual totals
   filter(cal.month<=12) %>%
   #drop unknown origin totals %>%
@@ -159,13 +165,12 @@ all.data <- cases %>%
 #4. Clean it up -------------
 
 final.data <- all.data[c("case", "NumCase",
-                 "NDVI","NDVIScale",
-                 "popLog10",
-                 "RF","RFsqrt","RFScale",
-                 "tempMean","tempScale",
-                 "fireNum", "fireDen", "fireDenSqrt","fireDenScale",
-                 "spRich","primProp",
-                 "muni.no", "month.no", "muni.name","muniArea", "cal.month","year")]
+                       "popLog10","NDVI","NDVIScale",
+                        "RFsqrt","RFScale",
+                        "tempMean","tempScale",
+                        "fireDenSqrt","fireDenScale",
+                        "spRich","primProp",
+                        "muni.no", "month.no", "muni.name", "cal.month","year")]
 
 
 #5. Split the data ----------------------
@@ -213,11 +218,23 @@ pres.meta <- all.pres %>%
   left_join(muni.centroids, by = "muni.no") %>%
   select(muni.no, month.no, x, y)
 N <- nrow(pres.meta) # size of all data
-n <- ceiling(0.33*N) # sample size, testing data = 30%
+n <- ceiling(0.30*N) # sample size, testing data = 30%
 p <- rep(n/N,N) # base inclusion probability 
 X <- as.matrix(pres.meta[2:4])
 set.seed(8675309)
 test.pres.inds <- lcube(p, X, cbind(p))
+
+#calculate index to split presence on based on x, y, and month.no
+bg.meta <- all.bg %>%
+  left_join(muni.centroids, by = "muni.no") %>%
+  select(muni.no, month.no, x, y)
+N <- nrow(bg.meta) # size of all data
+n <- ceiling(0.30*N) # sample size, testing data = 30%
+p <- rep(n/N,N) # base inclusion probability 
+X <- as.matrix(bg.meta[2:4])
+set.seed(8675309)
+test.bg.inds <- lcube(p, X, cbind(p))
+
 
 ## visualize randomness to check
 # s <- test.pres.inds
@@ -247,8 +264,8 @@ testing <- rbind(test.pres, test.bg)
 
 #8. Save data with spatial and temporal stratification---------------------------
 #individual training and testing data
-saveRDS(training, file="../data_clean/TrainingDataSpat.rds")
-saveRDS(testing, file="../data_clean/TestingDataSpat.rds")
+saveRDS(training, file="../data_clean/TrainingDataSpat2.rds")
+saveRDS(testing, file="../data_clean/TestingDataSpat2.rds")
 
 #index of data to create training and testing
 save(test.pres.inds, test.bg.inds, file="IndexForDataSplitSpat.RData")
