@@ -34,7 +34,7 @@ primRichness <- readRDS("../data_clean/environmental/primRichness.rds")
 ## 3. Maps of Species Richness ------
 
 primateMap <- munis %>%
-  select(muni.no = muni_no) %>%
+  dplyr::select(muni.no = muni_no) %>%
   left_join(primRichness, by = "muni.no") #NA is pinto bandiera that doesn't exist
 
 ggplot() +
@@ -90,16 +90,18 @@ indexSplit <- primateMap %>%
   select(muni.no, above5split = trueSplit) %>%
   st_set_geometry(NULL)
 
-saveRDS(indexSplit, "../data_clean/environmental/twoModelSplit2.rds")
+saveRDS(indexSplit, "../data_clean/environmental/twoModelSplit.rds")
+#also, you can just load this file becuase it doesn't change with new training and testing data
+#indexSplit <- readRDS("../data_clean/environmental/twoModelSplit.rds")
 
 # 5. Split training and testing data -----
 
 highNHP <- filter(indexSplit, above5split == "above5")
-test.data.lowNHP <- filter(test.data, !(muni.no %in% highNHP$muni.no)) #33 cases
-test.data.highNHP <- filter(test.data, (muni.no %in% highNHP$muni.no)) #6 cases
+test.data.lowNHP <- filter(test.data, !(muni.no %in% highNHP$muni.no)) #28 cases
+test.data.highNHP <- filter(test.data, (muni.no %in% highNHP$muni.no)) #7 cases
 
-train.data.lowNHP <- filter(train.data, !(muni.no %in% highNHP$muni.no))  #62 cases
-train.data.highNHP <- filter(train.data, (muni.no %in% highNHP$muni.no)) #only 16 cases
+train.data.lowNHP <- filter(train.data, !(muni.no %in% highNHP$muni.no))  #67 cases
+train.data.highNHP <- filter(train.data, (muni.no %in% highNHP$muni.no)) #only 14 cases
 
 #70/30 split seems to be kept relatively well
 
