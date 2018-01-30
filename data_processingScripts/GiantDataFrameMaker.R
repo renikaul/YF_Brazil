@@ -254,7 +254,7 @@ train.pres <- all.pres[-test.pres.inds,]
 
 #split training (not stratified at all because there are so many)
 #Split background data
-test.bg.inds <- base::sample(nrow(all.bg), ceiling(nrow(all.bg)/3))
+#test.bg.inds <- base::sample(nrow(all.bg), ceiling(nrow(all.bg)/3))
 test.bg <- all.bg[test.bg.inds,]
 train.bg <- all.bg[-test.bg.inds,]
 
@@ -268,4 +268,4 @@ saveRDS(training, file="../data_clean/TrainingDataSpat2.rds")
 saveRDS(testing, file="../data_clean/TestingDataSpat2.rds")
 
 #index of data to create training and testing
-save(test.pres.inds, test.bg.inds, file="IndexForDataSplitSpat.RData")
+save(test.pres.inds, test.bg.inds, file="IndexForDataSplitSpat2.RData")
