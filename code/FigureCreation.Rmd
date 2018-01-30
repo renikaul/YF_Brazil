@@ -293,9 +293,11 @@ pred.map <- left_join(pred.all.month, braz.map, by = "muni.no")
 
 ```{r}
 pdf(file = "figures/testFig4.pdf", width = 12, height = 12, family = "sans")
-ggplot(data = pred.map)+
+
+ggplot(data = pred.map[pred.map$cal.month == 1,])+
   geom_sf(aes(fill = mean.pred))+
-  facet_wrap(~cal.month+model)
+  facet_wrap(~model)
+
 dev.off()
 ```
 
