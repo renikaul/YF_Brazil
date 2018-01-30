@@ -22,8 +22,8 @@ library(sf)
 # we will load the data that has already been split into training and testing so that it can
 # easily be compared to the one-model method
 
-test.data <- readRDS("../data_clean/TestingDataSpat.rds")
-train.data <- readRDS("../data_clean/TrainingDataSpat.rds")
+test.data <- readRDS("../data_clean/TestingDataSpat2.rds")
+train.data <- readRDS("../data_clean/TrainingDataSpat2.rds")
 
 #municipality shapefile
 munis <- st_read("../data_clean", "BRAZpolygons")
@@ -90,7 +90,7 @@ indexSplit <- primateMap %>%
   select(muni.no, above5split = trueSplit) %>%
   st_set_geometry(NULL)
 
-saveRDS(indexSplit, "../data_clean/environmental/twoModelSplit.rds")
+saveRDS(indexSplit, "../data_clean/environmental/twoModelSplit2.rds")
 
 # 5. Split training and testing data -----
 
@@ -105,8 +105,8 @@ train.data.highNHP <- filter(train.data, (muni.no %in% highNHP$muni.no)) #only 1
 
 # save new datasets
 
-saveRDS(test.data.lowNHP, "../data_clean/TestingDataLowNHP.rds")
-saveRDS(test.data.highNHP, "../data_clean/TestingDataHighNHP.rds")
+saveRDS(test.data.lowNHP, "../data_clean/TestingDataLowNHP2.rds")
+saveRDS(test.data.highNHP, "../data_clean/TestingDataHighNHP2.rds")
 
-saveRDS(train.data.lowNHP, "../data_clean/TrainingDataLowNHP.rds")
-saveRDS(train.data.highNHP, "../data_clean/TrainingDataHighNHP.rds")
+saveRDS(train.data.lowNHP, "../data_clean/TrainingDataLowNHP2.rds")
+saveRDS(train.data.highNHP, "../data_clean/TrainingDataHighNHP2.rds")
