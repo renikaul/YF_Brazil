@@ -25,19 +25,15 @@ glm.formula <- as.formula("case~  popLog10+
 
 #1. High NHP Model----
 ## Load data----
-high.training <- readRDS("../data_clean/TrainingDataHighNHP.rds")
-high.testing <- readRDS("../data_clean/TestingDataHighNHP.rds")
+high.training <- readRDS("../data_clean/TrainingDataHighNHP2.rds")
+high.testing <- readRDS("../data_clean/TestingDataHighNHP2.rds")
 
-high.trainTrim <- high.training %>% filter(year <2014)
-high.testTrim <- high.testing %>% filter(year <2014)
-
-rm(high.testing, high.training)
 ## Build the models and training predictions ----
-high.model <-  BaggedModel(form.x.y = glm.formula, training = high.trainTrim, new.data = high.trainTrim, no.iterations = 500, bag.fnc = baggingTryCatch)
+high.model <-  BaggedModel(form.x.y = glm.formula, training = high.training, new.data = high.training, no.iterations = 500, bag.fnc = baggingTryCatch)
 
 ## Predict on testing data ----
 list.of.high.models <- high.model[[1]] #pull out models from object returned by BaggedModel
-high.test.pred <- baggedPredictions(list.of.high.models, high.testTrim) #predict on testing data
+high.test.pred <- baggedPredictions(list.of.high.models, high.testing) #predict on testing data
 
 high.test.pred[[1]] #pull out test auc
 
@@ -55,7 +51,7 @@ saveRDS(high.model.prediction, file="../data_out/MS_results/HighModel/wholePredi
 
 ## Assess variable importance through permutation test ----
 
-hPermFull <- permOneVar(formula = glm.formula, bag.fnc = baggingTryCatch, traindata = high.trainTrim, cores = 10, no.iterations = 500, perm = 100, viz = TRUE, title="High NHP Full Model")
+hPermFull <- permOneVar(formula = glm.formula, bag.fnc = baggingTryCatch, traindata = high.training, cores = 10, no.iterations = 500, perm = 100, viz = TRUE, title="High NHP Full Model")
 
 saveRDS(hPermFull, "../data_out/MS_results/HighModel/HPerm100Model500TryCatch.rds")
 
@@ -63,19 +59,15 @@ saveRDS(hPermFull, "../data_out/MS_results/HighModel/HPerm100Model500TryCatch.rd
 
 #2. Low NHP Model----
 ## Load data----
-low.training <- readRDS("../data_clean/TrainingDataLowNHP.rds")
-low.testing <- readRDS("../data_clean/TestingDataLowNHP.rds")
+low.training <- readRDS("../data_clean/TrainingDataLowNHP2.rds")
+low.testing <- readRDS("../data_clean/TestingDataLowNHP2.rds")
 
-low.trainTrim <- low.training %>% filter(year <2014)
-low.testTrim <- low.testing %>% filter(year <2014)
-
-rm(low.testing, low.training)
 ## Build the models and training predictions ----
-low.model <-  BaggedModel(form.x.y = glm.formula, training = low.trainTrim, new.data = low.trainTrim, no.iterations = 500, bag.fnc = baggingTryCatch)
+low.model <-  BaggedModel(form.x.y = glm.formula, training = low.training, new.data = low.training, no.iterations = 500, bag.fnc = baggingTryCatch)
 
 ## Predict on testing data ----
 list.of.low.models <- low.model[[1]] #pull out models from object returned by BaggedModel
-low.test.pred <- baggedPredictions(list.of.low.models, low.testTrim) #predict on testing data
+low.test.pred <- baggedPredictions(list.of.low.models, low.testing) #predict on testing data
 
 low.test.pred[[1]] #pull out test auc
 
@@ -93,7 +85,7 @@ saveRDS(low.model.prediction, file="../data_out/MS_results/LowModel/wholePredict
 
 ## Assess variable importance through permutation test ----
 
-lPermFull <- permOneVar(formula = glm.formula, bag.fnc = baggingTryCatch, traindata = low.trainTrim, cores = 10, no.iterations = 500, perm = 100, viz = TRUE, title="Low NHP Full Model")
+lPermFull <- permOneVar(formula = glm.formula, bag.fnc = baggingTryCatch, traindata = low.training, cores = 10, no.iterations = 500, perm = 100, viz = TRUE, title="Low NHP Full Model")
 
 saveRDS(hPermFull, "../data_out/MS_results/LowModel/lPerm100Model500TryCatch.rds")
 
@@ -104,16 +96,12 @@ saveRDS(hPermFull, "../data_out/MS_results/LowModel/lPerm100Model500TryCatch.rds
 one.training <- readRDS("../data_clean/TrainingDataSpat2.rds")
 one.testing <- readRDS("../data_clean/TestingDataSpat2.rds")
 
-one.trainTrim <- one.training %>% filter(year <2014)
-one.testTrim <- one.testing %>% filter(year <2014)
-
-rm(one.training, one.testing)
 ## Build the models and training predictions ----
-one.model <-  BaggedModel(form.x.y = glm.formula, training = one.trainTrim, new.data = one.trainTrim, no.iterations = 500, bag.fnc = baggingTryCatch)
+one.model <-  BaggedModel(form.x.y = glm.formula, training = one.training, new.data = one.training, no.iterations = 500, bag.fnc = baggingTryCatch)
 
 ## Predict on testing data ----
 list.of.one.models <- one.model[[1]]
-one.test.pred <- baggedPredictions(list.of.one.models, one.testTrim) #predict on testing data
+one.test.pred <- baggedPredictions(list.of.one.models, one.testing) #predict on testing data
 
 one.test.pred[[1]] #test auc
 
@@ -130,6 +118,6 @@ saveRDS(one.model.prediction, file="../data_out/MS_results/OneModel/wholePredict
 
 ## Assess variable importance through permutation test ----
 
-PermFullModel <- permOneVar(formula = glm.formula,bag.fnc = baggingTryCatch,traindata = one.trainTrim, cores = 10, no.iterations = 500, perm = 100, viz = TRUE, title="Full Model")
+PermFullModel <- permOneVar(formula = glm.formula,bag.fnc = baggingTryCatch,traindata = one.training, cores = 10, no.iterations = 500, perm = 100, viz = TRUE, title="Full Model")
 saveRDS(PermFullModel, "../data_out/MS_results/OneModel/Perm100FullModel500TryCatch.rds")
 
