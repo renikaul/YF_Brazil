@@ -291,14 +291,48 @@ pred.map <- left_join(pred.all.month, braz.map, by = "muni.no")
 
 ## Plot
 
+```{r static map theme}
+theme_map <- function(...) {
+  theme_minimal() +
+  theme(
+    axis.line = element_blank(),
+    axis.text.x = element_blank(),
+    axis.text.y = element_blank(),
+    axis.ticks = element_blank(),
+    axis.title.x = element_blank(),
+    axis.title.y = element_blank(),
+    legend.position = "right",
+    panel.grid = element_blank(),
+    plot.background = element_rect(fill = NA, color = NA), 
+    panel.background = element_rect(fill = NA, color = NA), 
+    legend.background = element_rect(fill = NA, color = NA),
+    strip.background = element_blank(),
+    strip.text = element_blank(),
+    ...
+  )
+}
+```
+
+Subset out months we want (Feb, )
+
 ```{r}
-pdf(file = "figures/testFig4.pdf", width = 12, height = 12, family = "sans")
+for (k in unique(pred.map$model)){
+  
+  for(i in 1:12){
+    
+    pdf(file = paste0("figures/Fig4/", gsub("\\.", "", k), "Month", i, ".pdf"), width = 12, height = 12, family = "sans")
 
-ggplot(data = pred.map[pred.map$cal.month == 1,])+
-  geom_sf(aes(fill = mean.pred))+
-  facet_wrap(~model)
+    p <- ggplot(data = pred.map[pred.map$cal.month == i & pred.map$model == k,])+
+      geom_sf(aes(fill = mean.pred), color = NA) +
+      ggtitle(paste(k, "month", i, sep = " "))
+    
+    print(p)
 
-dev.off()
+    dev.off()
+
+  } #month loop
+
+} #model loop
 ```
 
 
