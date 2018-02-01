@@ -30,15 +30,17 @@ This document creates the figures for:
 
 I'm currently loading data individually for each figure, then if you want to remake one figure you don't have to rerun the whole document, just that section.
 
-# Figure 1: ROC Plots
-
-# Figure 2: Variable Importance
+# Figure 1: Variable Importance
 
 Dodged barplot of variable importance
 
+# Figure 2: Coord Plot
+
+"weird ladder"
+
 # Figure 3: Lattice Plot 
 
-Figure showing results collapsed over space and time in a lattice. Maybe want to focus on showing variation via sd?. In order for these to play nicely with cowplot, I need to create each facet individually.
+Figure showing results collapsed over space and time in a lattice. 
 
 ## Load Data
 ```{r}
@@ -58,6 +60,14 @@ pred.lowNHP <- readRDS("../data_out/MS_results/LowModel/wholePredictions.rds")
 
 ```
 
+
+```{r download background countries}
+
+#cshapes package?
+
+```
+
+
 ## Calculate Values
 
 ### Over Space
@@ -67,18 +77,21 @@ I'm calculating the variation per municipality to get a measure of "flickering".
 ```{r}
 # calculate variation per municipality over whole time period
 var.one.model <- as.data.frame(pred.one.model) %>%
+  mutate(pred.scale = prediction * (sum(case)/sum(prediction))) %>%
   group_by(muni.no) %>%
-  summarise(pred.var = var(prediction, na.rm = T)) %>%
+  summarise(pred.var = var(pred.scale, na.rm = T)) %>%
   mutate(model = "one.model")
 
 var.highNHP <- as.data.frame(pred.highNHP) %>%
+  mutate(pred.scale = prediction * (sum(case)/sum(prediction))) %>%
   group_by(muni.no) %>%
-  summarise(pred.var = var(prediction, na.rm = T)) %>%
+  summarise(pred.var = var(pred.scale, na.rm = T)) %>%
   mutate(model = "highNHP")
 
 var.lowNHP <- as.data.frame(pred.lowNHP) %>%
+  mutate(pred.scale = prediction * (sum(case)/sum(prediction))) %>%
   group_by(muni.no) %>%
-  summarise(pred.var = var(prediction, na.rm = T)) %>%
+  summarise(pred.var = var(pred.scale, na.rm = T)) %>%
   mutate(model = "lowNHP")
 
 var.all.models <- rbind(var.one.model, var.highNHP, var.lowNHP) %>%
@@ -97,17 +110,20 @@ This looks at a time series, averaged over all municipalities by month.
 ```{r}
 time.one.model <- as.data.frame(pred.one.model) %>%
   group_by(month.no) %>%
-  summarise(pred.mean = mean(prediction, na.rm = T)) %>%
+  mutate(pred.scale = prediction * (sum(case)/sum(prediction))) %>%
+  summarise(pred.mean = mean(pred.scale, na.rm = T)) %>%
     mutate(model = "one.model")
 
 time.lowNHP <- as.data.frame(pred.lowNHP) %>%
   group_by(month.no) %>%
-  summarise(pred.mean = mean(prediction, na.rm = T)) %>%
+  mutate(pred.scale = prediction * (sum(case)/sum(prediction))) %>%
+  summarise(pred.mean = mean(pred.scale, na.rm = T)) %>%
     mutate(model = "lowNHP")
 
 time.highNHP <- as.data.frame(pred.highNHP) %>%
   group_by(month.no) %>%
-  summarise(pred.mean = mean(prediction, na.rm = T)) %>%
+  mutate(pred.scale = prediction * (sum(case)/sum(prediction))) %>%
+  summarise(pred.mean = mean(pred.scale, na.rm = T)) %>%
     mutate(model = "highNHP")
 
 time.all.models <- rbind(time.one.model, time.highNHP, time.lowNHP) 
@@ -156,6 +172,8 @@ theme_map <- function(...) {
 }
 ```
 
+## Add gray background to this
+
 ```{r facet}
 top.row <- ggplot() +
     geom_sf(data = braz.outline, color = "gray25", size = 0.1) +
@@ -164,7 +182,7 @@ top.row <- ggplot() +
     scale_fill_viridis(option = "magma", direction = -1, discrete = F,
                      na.value = "gray70", 
                      guide = guide_colorbar(
-                       title = "Variation",
+                       title = "Variance",
                        direction = "vertical",
                        barheight = unit(35, units = "mm"),
                        barwidth = unit(2, units = "mm"),
@@ -231,6 +249,7 @@ ggdraw() +
 dev.off()
 ```
 
+**Caption:** Model variance through space (a,b,c) and time(d,e,f). Plots of variance municipality-level predictions using the single process model (a), dual process model with low reservoir richness (b), and dual process model with high reservoir richness (c). Mean prediction across the entire study area of Brazil for the single process model (e), dual process model with low reservoir richness (e), and dual process model with high reservoir richness (f). Gray lines represent an individual year of data with overall mean in black.
 
 #Figure 4: Maps
 
@@ -251,6 +270,18 @@ nhp.split.map <- left_join(braz.map, nhp.split, by = "muni.no") %>%
   summarize() %>%
   st_buffer(0.01)
 
+#get brazil outline
+# braz.outline <- getData('GADM', country ='BRA', level = 0)
+# braz.outline <- st_as_sf(braz.outline)
+# braz.outline <- braz.outline %>%
+#   mutate(model = "one.model") %>%
+#   mutate(above5split = "none") %>%
+#   dplyr::select(model, above5split)
+
+#combine nhp split and brazil outline
+# split.map <- rbind(nhp.split.map, braz.outline)
+
+
 # prediction data
 pred.one.model <- readRDS("../data_out/MS_results/OneModel/wholePredictions.rds")
 pred.highNHP <- readRDS("../data_out/MS_results/HighModel/wholePredictions.rds")
@@ -261,17 +292,31 @@ pred.lowNHP <- readRDS("../data_out/MS_results/LowModel/wholePredictions.rds")
 
 Rescale low and high NHP data and combine into one dataframe.
 
+Find constants $c$, such that $ \sum{intensities} * c = \sum{pos.munis} $
+
+```{r, include = F, eval = F}
+calculateConstant <- function(pred.df){
+  sumPositive <- sum(pred.df$case)
+  sumPrediction <- sum(pred.df$prediction)
+  c <- sumPositive/sumPrediction
+  return(c)
+}
+
+calculateConstant(pred.lowNHP)
+```
+
+
 ```{r}
 pred.lowNHP <- pred.lowNHP %>%
-  mutate(pred.scale = prediction/max(prediction)) %>%
+  mutate(pred.scale = prediction * (sum(case)/sum(prediction))) %>%
   mutate(model = "two.model")
 
 pred.highNHP <- pred.highNHP %>%
-    mutate(pred.scale = prediction/max(prediction)) %>%
+  mutate(pred.scale = prediction * (sum(case)/sum(prediction))) %>%
   mutate(model = "two.model")
 
 pred.one.model <- pred.one.model %>%
-  mutate(pred.scale = prediction/max(prediction)) %>%
+  mutate(pred.scale = prediction * (sum(case)/sum(prediction))) %>%
   mutate(model = "one.model")
 
 pred.all <- rbind(pred.lowNHP, pred.highNHP, pred.one.model) %>%
@@ -313,9 +358,9 @@ theme_map <- function(...) {
 }
 ```
 
-Subset out months we want (Feb, )
+Subset out months we want (Feb, June, Dec.)
 
-```{r}
+```{r plot all months}
 for (k in unique(pred.map$model)){
   
   for(i in 1:12){
@@ -335,9 +380,42 @@ for (k in unique(pred.map$model)){
 } #model loop
 ```
 
+```{r}
+pred.map.subset <- pred.map %>%
+  filter(cal.month %in% c(2,6,12)) %>%
+  mutate(monthLabel = month.abb[cal.month])
+```
 
+Plot.
 
+```{r}
+pdf(file = "figures/manuscript/Figure4.pdf", width = 6.69, height = 4.75, family = "sans")
 
+ggplot() +
+  geom_sf(data = pred.map.subset, aes(fill = mean.pred), color = NA) +
+  scale_fill_viridis(option = "magma", direction = -1, discrete = F,
+                     na.value = "gray70", 
+                     guide = guide_colorbar(
+                       title = "Probablity",
+                       direction = "vertical",
+                       barheight = unit(35, units = "mm"),
+                       barwidth = unit(2, units = "mm"),
+                       draw.ulim = F,
+                       title.position = 'top',
+                       title.hjust = 0.5,
+                       label.hjust = 0.5,
+                       title.theme = element_text(size = 8, angle = 0),
+                       label.theme = element_text(size = 8, angle = 0)),
+                     limits = c(0,1)) +
+  facet_wrap(~model + monthLabel) +
+  geom_sf(data = nhp.split.map, fill = NA, color = "black")
+
+dev.off()
+```
+
+Eventually the one.model will not have the split. I just can't figure it out yet.
+
+Caption: 
 # Supp. Figure X: Gif of maps
 
 A seperate GIF for each model? Otherwise it a
