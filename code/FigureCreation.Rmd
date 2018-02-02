@@ -17,6 +17,7 @@ library(raster)
 library(viridis)
 library(cowplot)
 library(ggthemes)
+library(lubridate)
 
 #fig 4
 library(sf)
@@ -72,24 +73,24 @@ pred.lowNHP <- readRDS("../data_out/MS_results/LowModel/wholePredictions.rds")
 
 ### Over Space
 
-I'm calculating the variation per municipality to get a measure of "flickering".
+I'm calculating the variance per municipality to get a measure of "flickering". The variance is calculated on the probablity (that is, the rescaled value based on a contsant c, the frequency of positive cases in the dataset).
 
 ```{r}
 # calculate variation per municipality over whole time period
 var.one.model <- as.data.frame(pred.one.model) %>%
-  mutate(pred.scale = prediction * (sum(case)/sum(prediction))) %>%
+  mutate(pred.scale = prediction * (sum(case)/n())) %>%
   group_by(muni.no) %>%
   summarise(pred.var = var(pred.scale, na.rm = T)) %>%
   mutate(model = "one.model")
 
 var.highNHP <- as.data.frame(pred.highNHP) %>%
-  mutate(pred.scale = prediction * (sum(case)/sum(prediction))) %>%
+  mutate(pred.scale = prediction * (sum(case)/n())) %>%
   group_by(muni.no) %>%
   summarise(pred.var = var(pred.scale, na.rm = T)) %>%
   mutate(model = "highNHP")
 
 var.lowNHP <- as.data.frame(pred.lowNHP) %>%
-  mutate(pred.scale = prediction * (sum(case)/sum(prediction))) %>%
+  mutate(pred.scale = prediction * (sum(case)/n())) %>%
   group_by(muni.no) %>%
   summarise(pred.var = var(pred.scale, na.rm = T)) %>%
   mutate(model = "lowNHP")
@@ -110,21 +111,21 @@ This looks at a time series, averaged over all municipalities by month.
 ```{r}
 time.one.model <- as.data.frame(pred.one.model) %>%
   group_by(month.no) %>%
-  mutate(pred.scale = prediction * (sum(case)/sum(prediction))) %>%
+  mutate(pred.scale = prediction * (sum(case)/n())) %>%
   summarise(pred.mean = mean(pred.scale, na.rm = T)) %>%
-    mutate(model = "one.model")
+  mutate(model = "one.model")
 
 time.lowNHP <- as.data.frame(pred.lowNHP) %>%
   group_by(month.no) %>%
-  mutate(pred.scale = prediction * (sum(case)/sum(prediction))) %>%
+  mutate(pred.scale = prediction * (sum(case)/n())) %>%
   summarise(pred.mean = mean(pred.scale, na.rm = T)) %>%
-    mutate(model = "lowNHP")
+  mutate(model = "lowNHP")
 
 time.highNHP <- as.data.frame(pred.highNHP) %>%
   group_by(month.no) %>%
-  mutate(pred.scale = prediction * (sum(case)/sum(prediction))) %>%
+  mutate(pred.scale = prediction * (sum(case)/n())) %>%
   summarise(pred.mean = mean(pred.scale, na.rm = T)) %>%
-    mutate(model = "highNHP")
+  mutate(model = "highNHP")
 
 time.all.models <- rbind(time.one.model, time.highNHP, time.lowNHP) 
 
@@ -192,8 +193,7 @@ top.row <- ggplot() +
                        title.hjust = 0.5,
                        label.hjust = 0.5,
                        title.theme = element_text(size = 8, angle = 0),
-                       label.theme = element_text(size = 8, angle = 0)),
-                     limits = c(0,0.07)) +
+                       label.theme = element_text(size = 8, angle = 0))) +
     theme_map() +
   facet_wrap(~model, dir = "h") +
   panel_border()
@@ -211,7 +211,7 @@ bottom.row <-  ggplot(data = time.all.models, aes(x = monthLabel, y = pred.mean)
     theme_minimal() +
     ylab("Mean Prediction") +
     xlab("") +
-    ylim(0,0.18) +
+    ylim(0,0.002) +
     scale_x_discrete(breaks = c("Jan","Mar","May","Jul","Sep","Nov")) +
     theme(
       axis.title = element_text(size = 12),
@@ -292,31 +292,17 @@ pred.lowNHP <- readRDS("../data_out/MS_results/LowModel/wholePredictions.rds")
 
 Rescale low and high NHP data and combine into one dataframe.
 
-Find constants $c$, such that $ \sum{intensities} * c = \sum{pos.munis} $
-
-```{r, include = F, eval = F}
-calculateConstant <- function(pred.df){
-  sumPositive <- sum(pred.df$case)
-  sumPrediction <- sum(pred.df$prediction)
-  c <- sumPositive/sumPrediction
-  return(c)
-}
-
-calculateConstant(pred.lowNHP)
-```
-
-
 ```{r}
 pred.lowNHP <- pred.lowNHP %>%
-  mutate(pred.scale = prediction * (sum(case)/sum(prediction))) %>%
+  mutate(pred.scale = prediction * (sum(case)/n())) %>%
   mutate(model = "two.model")
 
 pred.highNHP <- pred.highNHP %>%
-  mutate(pred.scale = prediction * (sum(case)/sum(prediction))) %>%
+  mutate(pred.scale = prediction * (sum(case)/n())) %>%
   mutate(model = "two.model")
 
 pred.one.model <- pred.one.model %>%
-  mutate(pred.scale = prediction * (sum(case)/sum(prediction))) %>%
+  mutate(pred.scale = prediction * (sum(case)/n())) %>%
   mutate(model = "one.model")
 
 pred.all <- rbind(pred.lowNHP, pred.highNHP, pred.one.model) %>%
@@ -396,7 +382,7 @@ ggplot() +
   scale_fill_viridis(option = "magma", direction = -1, discrete = F,
                      na.value = "gray70", 
                      guide = guide_colorbar(
-                       title = "Probablity",
+                       title = "Probability",
                        direction = "vertical",
                        barheight = unit(35, units = "mm"),
                        barwidth = unit(2, units = "mm"),
@@ -405,8 +391,7 @@ ggplot() +
                        title.hjust = 0.5,
                        label.hjust = 0.5,
                        title.theme = element_text(size = 8, angle = 0),
-                       label.theme = element_text(size = 8, angle = 0)),
-                     limits = c(0,1)) +
+                       label.theme = element_text(size = 8, angle = 0))) +
   facet_wrap(~model + monthLabel) +
   geom_sf(data = nhp.split.map, fill = NA, color = "black")
 
