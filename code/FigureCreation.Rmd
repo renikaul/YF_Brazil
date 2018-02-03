@@ -11,17 +11,20 @@ output: html_document
 knitr::opts_chunk$set(echo = TRUE)
 library(tidyverse)
 
+
+
 #fig 3
+library(sf)
+library(raster)
+library(ggplot2)
+
+#fig 4
 library(sf)
 library(raster)
 library(viridis)
 library(cowplot)
 library(ggthemes)
-
-#fig 4
-library(sf)
-library(raster)
-library(ggplot2)
+library(lubridate)
 ```
 
 This document creates the figures for:
@@ -30,15 +33,169 @@ This document creates the figures for:
 
 I'm currently loading data individually for each figure, then if you want to remake one figure you don't have to rerun the whole document, just that section.
 
-# Figure 1: ROC Plots
-
-# Figure 2: Variable Importance
+# Figure 1: Variable Importance
 
 Dodged barplot of variable importance
 
-# Figure 3: Lattice Plot 
+# Figure 2: Coord Plot
 
-Figure showing results collapsed over space and time in a lattice. Maybe want to focus on showing variation via sd?. In order for these to play nicely with cowplot, I need to create each facet individually.
+"weird ladder"
+
+
+#Figure 3: Maps of Calendar Months
+
+Choose maps at certain time points averaged over calendar months to represent spatial patterns. Don't know which time points as of yet. This will pair with the supplementary gif.
+
+This map will consist of a 3 x 2 lattice, showing three characteristic time points (or mean over multiple months?) across the one and two-part model. The two-part model has each prediction rescaled to teh maximum of each respective model (i.e. low and high NHP). They are then plotted together, with a line denoting the spatial split between the models.
+
+## Load Data
+
+```{r}
+braz.map <- st_read("../data_clean", "BRAZpolygons")
+braz.map <- rename(braz.map, muni.no = muni_no)
+
+# NHP split index
+nhp.split <- readRDS("../data_clean/environmental/twoModelSplit.rds")
+nhp.split.map <- left_join(braz.map, nhp.split, by = "muni.no") %>%
+  group_by(above5split) %>%
+  summarize() %>%
+  st_buffer(0.01)
+
+#get brazil outline
+# braz.outline <- getData('GADM', country ='BRA', level = 0)
+# braz.outline <- st_as_sf(braz.outline)
+# braz.outline <- braz.outline %>%
+#   mutate(model = "one.model") %>%
+#   mutate(above5split = "none") %>%
+#   dplyr::select(model, above5split)
+
+#combine nhp split and brazil outline
+# split.map <- rbind(nhp.split.map, braz.outline)
+
+
+# prediction data
+pred.one.model <- readRDS("../data_out/MS_results/OneModel/wholePredictions.rds")
+pred.highNHP <- readRDS("../data_out/MS_results/HighModel/wholePredictions.rds")
+pred.lowNHP <- readRDS("../data_out/MS_results/LowModel/wholePredictions.rds")
+```
+
+## Calculate Data for Plots
+
+Rescale low and high NHP data and combine into one dataframe.
+
+```{r}
+pred.lowNHP <- pred.lowNHP %>%
+  mutate(pred.scale = prediction * (sum(case)/n())) %>%
+  mutate(model = "two.model")
+
+pred.highNHP <- pred.highNHP %>%
+  mutate(pred.scale = prediction * (sum(case)/n())) %>%
+  mutate(model = "two.model")
+
+pred.one.model <- pred.one.model %>%
+  mutate(pred.scale = prediction * (sum(case)/n())) %>%
+  mutate(model = "one.model")
+
+pred.all <- rbind(pred.lowNHP, pred.highNHP, pred.one.model) %>%
+  # get mean by calender month and muni
+  mutate(cal.month = month.no %% 12)
+
+pred.all$cal.month[pred.all$cal.month==0] <- 12
+
+pred.all.month <- pred.all %>%
+  group_by(muni.no, model, cal.month) %>%
+  summarise(mean.pred = mean(pred.scale))
+
+pred.map <- left_join(pred.all.month, braz.map, by = "muni.no")
+  
+```
+
+
+## Plot
+
+```{r static map theme}
+theme_map <- function(...) {
+  theme_minimal() +
+  theme(
+    axis.line = element_blank(),
+    axis.text.x = element_blank(),
+    axis.text.y = element_blank(),
+    axis.ticks = element_blank(),
+    axis.title.x = element_blank(),
+    axis.title.y = element_blank(),
+    legend.position = "right",
+    panel.grid = element_blank(),
+    plot.background = element_rect(fill = NA, color = NA), 
+    panel.background = element_rect(fill = NA, color = NA), 
+    legend.background = element_rect(fill = NA, color = NA),
+    strip.background = element_blank(),
+    strip.text = element_blank(),
+    ...
+  )
+}
+```
+
+Subset out months we want (Feb, June, Dec.)
+
+```{r plot all months, eval = F}
+for (k in unique(pred.map$model)){
+  
+  for(i in 1:12){
+    
+    pdf(file = paste0("figures/Fig4/", gsub("\\.", "", k), "Month", i, ".pdf"), width = 12, height = 12, family = "sans")
+
+    p <- ggplot(data = pred.map[pred.map$cal.month == i & pred.map$model == k,])+
+      geom_sf(aes(fill = mean.pred), color = NA) +
+      ggtitle(paste(k, "month", i, sep = " "))
+    
+    print(p)
+
+    dev.off()
+
+  } #month loop
+
+} #model loop
+```
+
+```{r}
+pred.map.subset <- pred.map %>%
+  filter(cal.month %in% c(2,6,12)) %>%
+  mutate(monthLabel = month.abb[cal.month])
+```
+
+Plot.
+
+```{r}
+pdf(file = "figures/manuscript/Figure3.pdf", width = 6.69, height = 4.75, family = "sans")
+
+ggplot() +
+  geom_sf(data = pred.map.subset, aes(fill = mean.pred), color = NA) +
+  scale_fill_viridis(option = "magma", direction = -1, discrete = F,
+                     na.value = "gray70", 
+                     guide = guide_colorbar(
+                       title = "Probability",
+                       direction = "vertical",
+                       barheight = unit(35, units = "mm"),
+                       barwidth = unit(2, units = "mm"),
+                       draw.ulim = F,
+                       title.position = 'top',
+                       title.hjust = 0.5,
+                       label.hjust = 0.5,
+                       title.theme = element_text(size = 8, angle = 0),
+                       label.theme = element_text(size = 8, angle = 0))) +
+  facet_wrap(~model + monthLabel) +
+  geom_sf(data = nhp.split.map, fill = NA, color = "black")
+
+dev.off()
+```
+
+Eventually the one.model will not have the split in it. I just can't figure it out yet.
+
+Caption: Probability of yf spillover averaged over calendar month for Dec., Feb., and Jun. Result from single model in top row and dual process model in bottom row.
+
+# Figure 4: Lattice Plot 
+
+Figure showing results collapsed over space and time in a lattice. 
 
 ## Load Data
 ```{r}
@@ -58,27 +215,33 @@ pred.lowNHP <- readRDS("../data_out/MS_results/LowModel/wholePredictions.rds")
 
 ```
 
+
+```{r download background countries}
+#cshapes package?
+```
+
+
 ## Calculate Values
 
 ### Over Space
 
-I'm calculating the variation per municipality to get a measure of "flickering".
+I'm calculating the variance per municipality to get a measure of "flickering". The variance is calculated on the raw values.
 
 ```{r}
-# calculate variation per municipality over whole time period
+# calculate variance per municipality over whole time period
 var.one.model <- as.data.frame(pred.one.model) %>%
   group_by(muni.no) %>%
-  summarise(pred.var = var(prediction, na.rm = T)) %>%
+  summarise(pred.var = var(prediction)) %>%
   mutate(model = "one.model")
 
 var.highNHP <- as.data.frame(pred.highNHP) %>%
   group_by(muni.no) %>%
-  summarise(pred.var = var(prediction, na.rm = T)) %>%
+  summarise(pred.var = var(prediction)) %>%
   mutate(model = "highNHP")
 
 var.lowNHP <- as.data.frame(pred.lowNHP) %>%
   group_by(muni.no) %>%
-  summarise(pred.var = var(prediction, na.rm = T)) %>%
+  summarise(pred.var = var(prediction)) %>%
   mutate(model = "lowNHP")
 
 var.all.models <- rbind(var.one.model, var.highNHP, var.lowNHP) %>%
@@ -92,23 +255,26 @@ var.all.models$model <- factor(var.all.models$model, levels = c("one.model", "lo
 
 ### Over Time
 
-This looks at a time series, averaged over all municipalities by month.
+This looks at a time series, averaged over all municipalities by month. This is plotting the probabilities. Note that this kind of creates a problem because they are on such different scales. We can make the y axis of each plot free if we want to visualize the seasonality better. Or not plot probability.
 
 ```{r}
 time.one.model <- as.data.frame(pred.one.model) %>%
+  mutate(pred.scale = prediction * (sum(case)/n())) %>%
   group_by(month.no) %>%
-  summarise(pred.mean = mean(prediction, na.rm = T)) %>%
-    mutate(model = "one.model")
+  summarise(pred.mean = mean(pred.scale, na.rm = T)) %>%
+  mutate(model = "one.model")
 
 time.lowNHP <- as.data.frame(pred.lowNHP) %>%
+  mutate(pred.scale = prediction * (sum(case)/n())) %>%
   group_by(month.no) %>%
-  summarise(pred.mean = mean(prediction, na.rm = T)) %>%
-    mutate(model = "lowNHP")
+  summarise(pred.mean = mean(pred.scale, na.rm = T)) %>%
+  mutate(model = "lowNHP")
 
 time.highNHP <- as.data.frame(pred.highNHP) %>%
+  mutate(pred.scale = prediction * (sum(case)/n())) %>%
   group_by(month.no) %>%
-  summarise(pred.mean = mean(prediction, na.rm = T)) %>%
-    mutate(model = "highNHP")
+  summarise(pred.mean = mean(pred.scale, na.rm = T)) %>%
+  mutate(model = "highNHP")
 
 time.all.models <- rbind(time.one.model, time.highNHP, time.lowNHP) 
 
@@ -156,6 +322,8 @@ theme_map <- function(...) {
 }
 ```
 
+## Add gray background to this
+
 ```{r facet}
 top.row <- ggplot() +
     geom_sf(data = braz.outline, color = "gray25", size = 0.1) +
@@ -164,7 +332,7 @@ top.row <- ggplot() +
     scale_fill_viridis(option = "magma", direction = -1, discrete = F,
                      na.value = "gray70", 
                      guide = guide_colorbar(
-                       title = "Variation",
+                       title = "Variance",
                        direction = "vertical",
                        barheight = unit(35, units = "mm"),
                        barwidth = unit(2, units = "mm"),
@@ -174,8 +342,7 @@ top.row <- ggplot() +
                        title.hjust = 0.5,
                        label.hjust = 0.5,
                        title.theme = element_text(size = 8, angle = 0),
-                       label.theme = element_text(size = 8, angle = 0)),
-                     limits = c(0,0.07)) +
+                       label.theme = element_text(size = 8, angle = 0))) +
     theme_map() +
   facet_wrap(~model, dir = "h") +
   panel_border()
@@ -191,9 +358,8 @@ bottom.row <-  ggplot(data = time.all.models, aes(x = monthLabel, y = pred.mean)
     geom_line(aes(group = year), color = "gray70")+
     geom_smooth(aes(x = cal.month, y = pred.mean), se = F, color = "black") +
     theme_minimal() +
-    ylab("Mean Prediction") +
+    ylab("Mean Probability") +
     xlab("") +
-    ylim(0,0.18) +
     scale_x_discrete(breaks = c("Jan","Mar","May","Jul","Sep","Nov")) +
     theme(
       axis.title = element_text(size = 12),
@@ -215,10 +381,10 @@ bottom.row <-  ggplot(data = time.all.models, aes(x = monthLabel, y = pred.mean)
 
 ## Combine into one lattice plot
 
-Use cowplot:
+Use cowplot. Note sometimes you need to make sure any pdf devices are off by running `dev.off()` a whole bunch of times first.
 
 ```{r}
-pdf(file = "figures/manuscript/Figure3.pdf", width = 6.69, height = 4.75, family = "sans")
+pdf(file = "figures/manuscript/Figure4.pdf", width = 6.69, height = 4.75, family = "sans")
 
 ggdraw() +
   draw_plot(top.row, x = 0, y = 0.5, width = 1, height = 0.5) +
@@ -231,79 +397,9 @@ ggdraw() +
 dev.off()
 ```
 
-
-#Figure 4: Maps
-
-Choose maps at certain time points to represent spatial patterns. Don't know which time points as of yet. This will pair with the supplementary gif.
-
-This map will consist of a 3 x 2 lattice, showing three characteristic time points (or mean over multiple months?) across the one and two-part model. The two-part model has each prediction rescaled to teh maximum of each respective model (i.e. low and high NHP). They are then plotted together, with a line denoting the spatial split between the models.
-
-## Load Data
-
-```{r}
-braz.map <- st_read("../data_clean", "BRAZpolygons")
-braz.map <- rename(braz.map, muni.no = muni_no)
-
-# NHP split index
-nhp.split <- readRDS("../data_clean/environmental/twoModelSplit.rds")
-nhp.split.map <- left_join(braz.map, nhp.split, by = "muni.no") %>%
-  group_by(above5split) %>%
-  summarize() %>%
-  st_buffer(0.01)
-
-# prediction data
-pred.one.model <- readRDS("../data_out/MS_results/OneModel/wholePredictions.rds")
-pred.highNHP <- readRDS("../data_out/MS_results/HighModel/wholePredictions.rds")
-pred.lowNHP <- readRDS("../data_out/MS_results/LowModel/wholePredictions.rds")
-```
-
-## Calculate Data for Plots
-
-Rescale low and high NHP data and combine into one dataframe.
-
-```{r}
-pred.lowNHP <- pred.lowNHP %>%
-  mutate(pred.scale = prediction/max(prediction)) %>%
-  mutate(model = "two.model")
-
-pred.highNHP <- pred.highNHP %>%
-    mutate(pred.scale = prediction/max(prediction)) %>%
-  mutate(model = "two.model")
-
-pred.one.model <- pred.one.model %>%
-  mutate(pred.scale = prediction/max(prediction)) %>%
-  mutate(model = "one.model")
-
-pred.all <- rbind(pred.lowNHP, pred.highNHP, pred.one.model) %>%
-  # get mean by calender month and muni
-  mutate(cal.month = month.no %% 12)
-
-pred.all$cal.month[pred.all$cal.month==0] <- 12
-
-pred.all.month <- pred.all %>%
-  group_by(muni.no, model, cal.month) %>%
-  summarise(mean.pred = mean(pred.scale))
-
-pred.map <- left_join(pred.all.month, braz.map, by = "muni.no")
-  
-```
-
-
-## Plot
-
-```{r}
-pdf(file = "figures/testFig4.pdf", width = 12, height = 12, family = "sans")
-
-ggplot(data = pred.map[pred.map$cal.month == 1,])+
-  geom_sf(aes(fill = mean.pred))+
-  facet_wrap(~model)
-
-dev.off()
-```
-
-
+**Caption:** Model variance through space (a,b,c) and time(d,e,f). Plots of variance municipality-level predictions using the single process model (a), dual process model with low reservoir richness (b), and dual process model with high reservoir richness (c). Mean probability across the entire study area of Brazil for the single process model (e), dual process model with low reservoir richness (e), and dual process model with high reservoir richness (f). Gray lines represent an individual year of data with overall mean in black.
 
 
 # Supp. Figure X: Gif of maps
 
-A seperate GIF for each model? Otherwise it a
+A seperate GIF for each model. Or maybe one GIF showing all three models at once, which would be more helpful but could be a huge file. 
