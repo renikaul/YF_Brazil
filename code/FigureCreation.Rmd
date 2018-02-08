@@ -25,6 +25,8 @@ library(viridis)
 library(cowplot)
 library(ggthemes)
 library(lubridate)
+library(dplyr)
+library(ggplot2)
 ```
 
 This document creates the figures for:
@@ -37,18 +39,32 @@ I'm currently loading data individually for each figure, then if you want to rem
 
 Dodged barplot of variable importance
 
-# Figure 2: Coord Plot
+```{r}
+#1. functions 
+
+#Return Variable importance with stdev
+VarImp =function(x){
+  matrix.Of.AUCs <- x[[3]]
+  
+   delta.auc <- perm.auc.mean[1] - perm.auc.mean[-c(1, length(perm.auc.mean))] #change in AUC from base model only for single variable permutation
+  rel.import <- delta.auc/max(delta.auc, na.rm = TRUE) # normalized relative change in AUC from base model only for single variable permutation
+  
+}
+#2. Load data
+fullM <- readRDS("../data_out/MS_results/OneModel/Perm100FullModel500TryCatch.rds") 
+lowM <- readRDS("../data_out/MS_results/LowModel/lPerm100Model500TryCatch.rds")
+highM <- readRDS('../data_out/MS_results/HighModel/HPerm100Model500TryCatch.rds')
+
+```
+# Figure 2: Coord Plot of Variable Importance Rank 
 
 ```{r}
-#global packages
-library(dplyr)
-library(ggplot2)
-library(ggthemes)
+
 # Dodged Variable Importance ----
 
 #1. load packages and functions
 
-#Return Quick Rank Importance
+#Return Rank Importance
 RankImp=function(x){
   #pull out Relative Importance
   RI <- x[[1]]

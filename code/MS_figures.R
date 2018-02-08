@@ -43,29 +43,44 @@ HFull <- RankImp(highM)
 LFull <- RankImp(lowM)
 
 RankFull <- rbind(Full,LFull, HFull)
-RankFull$Model <- factor(c(rep("Full", dim(Full)[1]),
-                           rep("Low NHP", dim(LFull)[1]),
-                           rep("High NHP", dim(HFull)[1])),
-                         levels=c("Full", "Low NHP", "High NHP"))
+RankFull$Model <- factor(c(rep("Single Point Process", dim(Full)[1]),
+                           rep("LRR", dim(LFull)[1]),
+                           rep("HRR", dim(HFull)[1])),
+                         levels=c("Single Point Process", "LRR", "HRR"))
 #order the variable levels
 RankFull <- within(RankFull,
                    Variable <- factor(Variable, 
-                                      levels = c( "fireDenSqrt","NDVI", "fireDenScale","RFScale","primProp", "tempScale","NDVIScale","tempMean", "RFsqrt","spRich", "popLog10" )))
+                                      levels = c("popLog10", "spRich","RFsqrt","tempMean","NDVIScale", "tempScale","primProp",
+                                                  "RFScale","fireDenScale","NDVI", "fireDenSqrt")))
 
 #RankFull$varImp <- as.numeric(as.character(RankFull$varImp))
+#variable names
+niceNames <- c("popLog10"="Population",
+               "spRich" = "NHP Richness",
+               "RFsqrt" = "Mean Rainfall",
+               "tempMean" = "Mean Temperature",
+               "NDVIScale" = "Scaled NDVI",
+               "tempScale" = "Scaled Mean Temperature",
+               "primProp" = "NHP Agriculture Overlap",
+               "RFScale" = "Scaled Mean Rainfall",
+               "fireDenScale" = "Scaled Fire Density",
+               "NDVI" ="NDVI",
+               "fireDenSqrt" ="Fire Density")
 
 #Relative Imp Plots
 
-b <- ggplot(RankFull, aes(x=Variable, y=varImp,fill=Model)) + 
+b <-  ggplot(RankFull, aes(x=Variable, y=varImp,fill=Model)) + 
   geom_bar(stat="identity",position="dodge") +
- #facet_grid(Model~.) +
   ylab("Relative Importance") + xlab("variable") +
-  theme(axis.text.x=element_text(angle=45, hjust=1)) +
-  theme_minimal()+
+   scale_y_continuous(expand = c(0, 0)) +
+   scale_x_discrete("",labels=niceNames) +
+  theme_few()+
+  theme(axis.text.x=element_text(angle=35, hjust=1), legend.position = c(.8,.8) ) +
   scale_fill_tableau("colorblind10")
-  
-plot(b)
 
+tiff("figures/manuscript/VarImp.tiff")
+plot(b)
+dev.off()
 # Coord Plot ----
  ##must run Variable importance plot first
 #cord plot business
@@ -73,19 +88,34 @@ RankFull <- within(RankFull,
                    Variable <- factor(Variable, 
                                       levels = c( "fireDenSqrt","NDVI", "fireDenScale","RFScale","primProp", "tempScale","NDVIScale","tempMean", "RFsqrt","spRich", "popLog10" )))
 
+justNames <- c("Population",
+               "NHP Richness",
+               "Mean Rainfall",
+               "Mean Temperature",
+                "Scaled NDVI",
+               "Scaled Mean\nTemperature",
+               "NHP Agriculture\nOverlap",
+               "Scaled Mean\nRainfall",
+                "Scaled Fire\nDensity",
+               "NDVI",
+               "Fire Density") 
 
 y_levels <- levels(RankFull$Variable)
 
 p <- ggplot(RankFull, aes(x = Model, y = varRank, group = Variable)) +   # group = id is important!
-  geom_path(aes(color = Variable),lineend = 'round', linejoin = 'round') +
-  scale_y_discrete(limits = levels(RankFull$Variable)) + #ylim/lab details
-  ylab("Rank Importance (1 is most important)") +
-#  scale_x_discrete(labels = c('Four','Six','Eight')) +
+  geom_hline(yintercept = c(1:11), color="grey80", linetype=2) +
+  geom_path(aes(color = Variable),lineend = 'round', linejoin = 'round', size=2) +
+  scale_y_discrete(limits = levels(RankFull$Variable), labels=c(11:1)) + #ylim/lab details
+  ylab("Variable Importance Rank") +
   xlab("Model")+
-  annotate("text", x = c(0.75), y=c(1,2,3,4), label = c("two", "ship", "six", "boat")) + 
+  theme_few() +
+  scale_x_discrete(expand = c(0, 1)) +
+  annotate("text", x = c(0.5), y=c(11:1), label = justNames) + 
   theme(legend.position = "none") 
 
+tiff("figures/manuscript/Rank.tiff")
 plot(p)
+dev.off()
 
 
 
