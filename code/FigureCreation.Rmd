@@ -45,11 +45,17 @@ Dodged barplot of variable importance
 #Return Variable importance with stdev
 VarImp =function(x){
   matrix.Of.AUCs <- x[[3]]
-  
-   delta.auc <- perm.auc.mean[1] - perm.auc.mean[-c(1, length(perm.auc.mean))] #change in AUC from base model only for single variable permutation
-  rel.import <- delta.auc/max(delta.auc, na.rm = TRUE) # normalized relative change in AUC from base model only for single variable permutation
-  
+  var.Imp.AUCs <- matrix.Of.AUCs[,-dim(matrix.Of.AUCs)[2]] #drop the all permutated
+  delta.AUC <- apply(var.Imp.AUCs,1,function(x) {(x[1]-x)/max(x[1]-x)} ) #calculate delta AUC and rescale to max delta AUC 
+  #rel.import <- delta.auc/max(delta.auc, na.rm = TRUE) # normalized relative change in AUC from base model only for single variable permutation
+  mean.Delta.AUC <- apply(delta.AUC, 1, mean) #mean
+  sem.Delta.AUC <- apply(delta.AUC,1,function(x) {sd(x)/sqrt(length(x))}) #standard error of the mean
+  summary.Delta.AUC <- as.data.frame(cbind(mean.Delta.AUC, sem.Delta.AUC))#put them together
+  summary.Delta.AUC$lci95.Delta.AUC <- apply(summary.Delta.AUC, 1, function(x) x[1]-2*x[2]) #lower 95% CI
+  summary.Delta.AUC$uci95.Delta.AUC <- apply(summary.Delta.AUC, 1, function(x) x[1]+2*x[2]) #upper 95% CI
+  return(summary.Delta.AUC)
 }
+
 #2. Load data
 fullM <- readRDS("../data_out/MS_results/OneModel/Perm100FullModel500TryCatch.rds") 
 lowM <- readRDS("../data_out/MS_results/LowModel/lPerm100Model500TryCatch.rds")
