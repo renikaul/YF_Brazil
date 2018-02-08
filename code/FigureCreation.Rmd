@@ -45,7 +45,7 @@ Dodged barplot of variable importance
 #Return Variable importance with stdev
 VarImp =function(x){
   matrix.Of.AUCs <- x[[3]]
-  var.Imp.AUCs <- matrix.Of.AUCs[,-dim(matrix.Of.AUCs)[2]] #drop the all permutated
+  var.Imp.AUCs <- matrix.Of.AUCs[complete.cases(matrix.Of.AUCs),-dim(matrix.Of.AUCs)[2]] #drop the all permutated, and rows with NAs (TryCatch failed)
   delta.AUC <- apply(var.Imp.AUCs,1,function(x) {(x[1]-x)/max(x[1]-x)} ) #calculate delta AUC and rescale to max delta AUC 
   #rel.import <- delta.auc/max(delta.auc, na.rm = TRUE) # normalized relative change in AUC from base model only for single variable permutation
   mean.Delta.AUC <- apply(delta.AUC, 1, mean) #mean
@@ -53,6 +53,7 @@ VarImp =function(x){
   summary.Delta.AUC <- as.data.frame(cbind(mean.Delta.AUC, sem.Delta.AUC))#put them together
   summary.Delta.AUC$lci95.Delta.AUC <- apply(summary.Delta.AUC, 1, function(x) x[1]-2*x[2]) #lower 95% CI
   summary.Delta.AUC$uci95.Delta.AUC <- apply(summary.Delta.AUC, 1, function(x) x[1]+2*x[2]) #upper 95% CI
+  summary.Delta.AUC$Variable <- rownames(summary.Delta.AUC)
   return(summary.Delta.AUC)
 }
 
@@ -60,6 +61,52 @@ VarImp =function(x){
 fullM <- readRDS("../data_out/MS_results/OneModel/Perm100FullModel500TryCatch.rds") 
 lowM <- readRDS("../data_out/MS_results/LowModel/lPerm100Model500TryCatch.rds")
 highM <- readRDS('../data_out/MS_results/HighModel/HPerm100Model500TryCatch.rds')
+
+
+Full <- VarImp(fullM)
+HFull <- VarImp(highM)
+LFull <- VarImp(lowM)
+
+RankFull <- rbind(Full[-1,],LFull[-1,], HFull[-1,])
+RankFull$Model <- factor(c(rep("Single Point Process", dim(Full)[1]-1),
+                           rep("LRR", dim(LFull)[1]-1),
+                           rep("HRR", dim(HFull)[1]-1)),
+                         levels=c("Single Point Process", "LRR", "HRR"))
+#order the variable levels
+RankFull <- within(RankFull,
+                   Variable <- factor(Variable, 
+                                      levels = c("popLog10", "spRich","RFsqrt","tempMean","NDVIScale", "tempScale","primProp",
+                                                  "RFScale","fireDenSqrt","NDVI", "fireDenScale")))
+
+#RankFull$varImp <- as.numeric(as.character(RankFull$varImp))
+#variable names
+niceNames <- c("popLog10"="Population",
+               "spRich" = "NHP Richness",
+               "RFsqrt" = "Mean Rainfall",
+               "tempMean" = "Mean Temperature",
+               "NDVIScale" = "Scaled NDVI",
+               "tempScale" = "Scaled Mean Temperature",
+               "primProp" = "NHP Agriculture Overlap",
+               "RFScale" = "Scaled Mean Rainfall",
+               "fireDenScale" = "Scaled Fire Density",
+               "NDVI" ="NDVI",
+               "fireDenSqrt" ="Fire Density")
+
+#Relative Imp Plots
+
+b <-   ggplot(RankFull, aes(x=Variable, y=mean.Delta.AUC,ymin=mean.Delta.AUC-sem.Delta.AUC, ymax=mean.Delta.AUC+sem.Delta.AUC, fill=Model)) + 
+  geom_bar(stat="identity",position="dodge")+
+  geom_errorbar(position="dodge", colour="black")+
+  ylab("Relative Importance") + xlab("variable") +
+   #scale_y_continuous(expand = c(0, 0)) +
+   scale_x_discrete("",labels=niceNames) +
+  theme_few()+
+  theme(axis.text.x=element_text(angle=35, hjust=1), legend.position = c(.8,.8) ) +
+  scale_fill_tableau("colorblind10")
+
+pdf("figures/manuscript/VarImp.pdf")
+plot(b)
+dev.off()
 
 ```
 # Figure 2: Coord Plot of Variable Importance Rank 
@@ -133,7 +180,8 @@ p <- ggplot(RankFull, aes(x = Model, y = varRank, group = Variable)) +   # group
   annotate("text", x = c(0.5), y=c(11:1), label = justNames) + 
   theme(legend.position = "none") 
 
-tiff("figures/manuscript/Rank.tiff")
+#tiff("figures/manuscript/Rank.tiff")
+pdf("figures/manuscript/Rank.pdf")
 plot(p)
 dev.off()
 ```
