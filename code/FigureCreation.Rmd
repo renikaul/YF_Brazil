@@ -39,8 +39,82 @@ Dodged barplot of variable importance
 
 # Figure 2: Coord Plot
 
-"weird ladder"
+```{r}
+#global packages
+library(dplyr)
+library(ggplot2)
+library(ggthemes)
+# Dodged Variable Importance ----
 
+#1. load packages and functions
+
+#Return Quick Rank Importance
+RankImp=function(x){
+  #pull out Relative Importance
+  RI <- x[[1]]
+  #convert varImp to numeric (coming out as factor for some reason)
+  RI$varImp <- as.numeric(as.character(RI$varImp))
+  #order and add rank
+  RI <- RI %>%
+    dplyr::arrange(desc(varImp)) %>%
+    dplyr::mutate(varRank=dim(RI)[1]:1)
+  
+  return(RI)
+}
+
+
+#2. Load data
+fullM <- readRDS("../data_out/MS_results/OneModel/Perm100FullModel500TryCatch.rds") 
+lowM <- readRDS("../data_out/MS_results/LowModel/lPerm100Model500TryCatch.rds")
+highM <- readRDS('../data_out/MS_results/HighModel/HPerm100Model500TryCatch.rds')
+
+#3. Pull out variable importance from permutations
+Full <- RankImp(fullM)
+HFull <- RankImp(highM)
+LFull <- RankImp(lowM)
+
+RankFull <- rbind(Full,LFull, HFull)
+RankFull$Model <- factor(c(rep("Single Point Process", dim(Full)[1]),
+                           rep("LRR", dim(LFull)[1]),
+                           rep("HRR", dim(HFull)[1])),
+                         levels=c("Single Point Process", "LRR", "HRR"))
+```
+
+```{r Coord Plot}
+#order variable 
+RankFull <- within(RankFull,
+                   Variable <- factor(Variable, 
+                                      levels = c( "fireDenSqrt","NDVI", "fireDenScale","RFScale","primProp", "tempScale","NDVIScale","tempMean", "RFsqrt","spRich", "popLog10" )))
+
+justNames <- c("Population",
+               "NHP Richness",
+               "Mean Rainfall",
+               "Mean Temperature",
+                "Scaled NDVI",
+               "Scaled Mean\nTemperature",
+               "NHP Agriculture\nOverlap",
+               "Scaled Mean\nRainfall",
+                "Scaled Fire\nDensity",
+               "NDVI",
+               "Fire Density") 
+
+y_levels <- levels(RankFull$Variable)
+
+p <- ggplot(RankFull, aes(x = Model, y = varRank, group = Variable)) +   # group = id is important!
+  geom_hline(yintercept = c(1:11), color="grey80", linetype=2) +
+  geom_path(aes(color = Variable),lineend = 'round', linejoin = 'round', size=2) +
+  scale_y_discrete(limits = levels(RankFull$Variable), labels=c(11:1)) + #ylim/lab details
+  ylab("Variable Importance Rank") +
+  xlab("Model")+
+  theme_few() +
+  scale_x_discrete(expand = c(0, 1)) +
+  annotate("text", x = c(0.5), y=c(11:1), label = justNames) + 
+  theme(legend.position = "none") 
+
+tiff("figures/manuscript/Rank.tiff")
+plot(p)
+dev.off()
+```
 
 #Figure 3: Maps of Calendar Months
 
