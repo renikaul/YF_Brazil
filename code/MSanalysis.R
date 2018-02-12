@@ -1,6 +1,5 @@
 # All code to build for YF MS
 
-
 #Load packages and functions ----
 
 ##packages----
@@ -120,4 +119,37 @@ saveRDS(one.model.prediction, file="../data_out/MS_results/OneModel/wholePredict
 
 PermFullModel <- permOneVar(formula = glm.formula,bag.fnc = baggingTryCatch,traindata = one.training, cores = 10, no.iterations = 500, perm = 100, viz = TRUE, title="Full Model")
 saveRDS(PermFullModel, "../data_out/MS_results/OneModel/Perm100FullModel500TryCatch.rds")
+
+#####################
+
+#4. Exploring Model testing AUC----
+#load data is not already in ws ----
+# one.model.prediction <- readRDS("../data_out/MS_results/OneModel/wholePredictions.rds")
+# low.model.prediction <- readRDS("../data_out/MS_results/LowModel/wholePredictions.rds")
+# high.model.prediction <- readRDS("../data_out/MS_results/HighModel/wholePredictions.rds")
+
+#function to return training and testing ----
+CalcAUC=function(x){
+  train <-x %>% filter(set=="train") %>% select(c("case", "prediction"))
+  train.preds <- ROCR::prediction(train$prediction, train$case)
+  train.auc <- unlist(ROCR::performance(train.preds, "auc")@y.values)
+  
+  test <-x %>% filter(set=="test") %>% select(c("case", "prediction"))
+  test.preds <- ROCR::prediction(test$prediction, test$case)
+  test.auc <- unlist(ROCR::performance(test.preds, "auc")@y.values)
+  
+  return(c(train.auc, test.auc))
+}
+
+#calculate training and testing AUC ----
+oneAUC <- CalcAUC(one.model.prediction)
+lowAUC <- CalcAUC(low.model.prediction)
+highAUC <- CalcAUC(high.model.prediction)
+
+#save AUCs in table
+sumAUC <- rbind(oneAUC,lowAUC,highAUC)
+colnames(sumAUC) <- c('train','test')
+write.csv(sumAUC, file="../data_out/MS_results/summaryAUC.csv")
+
+
 
