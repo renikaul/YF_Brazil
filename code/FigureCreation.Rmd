@@ -448,7 +448,7 @@ pred.map.subset <- pred.map %>%
 Plot.
 
 ```{r}
-pdf(file = "figures/manuscript/Figure3.pdf", width = 6.69, height = 4.75, family = "sans")
+pdf(file = "figures/manuscript/Figure3Prob.pdf", width = 6.69, height = 4.75, family = "sans")
 
 ggplot() +
   geom_sf(data = s.america, color = "gray80", fill = "gray80") +
@@ -563,7 +563,7 @@ time.all.models$cal.month[time.all.models$cal.month==0] <- 12
 #create year variable
 time.all.models <- time.all.models %>%
   mutate(year = ((month.no-1) %/% 12) + 2001) %>%
-  mutate(monthLabel = month(cal.month, label = T))
+  mutate(monthLabel = lubridate::month(cal.month, label = T))
 
 #order models
 time.all.models$model <- factor(time.all.models$model, levels = c("one.model", "lowNHP", "highNHP"))
@@ -679,4 +679,4 @@ dev.off()
 
 # Supp. Figure X: Gif of maps
 
-A seperate GIF for each model. Or maybe one GIF showing all three models at once, which would be more helpful but could be a huge file. 
+This will be a big gif with a panel for each model. Each will have a different color scheme (like green, blue,red, etc.) so it is clear they are not meant to be compared. It will be a plot of raw predictions.
