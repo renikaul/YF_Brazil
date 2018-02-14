@@ -44,9 +44,7 @@ Dodged barplot of variable importance
 
 #Figure 3: Maps of Calendar Months
 
-Choose maps at certain time points averaged over calendar months to represent spatial patterns. Don't know which time points as of yet. This will pair with the supplementary gif.
-
-This map will consist of a 3 x 2 lattice, showing three characteristic time points (or mean over multiple months?) across the one and two-part model. The two-part model has each prediction rescaled to teh maximum of each respective model (i.e. low and high NHP). They are then plotted together, with a line denoting the spatial split between the models.
+This map is a 3 x 2 lattice, showing three characteristic annual time points in the year (represented as mean across all instances of that month) across the single and dual-process model. These values are re-scaled in order to be comparable across models. Several ways we have done this: probability x 10^3 (multiply raw output by ratio of positive/background in the model, then multiply by 10^3 so it is easier to see), normalized (scaled to maximum value output by the model), and frequency x 10^3 (rescaled by constant c, so that the sum of all of the predictions multipled by c equals the initial number of positives).
 
 ## Load Data
 
@@ -62,16 +60,8 @@ nhp.split.map <- left_join(braz.map, nhp.split, by = "muni.no") %>%
   st_buffer(0.01)
 
 #get brazil outline
-# braz.outline <- getData('GADM', country ='BRA', level = 0)
-# braz.outline <- st_as_sf(braz.outline)
-# braz.outline <- braz.outline %>%
-#   mutate(model = "one.model") %>%
-#   mutate(above5split = "none") %>%
-#   dplyr::select(model, above5split)
-
-#combine nhp split and brazil outline
-# split.map <- rbind(nhp.split.map, braz.outline)
-
+braz.outline <- getData('GADM', country ='BRA', level = 0)
+braz.outline <- dplyr::select(st_as_sf(braz.outline), ISO)
 
 # prediction data
 pred.one.model <- readRDS("../data_out/MS_results/OneModel/wholePredictions.rds")
@@ -85,26 +75,34 @@ Rescale low and high NHP data and combine into one dataframe.
 
 ```{r}
 pred.lowNHP <- pred.lowNHP %>%
-  mutate(pred.scale = prediction * (sum(case)/n())) %>%
+  mutate(prob = prediction * (sum(case)/n())*1000) %>%
+  mutate(pred.norm = prediction/max(prediction)) %>%
+  mutate(pred.freq = prediction * (sum(case)/sum(prediction))*1000) %>%
   mutate(model = "two.model")
 
 pred.highNHP <- pred.highNHP %>%
-  mutate(pred.scale = prediction * (sum(case)/n())) %>%
+  mutate(prob = prediction * (sum(case)/n())*1000) %>%
+  mutate(pred.norm = prediction/max(prediction)) %>%
+  mutate(pred.freq = prediction * (sum(case)/sum(prediction))*1000) %>%
   mutate(model = "two.model")
 
 pred.one.model <- pred.one.model %>%
-  mutate(pred.scale = prediction * (sum(case)/n())) %>%
+  mutate(prob = prediction * (sum(case)/n())*1000) %>%
+  mutate(pred.norm = prediction/max(prediction)) %>%
+  mutate(pred.freq = prediction * (sum(case)/sum(prediction))*1000) %>%
   mutate(model = "one.model")
 
 pred.all <- rbind(pred.lowNHP, pred.highNHP, pred.one.model) %>%
-  # get mean by calender month and muni
   mutate(cal.month = month.no %% 12)
 
 pred.all$cal.month[pred.all$cal.month==0] <- 12
 
 pred.all.month <- pred.all %>%
   group_by(muni.no, model, cal.month) %>%
-  summarise(mean.pred = mean(pred.scale))
+  summarise(mean.prob = mean(prob), 
+            mean.pred.norm = mean(pred.norm),
+            mean.pred.freq = mean(pred.freq))
+
 
 pred.map <- left_join(pred.all.month, braz.map, by = "muni.no")
   
@@ -135,8 +133,6 @@ theme_map <- function(...) {
 }
 ```
 
-Subset out months we want (Feb, June, Dec.)
-
 ```{r plot all months, eval = F}
 for (k in unique(pred.map$model)){
   
@@ -157,13 +153,64 @@ for (k in unique(pred.map$model)){
 } #model loop
 ```
 
+Subset out months we want (Feb, June, Dec.)
+
 ```{r}
 pred.map.subset <- pred.map %>%
-  filter(cal.month %in% c(2,6,12)) %>%
+  #filter(cal.month %in% c(2,6,12)) %>%
+  filter(cal.month %in% c(2)) %>%
   mutate(monthLabel = month.abb[cal.month])
 ```
 
-Plot.
+Plot. Because of the line denoting the split, we need to plot the single and dual process model seperately, then facet together with cowplot.
+
+Single process.
+
+```{r}
+top.row <- ggplot() +
+  geom_sf(data = pred.map.subset[pred.map.subset$model=="one.model",], 
+          aes(fill = mean.pred.norm), color = NA) +
+  scale_fill_viridis(option = "magma", direction = -1, discrete = F,
+                     na.value = "gray70", 
+                     guide = guide_colorbar(
+                       title = "Prediction (normalized)",
+                       direction = "vertical",
+                       barheight = unit(35, units = "mm"),
+                       barwidth = unit(2, units = "mm"),
+                       draw.ulim = F,
+                       title.position = 'top',
+                       title.hjust = 0.5,
+                       label.hjust = 0.5,
+                       title.theme = element_text(size = 8, angle = 0),
+                       label.theme = element_text(size = 8, angle = 0))) +
+  facet_wrap(~monthLabel, dir = "h") +
+  geom_sf(data = braz.outline, fill = NA, color = "black")
+```
+
+
+```{r}
+bottom.row <- ggplot() +
+  geom_sf(data = pred.map.subset[pred.map.subset$model=="two.model",], 
+          aes(fill = mean.pred.norm), color = NA) +
+  scale_fill_viridis(option = "magma", direction = -1, discrete = F,
+                     na.value = "gray70", 
+                     guide = guide_colorbar(
+                       title = "Prediction (normalized)",
+                       direction = "vertical",
+                       barheight = unit(35, units = "mm"),
+                       barwidth = unit(2, units = "mm"),
+                       draw.ulim = F,
+                       title.position = 'top',
+                       title.hjust = 0.5,
+                       label.hjust = 0.5,
+                       title.theme = element_text(size = 8, angle = 0),
+                       label.theme = element_text(size = 8, angle = 0))) +
+  facet_wrap(~monthLabel, dir = "h") +
+  geom_sf(data = nhp.split.map, fill = NA, color = "black")
+```
+
+
+
 
 ```{r}
 pdf(file = "figures/manuscript/Figure3.pdf", width = 6.69, height = 4.75, family = "sans")
@@ -344,7 +391,7 @@ top.row <- ggplot() +
                        title.theme = element_text(size = 8, angle = 0),
                        label.theme = element_text(size = 8, angle = 0))) +
     theme_map() +
-  facet_wrap(~model, dir = "h") +
+  facet_wrap(~model, dir = "h", scales = "free_y") +
   panel_border()
 ```
 
