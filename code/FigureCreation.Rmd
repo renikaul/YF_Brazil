@@ -35,11 +35,100 @@ This document creates the figures for:
 
 I'm currently loading data individually for each figure, then if you want to remake one figure you don't have to rerun the whole document, just that section.
 
-# Figure 1: Variable Importance
+#Figure 1: Relative Variable Importance as quantiles
 
-Dodged barplot of variable importance
+The median, and 95% quantile reported for dAUC scaled to max dAUC for each model. 
 
-```{r}
+```{r relative variable importance Quantile}
+#function to calculate dAUC stats
+RelativeImportance=function(x, model="NA"){
+  perms <- x[[3]][complete.cases(x[[3]]),-c(1, dim(x[[3]])[2])] # pull out AUC values, but drop full model and all permuted data columns 
+  model.AUC <- as.numeric(as.character(x[[2]][1,2])) # pull out AUC for full model
+  # calculate delta AUC
+  delta.AUC <- model.AUC- perms
+  # scale delta AUC between zero and one
+  scale.delta.AUC <- delta.AUC/max(delta.AUC)
+  #calculate median, upper and lower quantiles
+  Quant.dAUC <- scale.delta.AUC %>% 
+    melt(value.name="dAUC") %>% 
+    rename(Rep=Var1, Variable=Var2)%>% 
+    group_by(Variable) %>%
+    summarise(dAUCmean=mean(dAUC),dAUCmedian=median(dAUC),Q975=quantile(dAUC, probs=0.975),Q025=quantile(dAUC, probs=0.025) ) %>%
+    arrange(desc(dAUCmedian)) %>%
+    mutate(Rank=c(11:1)) %>%
+    mutate(Model=model) %>%
+    ungroup()
+  
+  return(Quant.dAUC)
+}
+
+#variable names for publication
+niceNames <- c("popLog10"="Population",
+               "spRich" = "NHP Richness",
+               "RFsqrt" = "Mean Rainfall",
+               "tempMean" = "Mean Temperature",
+               "NDVIScale" = "Scaled NDVI",
+               "tempScale" = "Scaled Mean Temperature",
+               "primProp" = "NHP Agriculture Overlap",
+               "RFScale" = "Scaled Mean Rainfall",
+               "fireDenScale" = "Scaled Fire Density",
+               "NDVI" ="NDVI",
+               "fireDenSqrt" ="Fire Density")
+
+#load data
+fullM <- readRDS("../data_out/MS_results/OneModel/Perm100FullModel500TryCatch.rds") 
+lowM <- readRDS("../data_out/MS_results/LowModel/lPerm100Model500TryCatch.rds")
+highM <- readRDS('../data_out/MS_results/HighModel/HPerm100Model500TryCatch.rds')
+
+#calculate dAUC stats
+hri <- RelativeImportance(highM, "High")
+lri <- RelativeImportance(lowM, "Low")
+fri <- RelativeImportance(fullM, "Single")
+allRelImportance<- rbind(fri,lri,hri)
+
+#reorder factors for plotting 
+allRelImportance <- within(allRelImportance, Variable <- factor(Variable, levels = c( "popLog10","spRich","RFsqrt","tempMean","NDVIScale","tempScale","primProp","RFScale","fireDenSqrt","NDVI","fireDenScale")))
+allRelImportance <- within(allRelImportance, Model <- factor(Model, levels = c("Single","Low","High")))
+
+  
+b2 <-   ggplot(allRelImportance, aes(x=Variable, y=dAUCmedian, ymin = Q025, ymax = Q975, fill=Model))+
+    geom_crossbar(position="dodge")+
+    scale_y_continuous(limits=c(-.05,1))+
+    #geom_point(y=allRelImportance$dAUCmean)+
+    geom_hline(yintercept = 0.0, color="grey50", linetype=2) +
+    ylab("Relative Importance") + xlab("variable") +
+    scale_x_discrete("",labels=niceNames) +
+    theme_few()+
+    theme(axis.text.x=element_text(angle=35, hjust=1), legend.position = c(.8,.8) ) +
+    scale_fill_tableau("colorblind10")
+  
+  tiff("figures/manuscript/VarImpQuantiles.tiff")
+  plot(b2)
+  dev.off()
+  
+ # ggplot(allRelImportance, aes(x=Variable, y=dAUCmedian, ymin = Q025, ymax = Q975, fill=Model))+
+ #    geom_crossbar()+
+ #    facet_grid(Model~.)+
+ #    scale_y_continuous(limits=c(-.05,1))+
+ #    #geom_point(y=allRelImportance$dAUCmean)+
+ #    geom_hline(yintercept = 0.0, color="grey50", linetype=2) +
+ #    ylab("Relative Importance") + xlab("variable") +
+ #    scale_x_discrete("",labels=niceNames) +
+ #    theme_few()+
+ #    theme(axis.text.x=element_text(angle=35, hjust=1), legend.position = c(.9,.9) ) +
+ #    scale_fill_tableau("colorblind10")
+ #  
+ #  tiff("figures/manuscript/VarImpQuantilesLattice.tiff")
+ #  plot(b2)
+ #  dev.off()
+
+```
+
+# Figure 1: Variable Importance (OLD)
+
+Dodged barplot of variable importance, calculated by random pairing of permutations and where error assumes a normal distribution. 
+
+```{r, eval=FALSE}
 #1. functions 
 
 #Return Variable importance with stdev
@@ -108,10 +197,31 @@ pdf("figures/manuscript/VarImp.pdf")
 plot(b)
 dev.off()
 
+#latice alternative
+#b2 <- 
+  ggplot(RankFull, aes(x=Variable, y=mean.Delta.AUC, fill=Model)) + 
+  geom_bar(stat="identity")+
+  facet_grid(Model~.)+
+  geom_errorbar(aes(ymin=mean.Delta.AUC-2*sem.Delta.AUC, ymax=mean.Delta.AUC+2*sem.Delta.AUC), width=.2, colour="black")+
+  ylab("Relative Importance") + xlab("variable") +
+   #scale_y_continuous(expand = c(0, 0)) +
+   scale_x_discrete("",labels=niceNames) +
+  theme_few()+
+  theme(axis.text.x=element_text(angle=35, hjust=1), legend.position = c(.8,.8) ) +
+  scale_fill_tableau("colorblind10")
+  
+  pdf("figures/manuscript/VarImpLattice.pdf")
+plot(b2)
+dev.off()
 ```
-# Figure 2: Coord Plot of Variable Importance Rank 
 
-```{r}
+
+# Figure 2: Coord Plot of Variable Importance Rank Median
+
+Ordered based on medians calculated in figure 1. Must run figure 1 for data prep.  
+
+
+```{r mean coord plot data prep, eval=FALSE}
 
 # Dodged Variable Importance ----
 
@@ -150,12 +260,15 @@ RankFull$Model <- factor(c(rep("Single Point Process", dim(Full)[1]),
 ```
 
 ```{r Coord Plot}
-#order variable 
-RankFull <- within(RankFull,
+# pull out columns of interest
+allRank<- allRelImportance %>% select(Model,Variable,Rank )
+#flip order variable 
+allRank <- within(allRank,
                    Variable <- factor(Variable, 
-                                      levels = c( "fireDenSqrt","NDVI", "fireDenScale","RFScale","primProp", "tempScale","NDVIScale","tempMean", "RFsqrt","spRich", "popLog10" )))
+                                      levels = c( "fireDenScale","NDVI", "fireDenSqrt","RFScale","primProp", "tempScale","NDVIScale","tempMean", "RFsqrt","spRich", "popLog10" )))
 
-justNames <- c("Population",
+
+justNamesStart <- c("Population",
                "NHP Richness",
                "Mean Rainfall",
                "Mean Temperature",
@@ -163,25 +276,40 @@ justNames <- c("Population",
                "Scaled Mean\nTemperature",
                "NHP Agriculture\nOverlap",
                "Scaled Mean\nRainfall",
-                "Scaled Fire\nDensity",
+                "Fire\nDensity",
                "NDVI",
-               "Fire Density") 
+               "Scaled Fire Density") 
 
-y_levels <- levels(RankFull$Variable)
+justNamesEnd <- c(
+               "NHP Richness",
+               "Population",
+               "Mean Temperature",
+               "NHP Agriculture\nOverlap",
+               "Scaled NDVI",
+               "Mean Rainfall",
+               "Scaled Mean\nTemperature",
+               "Fire\nDensity",
+               "NDVI",
+               "Scaled Mean\nRainfall",
+               "Scaled Fire Density") 
 
-p <- ggplot(RankFull, aes(x = Model, y = varRank, group = Variable)) +   # group = id is important!
+y_levels <- levels(allRelImportance$Variable)
+
+p <- ggplot(allRelImportance, aes(x = Model, y = Rank, group = Variable)) +   # group = id is important!
   geom_hline(yintercept = c(1:11), color="grey80", linetype=2) +
   geom_path(aes(color = Variable),lineend = 'round', linejoin = 'round', size=2) +
-  scale_y_discrete(limits = levels(RankFull$Variable), labels=c(11:1)) + #ylim/lab details
-  ylab("Variable Importance Rank") +
+  scale_y_discrete(limits = levels(allRelImportance$Variable), labels=c(11:1)) + #ylim/lab details
+  ylab("Variable Importance Rank (median) ") +
   xlab("Model")+
   theme_few() +
   scale_x_discrete(expand = c(0, 1)) +
-  annotate("text", x = c(0.5), y=c(11:1), label = justNames) + 
-  theme(legend.position = "none") 
+  annotate("text", x = c(0.5), y=c(11:1), label = justNamesStart) + 
+  annotate("text", x = c(3.5), y=c(11:1), label = justNamesEnd) + 
+
+    theme(legend.position = "none") 
 
 #tiff("figures/manuscript/Rank.tiff")
-pdf("figures/manuscript/Rank.pdf")
+pdf("figures/manuscript/RankMedian.pdf")
 plot(p)
 dev.off()
 ```

@@ -1,12 +1,14 @@
-#######
+
 ## Figures for manuscript
 ## R. Kaul 1/27/18
-######
+
 
 #global packages
 library(dplyr)
 library(ggplot2)
 library(ggthemes)
+library(reshape2)
+
 # Dodged Variable Importance ----
 
 #1. load packages and functions
@@ -81,6 +83,81 @@ b <-  ggplot(RankFull, aes(x=Variable, y=varImp,fill=Model)) +
 tiff("figures/manuscript/VarImp.tiff")
 plot(b)
 dev.off()
+
+# Relative Importance (Drew) ----
+
+RelativeImportance=function(x, model="NA"){
+  perms <- x[[3]][complete.cases(x[[3]]),-c(1, dim(x[[3]])[2])] # pull out AUC values, but drop full model and all permuted data columns 
+  model.AUC <- as.numeric(as.character(x[[2]][1,2])) # pull out AUC for full model
+  # calculate delta AUC
+  delta.AUC <- model.AUC- perms
+  # scale delta AUC between zero and one
+  scale.delta.AUC <- delta.AUC/max(delta.AUC)
+  #calculate median, upper and lower quantiles
+  Quant.dAUC <- scale.delta.AUC %>% 
+    melt(value.name="dAUC") %>% 
+    rename(Rep=Var1, Variable=Var2)%>% 
+    group_by(Variable) %>%
+    summarise(dAUCmean=mean(dAUC),dAUCmedian=median(dAUC),Q975=quantile(dAUC, probs=0.975),Q025=quantile(dAUC, probs=0.025) ) %>%
+    arrange(desc(Q975)) %>%
+    mutate(Model=model)
+  return(Quant.dAUC)
+}
+
+
+hri <- RelativeImportance(highM, "High")
+hri <- within(hri, Variable <- factor(Variable, levels = c( "popLog10","spRich","NDVIScale","tempMean","fireDenScale","tempScale", "primProp", "RFsqrt", "RFScale","NDVI","fireDenSqrt")))
+
+
+lri <- RelativeImportance(lowM, "Low")
+lri <- within(lri, Variable <- factor(Variable, levels = c( "popLog10","spRich","RFsqrt","tempMean","NDVIScale","primProp", "NDVI","tempScale","RFScale","fireDenSqrt","fireDenScale")))
+
+fri <- RelativeImportance(fullM, "Single")
+fri <- within(fri, Variable <- factor(Variable, levels = c( "popLog10","spRich","RFsqrt","NDVIScale","tempScale","tempMean","NDVI","RFScale","primProp","fireDenSqrt","fireDenScale")))
+
+allRelImportance <- within(allRelImportance, Model <- factor(Model, levels = c("Single","High","Low")))
+
+bfull <-   ggplot(fri, aes(x=Variable, y=dAUCmedian, ymin = Q025, ymax = Q975, fill=Model))+
+  geom_crossbar(position="dodge")+
+  scale_y_continuous(limits=c(-.05,1))+
+  #geom_point(y=allRelImportance$dAUCmean)+
+  geom_hline(yintercept = 0.0, color="grey50", linetype=2) +
+  ylab("Relative Importance") + xlab("variable") +
+  scale_x_discrete("",labels=niceNames) +
+  theme_few()+
+  theme(axis.text.x=element_text(angle=35, hjust=1), legend.position = c(.8,.8) ) +
+  scale_fill_tableau("colorblind10")
+
+
+blow <-   ggplot(lri, aes(x=Variable, y=dAUCmedian, ymin = Q025, ymax = Q975, fill=Model))+
+  geom_crossbar(position="dodge")+
+  scale_y_continuous(limits=c(-.05,1))+
+  #geom_point(y=allRelImportance$dAUCmean)+
+  geom_hline(yintercept = 0.0, color="grey50", linetype=2) +
+  ylab("Relative Importance") + xlab("variable") +
+  scale_x_discrete("",labels=niceNames) +
+  theme_few()+
+  theme(axis.text.x=element_text(angle=35, hjust=1), legend.position = c(.8,.8) ) +
+  scale_fill_tableau("colorblind10")
+
+  
+bhigh <-   ggplot(hri, aes(x=Variable, y=dAUCmedian, ymin = Q025, ymax = Q975, fill=Model))+
+    geom_crossbar(position="dodge")+
+    scale_y_continuous(limits=c(-.05,1))+
+    #geom_point(y=allRelImportance$dAUCmean)+
+    geom_hline(yintercept = 0.0, color="grey50", linetype=2) +
+    ylab("Relative Importance") + xlab("variable") +
+    scale_x_discrete("",labels=niceNames) +
+    theme_few()+
+    theme(axis.text.x=element_text(angle=35, hjust=1), legend.position = c(.8,.8) ) +
+    scale_fill_tableau("colorblind10")
+  
+  pdf("figures/VarImpQuantile/models.pdf", onefile = TRUE)
+  plot(bfull)
+  plot(blow)
+  plot(bhigh)
+  dev.off()
+  
 # Coord Plot ----
  ##must run Variable importance plot first
 #cord plot business
