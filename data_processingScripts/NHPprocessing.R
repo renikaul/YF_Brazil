@@ -10,6 +10,7 @@ library(raster)
 library(rgeos)
 library(doParallel)
 library(foreach)
+library(dplyr)
 
 #load IUCN shapefile
 iucn <- readOGR("../../TERRESTRIAL_MAMMALS", "TERRESTRIAL_MAMMALS")
@@ -83,7 +84,7 @@ primates <- readOGR("../data_raw/environmental/NHPdata/", "primateSpecies")
 primates$value <- 1
 
 #extracts all the polygons that fall within the municipality
-test <-over(brazil, primates, returnList=T)
+test <- over(brazil, primates, returnList=T)
 #get number of species within each municipality
 spRich <- lapply(test, nrow)
 spRich2 <- data.frame(spRich=do.call(c, spRich))
@@ -94,3 +95,49 @@ speciesRichness <- spRich2[spRich2$muni.no!=431454,]
 
 #write to csv
 write.csv(speciesRichness, "../data_raw/environmental/primateRichness.csv", row.names = F)
+
+#save the names of species found in each municipality
+
+#use a for loop to extract the species names in each muni
+species.matrix <- matrix(nrow=5561, ncol = 93) #row = muni, col = species
+colnames(species.matrix) <- levels(primates$binomial)
+rownames(species.matrix) <- brazil$muni_no
+for (i in 1:5561){ #loop over munis
+  tmp.species <- test[[i]]$binomial
+  #fill in a one for all species found in that muni
+  species.matrix[i,colnames(species.matrix) %in% tmp.species] <- 1
+}
+  
+# save
+write.csv(species.matrix, "../data_raw/environmental/primateSpeciesIDmuni.csv", row.names=T)
+  
+#get species ID for LRR and HRR
+species.matrix <- read.csv("../data_raw/environmental/primateSpeciesIDmuni.csv")
+colnames(species.matrix)[1] <- "muni.no"
+
+#switch to longform
+species.id <- tidyr::gather(species.matrix, species, present, Alouatta.arctoidea:Saimiri.vanzolinii)
+
+#combine with data on nhp split
+nhp.split <- readRDS("../data_clean/environmental/twoModelSplit.rds")
+
+#get list of species per split
+species.split <- species.id %>%
+  left_join(nhp.split, by = "muni.no") %>%
+  group_by(above5split, species) %>%
+  #get total number of munis with that species per split
+  summarise(presence = sum(present, na.rm = T)) %>%
+  tidyr::spread(above5split, presence) %>%
+  #drop species found in neither 
+  filter(!(above5 == 0 & less == 0))
+
+#number of munis is uninformative because LRR has so many small ones
+#change to 1 or 0
+species.split$above5[species.split$above5>0] <- 1
+species.split$less[species.split$less>0] <- 1
+
+#chagne column names to match LRR and HRR
+colnames(species.split)[2:3] <- c("HRR", "LRR")
+
+#save
+write.csv(species.split, "../data_clean/environmental/speciesByModel.csv", row.names = F)
