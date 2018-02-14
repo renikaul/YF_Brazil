@@ -1,0 +1,94 @@
+---
+title: "Variable Importance"
+author: "RK"
+date: "2/11/2018"
+output:
+  pdf_document: default
+  html_document: default
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(ggplot2)
+library(reshape2)
+library(gplots)
+library(dplyr)
+
+# Quant.dAUC <- delta.AUC %>% 
+#   melt(value.name="dAUC") %>% 
+#   rename(Rep=Var1, Variable=Var2)%>% 
+#   group_by(Variable) %>%
+#   summarise(dAUCmean=mean(dAUC),dAUCmedian=median(dAUC),Q975=quantile(dAUC, probs=0.975),Q025=quantile(dAUC, probs=0.025) )
+# 
+# ggplot(Quant.dAUC, aes(x=Variable, y=dAUCmedian))+
+#   geom_boxplot(lower=Quant.dAUC$Q025, middle=Quant.dAUC$dAUCmedian, upper=Quant.dAUC$Q975)+
+#   scale_y_continuous(limits=c(-.025,0.2))+
+#   geom_point(y=Quant.dAUC$dAUCmean)
+
+```
+
+```{r load data, echo=FALSE}
+highM <- readRDS('../data_out/MS_results/OneModel/Perm100FullModel500TryCatch.rds')
+perms <- highM[[3]][complete.cases(highM[[3]]),-1]
+perm.sum <- highM[[2]]
+perm.sum$meanAUC <- as.numeric(as.character(perm.sum$meanAUC))
+perm.sum$sdAUC <- as.numeric(as.character(perm.sum$sdAUC))
+
+```
+# Step-by-step for calculating variable importance by permutation with 
+
+## 1. Calculating AUC with a variable permuted. 
+
+The model consists 11 variables, each permuted 100 times. 
+
+```{r data}
+head(perms)
+
+plotCI( x=c(1:13),y=perm.sum$meanAUC, uiw=perm.sum$sdAUC, gap=0, xaxt="n", xlab="Permuted Variable")
+axis(1, at=c(1:13),labels=perm.sum$Model, padj=0 )
+
+```
+
+
+## 2. Calculate delta AUC and rescale to max delta AUC
+
+The AUC for the model with the original data is `r round(as.numeric(as.character(highM[[2]][1,2])), digits=3)`. The permuted AUC is subtracted from the baseline AUC. Negative values mean the permutated dataset increased the model's AUC. 
+
+```{r delta AUC}
+delta.AUC <- as.numeric(as.character(highM[[2]][1,2]))- perms[,-12]
+head(delta.AUC)
+
+scale.delta.AUC <- delta.AUC/max(delta.AUC)
+```
+
+## 3. Rank variable importance by median and quantiles
+
+Plotted median, 97.5%,2.5% quantiles. Mean plotted as points. 
+
+```{r}
+
+Quant.dAUC <- scale.delta.AUC %>% 
+  melt(value.name="dAUC") %>% 
+  rename(Rep=Var1, Variable=Var2)%>% 
+  group_by(Variable) %>%
+  summarise(dAUCmean=mean(dAUC),dAUCmedian=median(dAUC),Q975=quantile(dAUC, probs=0.975),Q025=quantile(dAUC, probs=0.025) ) %>%
+  arrange(desc(Q975))
+  
+#High NHP
+ Quant.dAUC <- within(Quant.dAUC, Variable <- factor(Variable, levels = c( "spRich","popLog10","tempMean","primProp","NDVIScale","RFsqrt","tempScale","fireDenSqrt","NDVI","RFScale","fireDenScale")))
+
+#Low NHP and One Model
+#Quant.dAUC <- within(Quant.dAUC, Variable <- factor(Variable, levels = c( "popLog10","spRich","RFsqrt","tempMean","NDVIScale","primProp","NDVI","tempScale","RFScale","fireDenSqrt","fireDenScale")))
+
+
+ggplot(Quant.dAUC, aes(x=Variable, y=dAUCmedian))+
+  geom_boxplot(lower=Quant.dAUC$Q025, middle=Quant.dAUC$dAUCmedian, upper=Quant.dAUC$Q975)+
+  scale_y_continuous(limits=c(-.025,1))+
+  geom_point(y=Quant.dAUC$dAUCmean)+
+    geom_hline(yintercept = 0.085, color="grey50", linetype=2) +
+  ylab("Relative Importance")
+```
+
+## 4. Determining rank order
+
+All variables besides fireDenScale are tied for most important variable. 
