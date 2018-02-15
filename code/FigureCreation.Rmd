@@ -488,11 +488,11 @@ Caption: Probability of yf spillover averaged over calendar month for December (
 Plot Quantile.
 
 ```{r}
-pdf(file = "figures/manuscript/Figure3ProbQuant2008.pdf", width = 6.69, height = 4.75, family = "sans")
+pdf(file = "figures/manuscript/Figure3Quant2008.pdf", width = 6.69, height = 4.75, family = "sans")
 
 ggplot() +
   geom_sf(data = s.america, color = "gray80", fill = "gray80") +
-  geom_sf(data = pred.map.subset, aes(fill = cut(prob, quantile(prob, probs = seq(0,1,0.2)))), color = NA, size = 0) +
+  geom_sf(data = pred.map.subset, aes(fill = cut(prediction, quantile(prediction, probs = seq(0,1,0.2)))), color = NA, size = 0) +
   scale_fill_brewer(palette = "OrRd", direction = 1, type = "seq",
                      guide = guide_legend(
                        title = "Ranked Quintiles",
@@ -501,7 +501,7 @@ ggplot() +
                        title.theme = element_text(size = 8, angle = 0),
                        label.theme = element_text(size = 8, angle = 0),
                        nrow = 1),
-                    labels = c("0-20%", "21-40%", "41-60%", "61-80%", "81-100%", "")) +
+                    labels = c("0-20%", "21-40%", "41-60%", "61-80%", "81-100%")) +
   facet_grid(model ~ monthLabel, 
              labeller = labeller(
                model = c("one.model" = 'Single', "two.model" = 'Two Part')
@@ -513,45 +513,6 @@ ggplot() +
 
 dev.off()
 ```
-
-Single Model
-
-```{r}
-single.plot <- ggplot() +
-  geom_sf(data = s.america, color = "gray80", fill = "gray80") +
-  geom_sf(data = pred.map.subset[pred.map.subset$model=="one.model",], aes(fill = cut(prob, quantile(prob, probs = seq(0,1,0.2)))), color = NA, size = 0) +
-  scale_fill_brewer(palette = "OrRd", direction = 1, type = "seq",
-                     guide = guide_legend(
-                       title = "Ranked Quintiles",
-                       direction = "horizontal",
-                       title.position = 'top',
-                       title.theme = element_text(size = 8, angle = 0),
-                       label.theme = element_text(size = 8, angle = 0)),
-                    labels = c("0-20%", "21-40%", "41-60%", "61-80%", "81-100%")) +
-  facet_grid( ~ monthLabel, dir = "h") +
-  geom_sf(data = nhp.split.map, fill = NA, color = "gray50", size=0.1) +
-  coord_sf(xlim = c(-74, -34.78), ylim = c(-33.8, 5.3), datum = NA) +
-  my_theme_map()
-
-```
-
-Double Model
-
-```{r}
-double.plot <- ggplot() +
-  geom_sf(data = s.america, color = "gray80", fill = "gray80") +
-  geom_sf(data = pred.map.subset[pred.map.subset$model=="two.model",], aes(fill = cut(prob, quantile(prob, probs = seq(0,1,0.2)))), color = NA, size = 0) +
-  scale_fill_viridis(option = "magma", direction = -1, discrete = T,
-                     na.value = "gray70") +
-  facet_grid(model ~ monthLabel, 
-             labeller = labeller(
-               model = c("one.model" = 'Single', "two.model" = 'Two Part')
-             )) +
-  geom_sf(data = nhp.split.map, fill = NA, color = "black", size=0.1) +
-  coord_sf(xlim = c(-74, -34.78), ylim = c(-33.8, 5.3), datum = NA) +
-  my_theme_map()
-```
-
 
 # Figure 4: Lattice Plot 
 
