@@ -468,14 +468,14 @@ ggplot() +
              labeller = labeller(
                model = c("one.model" = 'Single', "two.model" = 'Two Part')
              )) +
-  geom_sf(data = nhp.split.map, fill = NA, color = "black", size=0.25) +
+  geom_sf(data = nhp.split.map, fill = NA, color = "black", size=0.1) +
   coord_sf(xlim = c(-74, -34.78), ylim = c(-33.8, 5.3), datum = NA) +
   my_theme_map()
 
 dev.off()
 ```
 
-Caption: Probability of yf spillover averaged over calendar month for December (a,d), February (b,e), and June (c,f). Result from single model in top row and dual process model in bottom row.
+Caption: Probability of yf spillover averaged over calendar month for December (a,d), February (b,e), and June (c,f). Result from single model in top row and two process model in bottom row.
 
 # Figure 4: Lattice Plot 
 
@@ -577,7 +577,7 @@ rm(time.one.model, time.highNHP, time.lowNHP)
 ### Over Space
 
 ```{r map theme}
-theme_map <- function(...) {
+my_theme_map <- function(...) {
   theme_minimal() +
   theme(
     axis.line = element_blank(),
@@ -590,6 +590,7 @@ theme_map <- function(...) {
     panel.grid = element_blank(),
     plot.background = element_rect(fill = NA, color = NA), 
     panel.background = element_rect(fill = NA, color = NA), 
+    panel.border = element_rect(fill = NA, color = "black"),
     legend.background = element_rect(fill = NA, color = NA),
     strip.background = element_blank(),
     strip.text = element_blank(),
@@ -605,7 +606,6 @@ top.row <- ggplot() +
     geom_sf(data = s.america, color = "gray80", fill = "gray80") +
     geom_sf(data = braz.outline, color = "gray25", size = 0.1) +
     geom_sf(data = var.all.models, aes(fill = pred.var), color = NA) +
-    coord_sf(datum = NA)+
     scale_fill_viridis(option = "magma", direction = -1, discrete = F,
                      na.value = "gray70", 
                      guide = guide_colorbar(
@@ -620,10 +620,9 @@ top.row <- ggplot() +
                        label.hjust = 0.5,
                        title.theme = element_text(size = 8, angle = 0),
                        label.theme = element_text(size = 8, angle = 0))) +
-    theme_map() +
+  my_theme_map() +
   facet_wrap(~model, dir = "h") +
-  panel_border() +
-  coord_sf(xlim = c(-74, -34.78), ylim = c(-33.8, 5.3))
+  coord_sf(xlim = c(-74, -34.78), ylim = c(-33.8, 5.3), datum = NA)
 ```
 
 
@@ -668,8 +667,8 @@ ggdraw() +
   draw_plot(top.row, x = 0, y = 0.5, width = 1, height = 0.5) +
   draw_plot(bottom.row, x = 0.02, y = 0, width = 0.98, height = 0.5) +
   draw_plot_label(label = letters[1:6],
-                  x = c(0.1,0.4,0.72,0.1,0.4,0.72),
-                  y = c(1,1,1,0.55,0.55,0.55), 
+                  x = c(0.1,0.4,0.70,0.1,0.4,0.70),
+                  y = c(1,1,1,0.53,0.53,0.53), 
                   size = 12)
 
 dev.off()
