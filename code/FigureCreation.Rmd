@@ -323,7 +323,7 @@ Current rescaling (probability) by multiplying each predition by value $c$ such 
 
 $$ \sum{predictions} * c = \sum{positives} $$
 
-This is done for each individual model (full, LRR, HRR), resulting in three different values of $c$. Note that the final values are x $10^3$.
+This is done for each individual model (full, LRR, HRR), resulting in three different values of $c$.
 
 ## Load Data
 
@@ -383,18 +383,17 @@ pred.all.month <- pred.all %>%
   mutate(log.prob = log(mean.prob))
 
 #save probabilities
-saveRDS(pred.all, "../data_out/MS_results/probabilities.rds")
+# saveRDS(pred.all, "../data_out/MS_results/probabilities.rds")
 
 pred.map <- left_join(pred.all.month, braz.map, by = "muni.no")
-  
 ```
 
 
 ## Plot
 
 ```{r static map theme}
-theme_map <- function(...) {
-  theme_minimal() +
+my_theme_map <- function(...) {
+  theme_bw() +
   theme(
     axis.line = element_blank(),
     axis.text.x = element_blank(),
@@ -403,15 +402,14 @@ theme_map <- function(...) {
     axis.title.x = element_blank(),
     axis.title.y = element_blank(),
     legend.position = "right",
-    panel.grid = element_blank(),
     plot.background = element_rect(fill = NA, color = NA), 
     panel.background = element_rect(fill = NA, color = NA), 
+    panel.border = element_rect(fill = NA, color = "black"),
     legend.background = element_rect(fill = NA, color = NA),
-    strip.background = element_blank(),
-    strip.text = element_blank(),
-    panel.grid.major = element_blank(),
-    panel.grid.minor = element_blank(),
-    plot.margin = unit(c(5,5,5,5), unit = "pt"),
+    strip.background = element_rect(fill = NA, color = NA),
+    panel.grid.major.x = element_blank(),
+    panel.grid.major.y = element_blank(),
+    panel.spacing = unit(10, "pt"),
     ...
   )
 }
@@ -442,7 +440,7 @@ Subset out months we want (Feb, June, Dec.)
 ```{r}
 pred.map.subset <- pred.map %>%
   filter(cal.month %in% c(2,6,12)) %>%
-  mutate(monthLabel = month.abb[cal.month])
+  mutate(monthLabel = factor(month.abb[cal.month], levels = c("Feb", "Jun", "Dec")))
 ```
 
 Plot.
@@ -466,10 +464,13 @@ ggplot() +
                        label.hjust = 0.5,
                        title.theme = element_text(size = 8, angle = 0),
                        label.theme = element_text(size = 8, angle = 0))) +
-  facet_wrap(~model + monthLabel) +
+  facet_grid(model ~ monthLabel, 
+             labeller = labeller(
+               model = c("one.model" = 'Single', "two.model" = 'Two Part')
+             )) +
   geom_sf(data = nhp.split.map, fill = NA, color = "black", size=0.25) +
-  coord_sf(xlim = c(-74, -34.78), ylim = c(-33.8, 5.3)) +
-  theme_map()
+  coord_sf(xlim = c(-74, -34.78), ylim = c(-33.8, 5.3), datum = NA) +
+  my_theme_map()
 
 dev.off()
 ```
@@ -504,7 +505,7 @@ pred.lowNHP <- readRDS("../data_out/MS_results/LowModel/wholePredictions.rds")
 
 ### Over Space
 
-I'm calculating the variance per municipality to get a measure of "flickering". The variance is calculated on the raw values.
+This calculates the variance per municipality to get a measure of "flickering". The variance is calculated on the raw values.
 
 ```{r}
 # calculate variance per municipality over whole time period
