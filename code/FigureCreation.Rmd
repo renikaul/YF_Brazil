@@ -318,13 +318,7 @@ dev.off()
 
 #Figure 3: Maps of Calendar Months
 
-This map is a 3 x 2 lattice, showing three characteristic annual time points in the year (represented as mean across all instances of that month) across the single and dual-process model. These values are re-scaled in order to be comparable across models.
-
-Current rescaling (probability) by multiplying each predition by value $c$ such that:
-
-$$ \sum{predictions} * c = \sum{positives} $$
-
-This is done for each individual model (full, LRR, HRR), resulting in three different values of $c$.
+This map is a 3 x 2 lattice, showing three characteristic annual time points in the year (represented as mean across all instances of that month) across the single and dual-process model. These values are represented by percentiles of each individual model.
 
 ## Load Data
 
@@ -355,22 +349,28 @@ pred.lowNHP <- readRDS("../data_out/MS_results/LowModel/wholePredictions.rds")
 
 ## Calculate Data for Plots
 
-Rescale raw outputs into probabilities and combine into one dataframe.
+Rescale raw outputs into percentiles and combine into one dataframe
 
 ```{r}
 pred.lowNHP <- pred.lowNHP %>%
-  mutate(c = sum(case)/sum(prediction))%>%
-  mutate(prob = prediction * c) %>%
+  mutate(percentile = cut(prediction, 
+                          quantile(prediction, probs = seq(0,1, by = 0.0001)), 
+                          include.lowest = T,
+                          labels = F)) %>%
   mutate(model = "two.model")
 
 pred.highNHP <- pred.highNHP %>%
-  mutate(c = sum(case)/sum(prediction))%>%
-  mutate(prob = prediction * c) %>%
+  mutate(percentile = cut(prediction, 
+                          quantile(prediction, probs = seq(0,1, by = 0.0001)), 
+                          include.lowest = T,
+                          labels = F)) %>%
   mutate(model = "two.model")
 
 pred.one.model <- pred.one.model %>%
-  mutate(c = sum(case)/sum(prediction))%>%
-  mutate(prob = prediction * c) %>%
+  mutate(percentile = cut(prediction, 
+                          quantile(prediction, probs = seq(0,1, by = 0.0001)), 
+                          include.lowest = T,
+                          labels = F)) %>%
   mutate(model = "one.model")
 
 pred.all <- rbind(pred.lowNHP, pred.highNHP, pred.one.model) %>%
@@ -392,7 +392,7 @@ pred.all.2008 <- pred.all %>%
 
 #pred.map <- left_join(pred.all.month, braz.map, by = "muni.no")
 
-pred.map <- na.omit(left_join(pred.all.2008, braz.map, by = "muni.no"))
+pred.map <- left_join(pred.all.2008, braz.map, by = "muni.no")
 
 ```
 
@@ -454,22 +454,16 @@ pred.map.subset <- pred.map %>%
 Plot.
 
 ```{r}
-pdf(file = "figures/manuscript/Figure3Prob.pdf", width = 6.69, height = 4.75, family = "sans")
+pdf(file = "figures/manuscript/Figure3Perc.pdf", width = 6.69, height = 4.75, family = "sans")
 
 ggplot() +
   geom_sf(data = s.america, color = "gray80", fill = "gray80") +
-  geom_sf(data = pred.map.subset, aes(fill = mean.prob), color = NA, size = 0) +
-  scale_fill_viridis(option = "magma", direction = -1, discrete = F,
-                     na.value = "gray70", 
+  geom_sf(data = pred.map.subset, aes(fill = percentile/100), color = NA, size = 0) +
+  scale_fill_distiller(palette = "OrRd", direction = 1, type = "seq",
                      guide = guide_colorbar(
-                       title = "Probability",
+                       title = "Percentile",
                        direction = "vertical",
-                       barheight = unit(35, units = "mm"),
-                       barwidth = unit(2, units = "mm"),
-                       draw.ulim = F,
                        title.position = 'top',
-                       title.hjust = 0.5,
-                       label.hjust = 0.5,
                        title.theme = element_text(size = 8, angle = 0),
                        label.theme = element_text(size = 8, angle = 0))) +
   facet_grid(model ~ monthLabel, 
@@ -717,3 +711,8 @@ dev.off()
 # Supp. Figure X: Gif of maps
 
 This will be a big gif with a panel for each model. Each will have a different color scheme (like green, blue,red, etc.) so it is clear they are not meant to be compared. It will be a plot of raw predictions.
+
+```{r}
+
+```
+
