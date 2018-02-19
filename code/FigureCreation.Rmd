@@ -36,10 +36,9 @@ This document creates the figures for:
 *Insert manuscript citation here*
 
 I'm currently loading data individually for each figure, then if you want to remake one figure you don't have to rerun the whole document, just that section.
-
 #Figure 1: Relative Variable Importance as quantiles
 
-The median, and 95% quantile reported for dAUC scaled to max dAUC for each model. 
+The median, and 95% quantile reported for dAUC scaled to max median dAUC for each model. 
 
 ```{r relative variable importance Quantile}
 #function to calculate dAUC stats
@@ -48,20 +47,24 @@ RelativeImportance=function(x, model="NA"){
   model.AUC <- as.numeric(as.character(x[[2]][1,2])) # pull out AUC for full model
   # calculate delta AUC
   delta.AUC <- model.AUC- perms
-  # scale delta AUC between zero and one
-  scale.delta.AUC <- delta.AUC/max(delta.AUC)
+    # scale delta AUC between zero and one
+    #scale.delta.AUC <- delta.AUC/max(delta.AUC)
   #calculate median, upper and lower quantiles
-  Quant.dAUC <- scale.delta.AUC %>% 
+  Quant.dAUC <- delta.AUC %>% 
     melt(value.name="dAUC") %>% 
     rename(Rep=Var1, Variable=Var2)%>% 
     group_by(Variable) %>%
     summarise(dAUCmean=mean(dAUC),dAUCmedian=median(dAUC),Q975=quantile(dAUC, probs=0.975),Q025=quantile(dAUC, probs=0.025) ) %>%
-    arrange(desc(dAUCmedian)) %>%
-    mutate(Rank=c(11:1)) %>%
-    mutate(Model=model) %>%
     ungroup()
   
-  return(Quant.dAUC)
+  scale.dAUC <- Quant.dAUC %>%
+      group_by(Variable) %>%
+      mutate_all(funs(./max(Quant.dAUC$Q975))) %>% # divid all values by max median value
+      arrange(desc(dAUCmedian))%>%
+      ungroup() %>%  
+      mutate(Rank=c(11:1), Model=model)
+      
+  return(scale.dAUC)
 }
 
 #variable names for publication
@@ -93,11 +96,11 @@ allRelImportance <- within(allRelImportance, Variable <- factor(Variable, levels
 allRelImportance <- within(allRelImportance, Model <- factor(Model, levels = c("Single","Low","High")))
 
   
-b2 <-   ggplot(allRelImportance, aes(x=Variable, y=dAUCmedian, ymin = Q025, ymax = Q975, fill=Model))+
-    geom_crossbar(position="dodge")+
-    scale_y_continuous(limits=c(-.05,1))+
-    #geom_point(y=allRelImportance$dAUCmean)+
+b2  <-  ggplot(allRelImportance, aes(x=Variable, y=dAUCmedian, ymin = Q025, ymax = Q975, fill=Model))+
     geom_hline(yintercept = 0.0, color="grey50", linetype=2) +
+    geom_crossbar(position="dodge")+
+    #scale_y_continuous(limits=c(-.5,2))+
+    #geom_point(y=allRelImportance$dAUCmean)+
     ylab("Relative Importance") + xlab("variable") +
     scale_x_discrete("",labels=niceNames) +
     theme_few()+
@@ -123,7 +126,20 @@ b2 <-   ggplot(allRelImportance, aes(x=Variable, y=dAUCmedian, ymin = Q025, ymax
  #  tiff("figures/manuscript/VarImpQuantilesLattice.tiff")
  #  plot(b2)
  #  dev.off()
+  
+b3 <-  ggplot(allRelImportance, aes(x=Variable, y=dAUCmedian, fill=Model)) + 
+  geom_bar(stat="identity",position="dodge")+
+  #geom_errorbar(position="dodge", colour="black")+
+  ylab("Relative Importance") + xlab("variable") +
+   #scale_y_continuous(expand = c(0, 0)) +
+   scale_x_discrete("",labels=niceNames) +
+  theme_few()+
+  theme(axis.text.x=element_text(angle=35, hjust=1), legend.position = c(.8,.8) ) +
+  scale_fill_tableau("colorblind10")
 
+tiff("figures/manuscript/VarImpMedian.tiff")
+plot(b3)
+dev.off()
 ```
 
 # Figure 1: Variable Importance (OLD)
@@ -298,7 +314,7 @@ justNamesEnd <- c(
 y_levels <- levels(allRelImportance$Variable)
 
 p <- ggplot(allRelImportance, aes(x = Model, y = Rank, group = Variable)) +   # group = id is important!
-  geom_hline(yintercept = c(1:11), color="grey80", linetype=2) +
+  geom_hline(yintercept = c(1:11), color="grey70", linetype=2, alpha=0.5, size=0.25) +
   geom_path(aes(color = Variable),lineend = 'round', linejoin = 'round', size=2) +
   scale_y_discrete(limits = levels(allRelImportance$Variable), labels=c(11:1)) + #ylim/lab details
   ylab("Variable Importance Rank (median) ") +
@@ -315,7 +331,6 @@ pdf("figures/manuscript/RankMedian.pdf")
 plot(p)
 dev.off()
 ```
-
 #Figure 3: Maps of Calendar Months
 
 This map is a 3 x 2 lattice, showing three characteristic annual time points in the year (represented as mean across all instances of that month) across the single and dual-process model. These values are represented by percentiles of each individual model.
