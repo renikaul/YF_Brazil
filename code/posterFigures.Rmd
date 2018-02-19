@@ -1,0 +1,13 @@
+---
+title: "Poster Figures"
+author: "Michelle Evans"
+date: "2/19/2018"
+output: html_document
+---
+
+This document makes figures from the yellow fever Brazil project for a poster.
+
+Poster Session:
+
+Symposium on Vector Population Dynamics. Feb 2018. University of Georgia. Center for Ecology of Infectious Diseases.
+
