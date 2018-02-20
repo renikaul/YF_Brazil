@@ -46,25 +46,36 @@ Load data.
 pred.one.model <- readRDS("../data_out/MS_results/OneModel/wholePredictions.rds")
 pred.highNHP <- readRDS("../data_out/MS_results/HighModel/wholePredictions.rds")
 pred.lowNHP <- readRDS("../data_out/MS_results/LowModel/wholePredictions.rds")
+
+nhp.split <- readRDS("../data_clean/environmental/twoModelSplit.rds")
 ```
 
 Calculate seasonality (mean for all of brazil by month by model)
 
 ```{r}
 time.one.model <- as.data.frame(pred.one.model) %>%
-  group_by(month.no) %>%
-  summarise(pred.mean = mean(prediction, na.rm = T)) %>%
-  mutate(model = "one.model")
+  left_join(nhp.split, by = "muni.no") %>%
+  mutate(region = case_when(
+    above5split == "above5" ~ "HRR",
+    above5split == "less" ~ "LRR"
+  )) %>%
+  group_by(month.no, region) %>%
+  summarise(pred.mean = mean(prediction, na.rm = T), sumCases = sum(case)) %>%
+  mutate(model = "one.model") %>%
+  select(month.no, pred.mean, sumCases, model, region) %>%
+  ungroup()
 
 time.lowNHP <- as.data.frame(pred.lowNHP) %>%
   group_by(month.no) %>%
-  summarise(pred.mean = mean(prediction, na.rm = T)) %>%
-  mutate(model = "lowNHP")
+  summarise(pred.mean = mean(prediction, na.rm = T), sumCases = sum(case)) %>%
+  mutate(model = "two.model") %>%
+  mutate(region = "LRR")
 
 time.highNHP <- as.data.frame(pred.highNHP) %>%
   group_by(month.no) %>%
-  summarise(pred.mean = mean(prediction, na.rm = T)) %>%
-  mutate(model = "highNHP")
+  summarise(pred.mean = mean(prediction, na.rm = T), sumCases = sum(case)) %>%
+  mutate(model = "two.model") %>%
+  mutate(region = "HRR")
 
 time.all.models <- rbind(time.one.model, time.highNHP, time.lowNHP) 
 
@@ -80,7 +91,10 @@ time.all.models <- time.all.models %>%
   mutate(monthLabel = lubridate::month(cal.month, label = T))
 
 #order models
-time.all.models$model <- factor(time.all.models$model, levels = c("one.model", "lowNHP", "highNHP"))
+time.all.models$model <- factor(time.all.models$model, 
+                                levels = c("one.model", "two.model"))
+time.all.models$region <- factor(time.all.models$region, 
+                                 levels = c("LRR", "HRR"))
 
 rm(time.one.model, time.highNHP, time.lowNHP)
 ```
@@ -88,32 +102,34 @@ rm(time.one.model, time.highNHP, time.lowNHP)
 ##Plot
 
 ```{r}
-png(file = "figures/poster/seasonalityTimeSeries.png", width = 3600, height = 1500, units = "px", res = 300)
+png(file = "figures/poster/seasonalityTimeSeriesSquare.png", width = 2000, height = 2000, units = "px", res = 300)
 
 ggplot(data = time.all.models, aes(x = monthLabel, y = pred.mean)) +
     geom_line(aes(group = year), color = "gray70", size = 1)+
     geom_smooth(aes(x = cal.month, y = pred.mean), se = F, color = "black", 
                 size = 1.5) +
-    theme_minimal() +
+    theme_bw() +
     ylab("") +
     xlab("") +
     scale_x_discrete(breaks = c("Jan","Mar","May","Jul","Sep","Nov")) +
     theme(
       axis.title = element_text(size = 40),
-      axis.text = element_text(size = 28),
-      axis.text.x = element_text(size = 28, angle = 60, 
+      axis.text = element_text(size = 20),
+      axis.text.x = element_text(size = 20, angle = 60, 
                                  vjust=1, hjust = 1),
       panel.background = element_blank(),
       strip.background = element_blank(),
-      strip.text.x = element_blank(),
+      strip.text = element_blank(),
       axis.line = element_line(),
       panel.grid = element_blank(),
       axis.line.y = element_line(),
       axis.ticks.length = unit(0.5, "lines"),
       axis.ticks = element_line()
     ) +
-  facet_wrap(~model) +
-  panel_border()
+  facet_grid(region~model) +
+  geom_rug(aes(x=jitter(as.numeric(monthLabel),0.2), alpha = sumCases^0.5, size = sumCases), inherit.aes = FALSE) +
+  scale_alpha(range = c(0,1)) +
+  guides(alpha = F, size = F)
 
 dev.off()
 ```
@@ -381,3 +397,193 @@ ggplot(data = nhp.split.map) +
 
 dev.off()
 ```
+
+# Model of example months
+
+3 x 2 lattice showing three months and both models
+
+## Process Data
+
+Load Data
+
+```{r}
+braz.map <- st_read("../data_clean/shapefiles", "BRAZNoIslands")
+braz.map <- rename(braz.map, muni.no = muni_no)
+
+# NHP split index
+nhp.split <- readRDS("../data_clean/environmental/twoModelSplit.rds")
+nhp.split.map <- left_join(braz.map, nhp.split, by = "muni.no") %>%
+  group_by(above5split) %>%
+  summarize() %>%
+  #gets out any weird lines between polygons
+  st_buffer(0.01)
+
+#get brazil outline
+braz.outline <- st_read("../data_clean/shapefiles", "brazilOutline")
+braz.outline <- select(braz.outline, ADMIN)
+
+#get other neighboring countries
+s.america <- st_read("../data_clean/shapefiles", "South_America")
+
+# prediction data
+pred.one.model <- readRDS("../data_out/MS_results/OneModel/wholePredictions.rds")
+pred.highNHP <- readRDS("../data_out/MS_results/HighModel/wholePredictions.rds")
+pred.lowNHP <- readRDS("../data_out/MS_results/LowModel/wholePredictions.rds")
+```
+
+Calculate Percentiles
+
+```{r}
+pred.lowNHP <- pred.lowNHP %>%
+  mutate(percentile = cut(prediction, 
+                          quantile(prediction, probs = seq(0,1, by = 0.0001)), 
+                          include.lowest = T,
+                          labels = F)) %>%
+  mutate(model = "two.model")
+
+pred.highNHP <- pred.highNHP %>%
+  mutate(percentile = cut(prediction, 
+                          quantile(prediction, probs = seq(0,1, by = 0.0001)), 
+                          include.lowest = T,
+                          labels = F)) %>%
+  mutate(model = "two.model")
+
+pred.one.model <- pred.one.model %>%
+  mutate(percentile = cut(prediction, 
+                          quantile(prediction, probs = seq(0,1, by = 0.0001)), 
+                          include.lowest = T,
+                          labels = F)) %>%
+  mutate(model = "one.model")
+
+pred.all <- rbind(pred.lowNHP, pred.highNHP, pred.one.model) %>%
+  mutate(cal.month = month.no %% 12)
+
+pred.all$cal.month[pred.all$cal.month==0] <- 12
+
+pred.all <- mutate(pred.all, year = 2001 + month.no %/% 12)
+
+pred.all.year <- pred.all %>%
+  filter(year==2012)
+
+pred.map.all <- left_join(pred.all, braz.map, by = "muni.no")
+
+pred.map.year <- left_join(pred.all.year, braz.map, by = "muni.no")
+
+pred.map.subset <- pred.map.year %>%
+  filter(cal.month %in% c(1,6,9)) %>%
+  mutate(monthLabel = factor(month.abb[cal.month], levels = c("Jan", "Jun", "Sep")))
+```
+
+Calculate case centroids
+
+```{r}
+case.centroids <- pred.map.all %>%
+  filter(case==1)
+
+case.centroids <- st_centroid(st_sf(case.centroids))
+```
+
+
+## Static Plot
+
+Map theme
+
+```{r}
+my_theme_map <- function(...) {
+  theme_bw() +
+  theme(
+    axis.line = element_blank(),
+    axis.text.x = element_blank(),
+    axis.text.y = element_blank(),
+    axis.ticks = element_blank(),
+    axis.title.x = element_blank(),
+    axis.title.y = element_blank(),
+    legend.position = "right",
+    plot.background = element_rect(fill = NA, color = NA), 
+    panel.background = element_rect(fill = NA, color = NA), 
+    panel.border = element_rect(fill = NA, color = "black"),
+    legend.background = element_rect(fill = NA, color = NA),
+    strip.background = element_rect(fill = NA, color = NA),
+    panel.grid.major.x = element_blank(),
+    panel.grid.major.y = element_blank(),
+    panel.spacing = unit(10, "pt"),
+    ...
+  )
+}
+```
+
+
+```{r}
+png(file = "figures/poster/staticMap.png", width = 2700, height = 1800, units = "px", res = 300, bg = 'transparent')
+
+ggplot() +
+  geom_sf(data = s.america, color = "gray80", fill = "gray80") +
+  geom_sf(data = pred.map.subset, aes(fill = percentile/100), color = NA, size = 0) +
+  scale_fill_distiller(palette = "OrRd", direction = 1, type = "seq",
+                     guide = guide_colorbar(
+                       title = "Percentile",
+                       direction = "vertical",
+                       title.position = 'top',
+                       title.theme = element_text(size = 8, angle = 0),
+                       label.theme = element_text(size = 8, angle = 0))) +
+  facet_grid(model ~ monthLabel, 
+             labeller = labeller(
+               model = c("one.model" = 'Single', "two.model" = 'Two Part')
+             )) +
+  geom_sf(data = nhp.split.map, fill = NA, color = "black", size=0.1) +
+  coord_sf(xlim = c(-74, -34.78), ylim = c(-33.8, 5.3), datum = NA) +
+  my_theme_map()
+
+dev.off()
+```
+
+
+## GIFs
+
+Make individual png file and then loop together using Image Magick afterwards.
+
+```{r} 
+for (i in 1:max(pred.map.all$month.no)){
+  
+  png(file = paste0("figures/poster/gifs/month", 
+                    formatC(i, width = 3, format = "d", flag = "0"), ".png"), 
+      width = 1800, height = 1000, units = "px", res = 300, bg = 'white')
+  
+  plot.year <- 2001 + (i%/% 12)
+  plot.month <- month.name[i %% 12]
+  if(is_empty(plot.month)){plot.month == "December"}
+  
+  plotTitle <- paste("Spillover risk in", plot.month, plot.year, sep = " ")
+  
+gif.plot <- ggplot() +
+  geom_sf(data = s.america, color = "gray80", fill = "gray80") +
+  geom_sf(data = pred.map.all[pred.map.all$month.no==i,], aes(fill = percentile/100), color = NA, size = 0) +
+  scale_fill_distiller(palette = "OrRd", direction = 1, type = "seq",
+                     guide = guide_colorbar(
+                       title = "Percentile",
+                       direction = "vertical",
+                       title.position = 'top',
+                       title.theme = element_text(size = 8, angle = 0),
+                       label.theme = element_text(size = 8, angle = 0),
+                       limits = c(0,100))) +
+  facet_grid(. ~ model, 
+             labeller = labeller(
+               model = c("one.model" = 'Country-wide', "two.model" = 'Regional')
+             )) +
+  geom_sf(data = nhp.split.map, fill = NA, color = "black", size=0.1) +
+  geom_sf(data = case.centroids[case.centroids$month.no==i,], size = 1) + 
+  coord_sf(xlim = c(-74, -34.78), ylim = c(-33.8, 5.3), datum = NA) +
+  my_theme_map() +
+  ggtitle(plotTitle)
+
+print(gif.plot)
+
+dev.off()
+
+}
+```
+
+Use ImageMagick to create plot from png files
+
+cd into `figures/posters/gifs`
+CMDLINE: `convert -delay 50 *.png \ predictionsAll.gif`
