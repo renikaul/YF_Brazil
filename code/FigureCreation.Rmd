@@ -11,7 +11,8 @@ output: html_document
 knitr::opts_chunk$set(echo = TRUE)
 library(tidyverse)
 
-
+#fig 1
+library(reshape2)
 
 #fig 3
 library(sf)
@@ -331,6 +332,7 @@ pdf("figures/manuscript/RankMedian.pdf")
 plot(p)
 dev.off()
 ```
+
 #Figure 3: Maps of Calendar Months
 
 This map is a 3 x 2 lattice, showing three characteristic annual time points in the year (represented as mean across all instances of that month) across the single and dual-process model. These values are represented by percentiles of each individual model.
