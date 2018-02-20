@@ -352,8 +352,8 @@ nhp.split.map <- left_join(braz.map, nhp.split, by = "muni.no") %>%
   st_buffer(0.01)
 
 #get brazil outline
-braz.outline <- getData('GADM', country ='BRA', level = 0)
-braz.outline <- dplyr::select(st_as_sf(braz.outline), ISO)
+braz.outline <- st_read("../data_clean/shapefiles", "brazilOutline")
+braz.outline <- select(braz.outline, ADMIN)
 
 #get other neighboring countries
 s.america <- st_read("../data_clean/shapefiles", "South_America")
