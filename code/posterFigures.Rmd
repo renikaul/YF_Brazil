@@ -585,5 +585,5 @@ dev.off()
 
 Use ImageMagick to create plot from png files
 
-cd into `figures/posters/gifs`
-CMDLINE: `convert -delay 50 *.png \ predictionsAll.gif`
+cd into `figures/poster/gifs`
+CMDLINE: `convert -delay 50 *.png \ predictions.gif`
