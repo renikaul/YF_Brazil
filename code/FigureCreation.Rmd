@@ -471,7 +471,7 @@ pred.map.subset <- pred.map %>%
 Plot.
 
 ```{r}
-pdf(file = "figures/manuscript/Figure3Perc.pdf", width = 6.69, height = 4.75, family = "sans")
+pdf(file = "figures/manuscript/PercentileMap.pdf", width = 6.69, height = 4.75, family = "sans")
 
 ggplot() +
   geom_sf(data = s.america, color = "gray80", fill = "gray80") +
@@ -485,7 +485,7 @@ ggplot() +
                        label.theme = element_text(size = 8, angle = 0))) +
   facet_grid(model ~ monthLabel, 
              labeller = labeller(
-               model = c("one.model" = 'Single', "two.model" = 'Two Part')
+               model = c("one.model" = 'National Model', "two.model" = 'Regional Model')
              )) +
   geom_sf(data = nhp.split.map, fill = NA, color = "black", size=0.1) +
   coord_sf(xlim = c(-74, -34.78), ylim = c(-33.8, 5.3), datum = NA) +
