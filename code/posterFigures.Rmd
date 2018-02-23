@@ -548,24 +548,28 @@ for (i in 1:max(pred.map.all$month.no)){
   png(file = paste0("figures/poster/gifs/month", 
                     formatC(i, width = 3, format = "d", flag = "0"), ".png"), 
       width = 1800, height = 1000, units = "px", res = 300, bg = 'white')
-  
-  plot.year <- 2001 + (i%/% 12)
-  plot.month <- month.name[i %% 12]
-  if(is_empty(plot.month)){plot.month == "December"}
+  #adjust for my bad ability at division which makes december respond strange
+  if (i%%12 == 0){
+    plot.year <- 2000 + (i%/% 12)
+    plot.month <- "December"
+  } else{
+    plot.year <- 2001 + (i%/% 12)
+    plot.month <- month.name[i %% 12]
+  }
   
   plotTitle <- paste("Spillover risk in", plot.month, plot.year, sep = " ")
   
 gif.plot <- ggplot() +
   geom_sf(data = s.america, color = "gray80", fill = "gray80") +
   geom_sf(data = pred.map.all[pred.map.all$month.no==i,], aes(fill = percentile/100), color = NA, size = 0) +
-  scale_fill_distiller(palette = "OrRd", direction = 1, type = "seq",
+  scale_fill_distiller(palette = "OrRd", direction = 1, type = "seq", limits = c(0,100),
                      guide = guide_colorbar(
                        title = "Percentile",
                        direction = "vertical",
                        title.position = 'top',
                        title.theme = element_text(size = 8, angle = 0),
-                       label.theme = element_text(size = 8, angle = 0),
-                       limits = c(0,100))) +
+                       label.theme = element_text(size = 8, angle = 0))
+                     ) +
   facet_grid(. ~ model, 
              labeller = labeller(
                model = c("one.model" = 'Country-wide', "two.model" = 'Regional')
@@ -586,4 +590,4 @@ dev.off()
 Use ImageMagick to create plot from png files
 
 cd into `figures/poster/gifs`
-CMDLINE: `convert -delay 50 *.png \ predictions.gif`
+CMDLINE: `convert -delay 50 *.png \MapPercentile.gif`
