@@ -336,7 +336,9 @@ pred.all <- rbind(pred.lowNHP, pred.highNHP, pred.one.model) %>%
 pred.all$cal.month[pred.all$cal.month==0] <- 12
 
 pred.all.2008 <- pred.all %>%
-  mutate(year = 2001 + month.no %/% 12) %>%
+  mutate(year = case_when(
+    cal.month != 12 ~ 2001 + month.no %/% 12,
+    cal.month == 12 ~ 2000 + month.no %/% 12)) %>%
   filter(year==2008)
 
 pred.map <- left_join(pred.all.2008, braz.map, by = "muni.no")
@@ -380,7 +382,9 @@ pred.map.subset <- pred.map %>%
 Plot.
 
 ```{r}
-pdf(file = "figures/manuscript/PercentileMap.pdf", width = 6.69, height = 4.75, family = "sans")
+#pdf(file = "figures/manuscript/PercentileMap.pdf", width = 6.69, height = 4.75, family = "sans")
+
+tiff(file = "figures/manuscript/PercentileMap.tiff", width = 2007, height = 1425, units = "px", res = 300, family = "sans", compression = "lzw")
 
 ggplot() +
   geom_sf(data = s.america, color = "gray80", fill = "gray80") +
