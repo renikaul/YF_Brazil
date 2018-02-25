@@ -30,11 +30,11 @@ hrrCol <- "#7570b3"
 
 This document creates the figures for:
 
-Kaul, RajReni B., Michelle V. Evans, Courtney C. Murdock, John M. Drake. 2018. Spatio-temporal Spillover Risk of Yellow Fever in Brazil. *BMC Medicine*
+Kaul, RajReni B., Michelle V. Evans, Courtney C. Murdock, John M. Drake. 2018. Spatio-temporal spillover risk of yellow fever in brazil. *BMC Medicine*.
 
 Data is loaded individually for each figure (except coord plot figure), but packages and set up must be run for everything.
 
-Figure sizing:
+Figure sizing (max file size 10 MB):
 
 Half page width = 85mm (3.3 inch)
 Full page width = 170 mm (6.69 inch)
@@ -104,10 +104,7 @@ print(histPlot)
 print(splitMap, vp = vp)
 
 dev.off()
-
 ```
-
-
 
 # Relative Variable Importance as quantiles
 
@@ -207,7 +204,7 @@ b3 <-  ggplot(allRelImportance, aes(x=Variable, y=dAUCmedian, fill=Model)) +
   theme(text = element_text(face="bold",size=18))+
   theme(axis.text.x=element_text(angle=45, hjust=1), legend.position = c(.6,.8) ) +
   labs(y="Relative Variable Importance") + 
-  scale_fill_tableau("colorblind10")
+  scale_fill_manual(values = c(singleCol, lrrCol, hrrCol))
 
 plot(b3)
 
@@ -278,7 +275,7 @@ dev.off()
 
 #Maps of Calendar Months
 
-This map is a 3 x 2 lattice, showing three characteristic annual time points in the year (represented as mean across all instances of that month) across the single and dual-process model. These values are represented by percentiles of each individual model.
+This map is a 3 x 2 lattice, showing three time points in 2008 across the national and regional model. These values are represented by percentiles of each individual model.
 
 ## Load Data
 
@@ -338,22 +335,11 @@ pred.all <- rbind(pred.lowNHP, pred.highNHP, pred.one.model) %>%
 
 pred.all$cal.month[pred.all$cal.month==0] <- 12
 
-# pred.all.month <- pred.all %>%
-#   group_by(muni.no, model, cal.month) %>%
-#   summarise(mean.prob = mean(prob)) %>%
-#   mutate(log.prob = log(mean.prob))
-
 pred.all.2008 <- pred.all %>%
   mutate(year = 2001 + month.no %/% 12) %>%
   filter(year==2008)
 
-#save probabilities
-# saveRDS(pred.all, "../data_out/MS_results/probabilities.rds")
-
-#pred.map <- left_join(pred.all.month, braz.map, by = "muni.no")
-
 pred.map <- left_join(pred.all.2008, braz.map, by = "muni.no")
-
 ```
 
 
@@ -383,27 +369,7 @@ my_theme_map <- function(...) {
 }
 ```
 
-```{r plot all months, eval = F}
-for (k in unique(pred.map$model)){
-  
-  for(i in 1:12){
-    
-    pdf(file = paste0("figures/Fig4/", gsub("\\.", "", k), "Month", i, ".pdf"), width = 12, height = 12, family = "sans")
-
-    p <- ggplot(data = pred.map[pred.map$cal.month == i & pred.map$model == k,])+
-      geom_sf(aes(fill = mean.pred), color = NA) +
-      ggtitle(paste(k, "month", i, sep = " "))
-    
-    print(p)
-
-    dev.off()
-
-  } #month loop
-
-} #model loop
-```
-
-Subset out months we want.
+Subset out months.
 
 ```{r}
 pred.map.subset <- pred.map %>%
@@ -433,37 +399,6 @@ ggplot() +
   geom_sf(data = nhp.split.map, fill = NA, color = "black", size=0.1) +
   coord_sf(xlim = c(-74, -34.78), ylim = c(-33.8, 5.3), datum = NA) +
   my_theme_map()
-
-dev.off()
-```
-
-Caption: Probability of yf spillover averaged over calendar month for December (a,d), February (b,e), and June (c,f). Result from single model in top row and two process model in bottom row.
-
-Plot Quantile.
-
-```{r}
-pdf(file = "figures/manuscript/Figure3Quant2008.pdf", width = 6.69, height = 4.75, family = "sans")
-
-ggplot() +
-  geom_sf(data = s.america, color = "gray80", fill = "gray80") +
-  geom_sf(data = pred.map.subset, aes(fill = cut(prediction, quantile(prediction, probs = seq(0,1,0.2)))), color = NA, size = 0) +
-  scale_fill_brewer(palette = "OrRd", direction = 1, type = "seq",
-                     guide = guide_legend(
-                       title = "Ranked Quintiles",
-                       direction = "horizontal",
-                       title.position = 'top',
-                       title.theme = element_text(size = 8, angle = 0),
-                       label.theme = element_text(size = 8, angle = 0),
-                       nrow = 1),
-                    labels = c("0-20%", "21-40%", "41-60%", "61-80%", "81-100%")) +
-  facet_grid(model ~ monthLabel, 
-             labeller = labeller(
-               model = c("one.model" = 'Single', "two.model" = 'Two Part')
-             )) +
-  geom_sf(data = nhp.split.map, fill = NA, color = "gray20", size=0.01) +
-  coord_sf(xlim = c(-74, -34.78), ylim = c(-33.8, 5.3), datum = NA) +
-  my_theme_map() +
-  theme(legend.position = "bottom")
 
 dev.off()
 ```
@@ -652,7 +587,10 @@ bottom.row <-  ggplot(data = time.all.models, aes(x = monthLabel, y = pred.mean)
 Use cowplot. Note sometimes you need to make sure any pdf devices are off by running `dev.off()` a whole bunch of times first.
 
 ```{r}
-pdf(file = "figures/manuscript/LatticePlot.pdf", width = 6.69, height = 4.75, family = "sans")
+#pdf(file = "figures/manuscript/LatticePlot.pdf", width = 6.69, height = 4.75, family = "sans")
+
+tiff(file = "figures/manuscript/LatticePlot.tiff", width = 2007, height = 1425, units = "px", res = 300, family = "sans", compression = "lzw")
+
 
 ggdraw() +
   draw_plot(top.row, x = 0, y = 0.5, width = 1, height = 0.5) +
@@ -665,10 +603,7 @@ ggdraw() +
 dev.off()
 ```
 
-**Caption:** Model variance through space (a,b,c) and time(d,e,f). Plots of variance municipality-level predictions using the single process model (a), dual process model with low reservoir richness (b), and dual process model with high reservoir richness (c). Mean probability across the entire study area of Brazil for the single process model (e), dual process model with low reservoir richness (e), and dual process model with high reservoir richness (f). Gray lines represent an individual year of data with overall mean in black.
-
-
-# Supp. Figure: Gif of maps
+# Supp. Figure: GIF of maps
 
 GIF of model predictions as percentiles. This plots indidivudal png files which are then converted to GIF using ImageMagick.
 
