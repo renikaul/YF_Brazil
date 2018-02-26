@@ -1,5 +1,5 @@
 # YF_Brazil
-   Target journal: BMC Medicine [Special Issue](https://bmcmedicine.biomedcentral.com/articles/collections/spatialepidemiology?sap-outbound-id=): Spatial epidemiology and infectious diseases **Due Feb 28th** (see [BMC Medicine ms requirements](https://bmcmedicine.biomedcentral.com/submission-guidelines/preparing-your-manuscript/research-articles)
+   Target journal: BMC Medicine [Special Issue](https://bmcmedicine.biomedcentral.com/articles/collections/spatialepidemiology?sap-outbound-id=): Spatial epidemiology and infectious diseases **Due Feb 28th -> March 15th** (see [BMC Medicine ms requirements](https://bmcmedicine.biomedcentral.com/submission-guidelines/preparing-your-manuscript/research-articles)
    
  # Timeline for 28th submission deadline
  
