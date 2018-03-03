@@ -66,6 +66,9 @@ nhp.split.map <- left_join(braz.map, nhp.split, by = "muni.no") %>%
   summarize() %>%
   #gets out any weird lines between polygons
   st_buffer(0.01)
+
+#create dataframe that keeps split and raw NHP richness
+nhpColor <- left_join(primRichness, nhp.split, by = "muni.no")
 ```
 
 ## Plot
@@ -86,13 +89,27 @@ splitMap <- ggplot(data = nhp.split.map) +
 
 ### Histogram
 
+Based on split
+
 ```{r}
 histPlot <- ggplot(data = primRichness) +
   geom_histogram(aes(x=spRich), binwidth = 1, fill = c(rep(lrrCol, 6), rep(hrrCol,  17))) +
-  ylab(expression("Log"[10]*"Municipalities")) +
+  ylab(expression("No. of Municipalities")) +
   xlab("NHP Species Richness") +
   scale_y_continuous(trans = 'log10', expand = c(0,0)) +
   scale_x_continuous(expand = c(0,0))
+```
+
+Based on species richness
+```{r}
+histPlot <- ggplot(data = nhpColor) +
+  geom_histogram(aes(x=spRich, fill = above5split), binwidth = 1, alpha = 0.8, position = "identity") +
+  ylab(expression("No. of Municipalities")) +
+  xlab("NHP Species Richness") +
+  scale_y_log10(expand = c(0,0)) +
+  scale_x_continuous(expand = c(0,0)) +
+  scale_fill_manual(values = c(hrrCol, lrrCol)) +
+  guides(fill = F)
 ```
 
 ### Facet Together
@@ -100,7 +117,7 @@ histPlot <- ggplot(data = primRichness) +
 ```{r}
 vp <- viewport(width = 0.45, height = 0.45, x = 0.75, y = 0.72)
 
-pdf(file = "figures/manuscript/nhpSplitDist.pdf", width = 3.3, height = 3.3, family = "sans") 
+pdf(file = "../data_out/MS_results/figures/manuscript/nhpSplitDist.pdf", width = 3.3, height = 3.3, family = "sans") 
 
 print(histPlot)
 print(splitMap, vp = vp)
@@ -210,11 +227,11 @@ b3 <-  ggplot(allRelImportance, aes(x=Variable, y=dAUCmedian, fill=Model)) +
 
 plot(b3)
 
-tiff("figures/manuscript/VarImpMedian.tiff")
+tiff("../data_out/MS_results/figures/manuscript/VarImpMedian.tiff")
 plot(b3)
 dev.off()
 
-pdf("figures/manuscript/VarImpMedian.pdf")
+pdf("../data_out/MS_results/figures/manuscript/VarImpMedian.pdf")
 plot(b3)
 dev.off()
 ```
@@ -266,11 +283,11 @@ p <- ggplot(allRelImportance, aes(x = Model, y = Rank, group = Variable)) +   # 
   annotate("text", x = c(3.5), y=c(11:1), label = justNamesEnd) + 
   theme(legend.position = "none") 
 
-tiff("figures/manuscript/RankMedian.tiff")
+tiff("../data_out/MS_results/figures/manuscript/RankMedian.tiff")
 plot(p)
 dev.off()
 
-pdf("figures/manuscript/RankMedian.pdf")
+pdf("../data_out/MS_results/figures/manuscript/RankMedian.pdf")
 plot(p)
 dev.off()
 ```
@@ -384,9 +401,9 @@ pred.map.subset <- pred.map %>%
 Plot.
 
 ```{r}
-#pdf(file = "figures/manuscript/PercentileMap.pdf", width = 6.69, height = 4.75, family = "sans")
+#pdf(file = "../data_out/MS_results/figures/manuscript/PercentileMap.pdf", width = 6.69, height = 4.75, family = "sans")
 
-tiff(file = "figures/manuscript/PercentileMap.tiff", width = 2007, height = 1425, units = "px", res = 300, family = "sans", compression = "lzw")
+tiff(file = "../data_out/MS_results/figures/manuscript/PercentileMap.tiff", width = 2007, height = 1425, units = "px", res = 300, family = "sans", compression = "lzw")
 
 ggplot() +
   geom_sf(data = s.america, color = "gray80", fill = "gray80") +
@@ -593,9 +610,9 @@ bottom.row <-  ggplot(data = time.all.models, aes(x = monthLabel, y = pred.mean)
 Use cowplot. Note sometimes you need to make sure any pdf devices are off by running `dev.off()` a whole bunch of times first.
 
 ```{r}
-#pdf(file = "figures/manuscript/LatticePlot.pdf", width = 6.69, height = 4.75, family = "sans")
+#pdf(file = "../data_out/MS_results/figures/manuscript/LatticePlot.pdf", width = 6.69, height = 4.75, family = "sans")
 
-tiff(file = "figures/manuscript/LatticePlot.tiff", width = 2007, height = 1425, units = "px", res = 300, family = "sans", compression = "lzw")
+tiff(file = "../data_out/MS_results/figures/manuscript/LatticePlot.tiff", width = 2007, height = 1425, units = "px", res = 300, family = "sans", compression = "lzw")
 
 
 ggdraw() +
@@ -717,7 +734,7 @@ my_theme_map <- function(...) {
 ```{r} 
 for (i in 1:max(pred.map.all$month.no)){
   
-  png(file = paste0("figures/poster/gifs/month", 
+  png(file = paste0("../data_out/MS_results/figures/manuscript/gifs/month", 
                     formatC(i, width = 3, format = "d", flag = "0"), ".png"), 
       width = 1800, height = 1000, units = "px", res = 300, bg = 'white')
   #adjust for my bad ability at division which makes december respond strange
@@ -761,5 +778,5 @@ dev.off()
 
 Use ImageMagick to create plot from png files
 
-cd into `figures/poster/gifs`
+cd into `../data_out/MS_results/figures/poster/gifs`
 CMDLINE: `convert -delay 50 *.png \MapPercentile.gif`
