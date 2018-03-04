@@ -42,7 +42,7 @@
 
 ## Primate Maps
 
-**Downloaded**: Data is the IUCN Redlist of Terrestrial Mammal Shapefiles (http://www.iucnredlist.org/technical-documents/spatial-data). This was processed via 'primateProcessing.R'. 
+**Downloaded**: Data is the IUCN Redlist of Terrestrial Mammal Shapefiles (http://www.iucnredlist.org/technical-documents/spatial-data). This was processed via `primateProcessing.R`. 
 
 
 *Primate Proportions:* km^2/year. 

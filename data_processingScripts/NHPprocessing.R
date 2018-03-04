@@ -46,7 +46,6 @@ brazil <- readOGR("../data_clean","BRAZpolygons")
 # results in primateRaster.tif
 
 # stack all of the rasters and reclassify, then loop over the genera
-#files <- c("../../envCovariates/2001landcoverTest.tif", "../../envCovariates/2002landcoverTest.tif")
 files <- list.files("../../landCover/landCoverTIF", full.names=T)
 primateRaster <- raster("../../landCover/primate/primateRaster.tif")
 
