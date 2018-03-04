@@ -173,37 +173,9 @@ final.data <- all.data[c("case", "NumCase",
                         "muni.no", "month.no", "muni.name", "cal.month","year")]
 
 
-#5. Split the data ----------------------
 
-all.data <- final.data[order(-final.data$case, final.data$month.no),] 
 
-all.pres <- filter(all.data, case==1)
-all.bg <- filter(all.data, case==0)
-
-#Split infected municipalities
-#test.pres.inds <- base::sample(nrow(all.pres), ceiling(nrow(all.pres)/3)) #without year stratification
-test.pres.inds <- seq(1,nrow(all.pres), by=3) #with year stratification
-test.pres <- all.pres[test.pres.inds,]
-train.pres <- all.pres[-test.pres.inds,]
-
-#Split background data
-test.bg.inds <- base::sample(nrow(all.bg), ceiling(nrow(all.bg)/3))
-test.bg <- all.bg[test.bg.inds,]
-train.bg <- all.bg[-test.bg.inds,]
-
-training <- rbind(train.pres, train.bg)
-testing <- rbind(test.pres, test.bg)
-
-#6. Save data ---------------------------
-#individual training and testing data
-saveRDS(training, file="../data_clean/TrainingData.rds")
-saveRDS(testing, file="../data_clean/TestingData.rds")
-saveRDS(final.data, file="../data_clean/FinalData.rds")
-
-#index of data to create training and testing
-save(test.pres.inds, test.bg.inds, file="IndexForDataSplit.RData")
-
-#7. Split the data spatially and temporally (from #4)----------------------
+#5. Split the data spatially and temporally----------------------
 
 #get lat long coordinates for positive cases
 brazil <- readOGR("../data_clean", "BRAZpolygons")
@@ -262,7 +234,7 @@ train.bg <- all.bg[-test.bg.inds,]
 training <- rbind(train.pres, train.bg)
 testing <- rbind(test.pres, test.bg)
 
-#8. Save data with spatial and temporal stratification---------------------------
+#6. Save data with spatial and temporal stratification---------------------------
 #individual training and testing data
 saveRDS(training, file="../data_clean/TrainingDataSpat2.rds")
 saveRDS(testing, file="../data_clean/TestingDataSpat2.rds")
