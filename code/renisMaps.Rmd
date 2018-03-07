@@ -1,0 +1,130 @@
+---
+title: "Reni's Maps"
+author: "Michelle Evans"
+date: "March 7, 2018"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(ggplot2)
+library(rgdal)
+library(dplyr)
+library(leaflet)
+library(RColorBrewer)
+library(sf)
+```
+
+This document makes maps of environmental variables for Reni.
+
+```{r}
+environmental <- readRDS("../data_clean/FinalData.rds")
+braz.map <- st_read("../data_clean/shapefiles", "BRAZNoIslands")
+braz.map <- rename(braz.map, muni.no = muni_no)
+```
+
+# Maps of Highest Monthly Rainfall by Year
+
+In this map, we have one map per year. Then each municipality is colored by the month which has the highest rainfall for that year.
+
+```{r}
+monthRain <- environmental %>%
+  select(muni.no, month.no, cal.month, year, RFsqrt) %>%
+  group_by(muni.no, year) %>%
+  filter(RFsqrt==max(RFsqrt)) %>%
+  ungroup()
+
+monthRain <- left_join(monthRain, braz.map, by = "muni.no")
+```
+
+```{r}
+for (i in 2001:2013){
+  png(file = paste0("figures/reni/rainxyear/year", i, ".png"), width = 700, height = 500, units = "px", res = 100, bg = 'white')
+  
+  monthplot <- ggplot(data=monthRain[monthRain$year==i,], aes(fill=factor(cal.month, levels = 1:12)))+
+    geom_sf(color = NA) +
+    ggtitle(paste0("Which month had the highest rainfall in ", i))
+    
+  print(monthplot)
+  dev.off()
+}
+```
+
+# Maps of Highest Temperature by Year
+
+```{r}
+monthTemp <- environmental %>%
+  select(muni.no, month.no, cal.month, year, tempMean) %>%
+  group_by(muni.no, year) %>%
+  filter(tempMean==max(tempMean)) %>%
+  ungroup()
+
+monthTemp <- left_join(monthTemp, braz.map, by = "muni.no")
+```
+
+```{r}
+for (i in 2001:2013){
+  png(file = paste0("figures/reni/tempxyear/year", i, ".png"), width = 700, height = 500, units = "px", res = 100, bg = 'white')
+  
+  monthplot <- ggplot(data=monthTemp[monthTemp$year==i,], aes(fill=factor(cal.month, levels = c(1:12))))+
+    geom_sf(color = NA) +
+    ggtitle(paste0("Which month had the highest temperature in ", i))
+    
+  print(monthplot)
+  dev.off()
+}
+```
+
+# Maps of Highest Rainfall by month
+
+These maps answer the question: which year had the highest rainfall in January (Feb,etc)?
+
+```{r}
+yearRain <- environmental %>%
+  select(muni.no, month.no, cal.month, year, RFsqrt) %>%
+  group_by(muni.no, cal.month) %>%
+  filter(year<2014) %>%
+  filter(RFsqrt==max(RFsqrt)) %>%
+  ungroup()
+
+yearRain <- left_join(yearRain, braz.map, by = "muni.no")
+```
+
+```{r}
+for (i in 1:12){
+  png(file = paste0("figures/reni/rainxmonth/month", i, ".png"), width = 700, height = 500, units = "px", res = 100, bg = 'white')
+  
+  monthplot <- ggplot(data=yearRain[yearRain$cal.month==i,], aes(fill=factor(year, levels = 2001:2013)))+
+    geom_sf(color = NA) +
+    ggtitle(paste0("Which year had the highest rainfall in ", month.abb[i]))
+    
+  print(monthplot)
+  dev.off()
+}
+```
+
+# Maps of Highest Temperature by Month
+
+```{r}
+yearTemp <- environmental %>%
+  select(muni.no, month.no, cal.month, year, tempMean) %>%
+  group_by(muni.no, cal.month) %>%
+  filter(year<2014) %>%
+  filter(tempMean==max(tempMean)) %>%
+  ungroup()
+
+yearTemp<- left_join(yearTemp, braz.map, by = "muni.no")
+```
+
+```{r}
+for (i in 1:12){
+  png(file = paste0("figures/reni/tempxmonth/month", i, ".png"), width = 700, height = 500, units = "px", res = 100, bg = 'white')
+  
+  monthplot <- ggplot(data=yearTemp[yearTemp$cal.month==i,], aes(fill=factor(year, levels = 2001:2013)))+
+    geom_sf(color = NA) +
+    ggtitle(paste0("Which year had the highest rainfall in ", month.abb[i]))
+    
+  print(monthplot)
+  dev.off()
+}
+```
