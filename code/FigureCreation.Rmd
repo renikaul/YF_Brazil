@@ -403,7 +403,9 @@ Plot.
 ```{r}
 #pdf(file = "../data_out/MS_results/figures/manuscript/PercentileMap.pdf", width = 6.69, height = 4.75, family = "sans")
 
-tiff(file = "../data_out/MS_results/figures/manuscript/PercentileMap.tiff", width = 2007, height = 1425, units = "px", res = 300, family = "sans", compression = "lzw")
+tiff(file = "../data_out/MS_results/figures/manuscript/PercentileMap.tiff", width = 170, height = 110, units = "mm", res = 250, family = "sans", compression = "lzw") #to get less than 10 MB
+
+#tiff(file = "../data_out/MS_results/figures/manuscript/PercentileMap.tiff", width = 2007, height = 1425, units = "px", res = 300, family = "sans", compression = "lzw")
 
 ggplot() +
   geom_sf(data = s.america, color = "gray80", fill = "gray80") +
@@ -736,7 +738,7 @@ for (i in 1:max(pred.map.all$month.no)){
   
   png(file = paste0("../data_out/MS_results/figures/manuscript/gifs/month", 
                     formatC(i, width = 3, format = "d", flag = "0"), ".png"), 
-      width = 1800, height = 1000, units = "px", res = 300, bg = 'white')
+      width = 600, height = 330, units = "px", res = 100, bg = 'white')
   #adjust for my bad ability at division which makes december respond strange
   if (i%%12 == 0){
     plot.year <- 2000 + (i%/% 12)
@@ -761,7 +763,7 @@ gif.plot <- ggplot() +
                      ) +
   facet_grid(. ~ model, 
              labeller = labeller(
-               model = c("one.model" = 'Country-wide', "two.model" = 'Regional')
+               model = c("one.model" = 'National', "two.model" = 'Regional')
              )) +
   geom_sf(data = nhp.split.map, fill = NA, color = "black", size=0.1) +
   geom_sf(data = case.centroids[case.centroids$month.no==i,], size = 1) + 
@@ -779,4 +781,5 @@ dev.off()
 Use ImageMagick to create plot from png files
 
 cd into `../data_out/MS_results/figures/poster/gifs`
-CMDLINE: `convert -delay 50 *.png \MapPercentile.gif`
+CMDLINE: `convert -delay 50 *.png \MapPercentile.gif` (for gif)
+CMDLINE: `convert -antialias -delay 1 *.png MapPercentile.mp4` (for mp4)
