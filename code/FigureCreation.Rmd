@@ -558,7 +558,7 @@ top.row <- ggplot() +
     scale_fill_viridis(option = "magma", direction = -1, discrete = F,
                      na.value = "gray70", 
                      guide = guide_colorbar(
-                       title = "Variance",
+                       title = "Seasonality\nin Intensity\n(Variance)",
                        direction = "vertical",
                        barheight = unit(35, units = "mm"),
                        barwidth = unit(2, units = "mm"),
@@ -584,7 +584,7 @@ bottom.row <-  ggplot(data = time.all.models, aes(x = monthLabel, y = pred.mean)
     geom_line(aes(group = year), color = "gray70")+
     geom_smooth(aes(x = cal.month, y = pred.mean), se = F, color = "black") +
     theme_minimal() +
-    ylab("Mean Prediction") +
+    ylab("Mean Intensity") +
     xlab("") +
     scale_x_discrete(breaks = c("Jan","Mar","May","Jul","Sep","Nov")) +
     theme(
@@ -617,9 +617,9 @@ tiff(file = "../data_out/MS_results/figures/manuscript/LatticePlot.tiff", width 
 
 ggdraw() +
   draw_plot(top.row, x = 0, y = 0.5, width = 1, height = 0.5) +
-  draw_plot(bottom.row, x = 0.02, y = 0, width = 0.98, height = 0.5) +
+  draw_plot(bottom.row, x = 0.04, y = 0, width = 0.96, height = 0.5) +
   draw_plot_label(label = letters[1:6],
-                  x = c(0.1,0.4,0.70,0.1,0.4,0.70),
+                  x = c(0.12,0.42,0.70,0.12,0.42,0.70),
                   y = c(1,1,1,0.53,0.53,0.53), 
                   size = 12)
 
