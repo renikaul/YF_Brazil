@@ -24,6 +24,7 @@
 %%landscape orientation
 \usepackage{pdflscape}
 \usepackage[hyphens]{url}
+\usepackage{hyperref}
 
 \begin{document}
 
@@ -58,15 +59,19 @@ Primate species richness data was obtained from the IUCN Redlist of Terrestrial 
 \begin{table}[h]
 \normalsize
 \centering
-\caption{Data summary}
+\caption{Data summary. Training and testing dataset used to build the national model, which was then subset into the low reservoir richness (LRR), and high reservoir richness (HRR) regional models. }
 \label{my-label}
 \begin{tabular}{lcclccl}
       & \multicolumn{3}{c}{Positive Observations}                          & \multicolumn{3}{c}{Background Observations}                          \\ \cline{2-7}
 Model & \multicolumn{1}{l}{Training} & \multicolumn{1}{l}{Testing} & Total & \multicolumn{1}{l}{Training} & \multicolumn{1}{l}{Testing} & Total   \\ \hline
-SPP   & 81                           & 35                          & 116   & 607,070                      & 260,174                     & 867,244 \\
+National   & 81                           & 35                          & 116   & 607,070                      & 260,174                     & 867,244 \\
 LRR   & 67                           & 28                          & 95    & 584,159                      & 250,346                     & 834,505 \\
 HRR   & 14                           & 7                           & 21    & 22,911                       & 9,828                       & 32,739
 \end{tabular}
+%\begin{flushleft}
+%\smallskip
+%
+%\end{flushleft}
 \end{table}
 
 \end{document}
