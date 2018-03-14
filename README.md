@@ -8,7 +8,9 @@ Kaul, RajReni B., Michelle V. Evans, Courtney C. Murdock, John M. Drake. 2018. S
 
 The majority of this code is to be run in `R`, and was initially run on the following version:
 
-**Insert version from high mem machine here**
+    R version 3.4.3 (2017-11-30)
+    Platform: x86_64-pc-linux-gnu (64-bit)
+    Running under: Ubuntu 14.04.5 LTS
 
 Some scripts to download data will need to run via the command line, and were initially run on Linux machines.
 
