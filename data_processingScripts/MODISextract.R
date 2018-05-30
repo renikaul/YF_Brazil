@@ -41,7 +41,7 @@ write.csv(NDVIdf2, file="../data_raw/environmental/NDVIall.csv", row.names=F)
 
 #
 #
-## ---------------------------------------------LST processing (w/ 8 day data MOD11A2)
+#### -----------------------LST processing (w/ 8 day data MOD11A2)  ####
 
 # Step 1: Raster calculate to get the min, mean, and max value per month (each 168) 
 # for every 1 km grid
@@ -170,7 +170,7 @@ maxTDF$IBGE_ID <- brazil@data$codigo_ibg
 maxTDF$IBGE_Name <- brazil@data$nome
 write.csv(maxTDF, file="LST/max/CSVs/maxTall.csv", row.names=F)
 
-###-------Land Surface Temperature (monthly data, MOD11C3)----------------------------------#####
+###-------Land Surface Temperature (monthly data, MOD11C3) #####
 
 brazil <- readOGR(dsn="../data_clean", layer="BRAZpolygons")#this must be loaded
 
