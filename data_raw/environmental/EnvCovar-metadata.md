@@ -54,3 +54,9 @@ Filename: primateProp.csv
 *Primate Richness*: This is equal to the original resolution of the shapefiles and is not temporal. It is the total number of NHP species (of the 9 genera) found in that municipality.
 
 Filename: primateRichness.csv
+
+## Mosquito Data
+
+MaxEnt models of occurence of Ha. janthinomys, Ha. leucocelaneus, and Sa. chloropterus were downloaded from VectorMap. It was created in 2011, so is not temporal, and is at a 0.04 degree (~4km) resolution. The spatial mean of this data was taken per municipality and then the highest probability of occurence across species was chosen to represent the maximum probability of vector occurence.
+
+Filename: mosquitoOccurence.csv (raw values per species)

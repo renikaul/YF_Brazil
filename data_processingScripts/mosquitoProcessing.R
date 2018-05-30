@@ -37,7 +37,7 @@ sa.chloro.prob <- extract(sa.chloro, brazil, fun = mean, na.rm = T)
 mosi.prob <- data.frame(muni.no = brazil$muni_no, ha.leuco = ha.leuco.prob, ha.janthin = ha.janthin.prob,
                               sa.chloro = sa.chloro.prob)
 # save as raw data
-write.csv(mosi.prob, "../data_raw/environmental/mosiData/mosquitoOccurence.csv", row.names = F)
+write.csv(mosi.prob, "../data_raw/environmental/mosquitoOccurence.csv", row.names = F)
 
 # gather into long format & find maximum
 mosi.occ <- mosi.prob %>%

@@ -18,6 +18,7 @@
 # firesDenScale : number of fires oberserved in month divided by muniArea rescaled to max value for that muni and calendar month. NA values converted to zero. 
 # spRich : number of non-human primates by species with ranges based on IUCN {0-22}
 # primProp : sum of each municipalities relative area that is both agricultural and falls within a primate genus range. {0,9} Missing for 2014
+# vectorOcc : maximum probability of a known spillover vector occuring within that municipality
 # muni.no : unique number to identify municipality
 # month.no : numbered month of observation {1,168}
 # muni.name : character string name
@@ -116,6 +117,10 @@ fires <- readRDS("../data_clean/environmental/numFires.rds")
    group_by(muni.no, cal.month) %>%
    mutate(fireDenScale = ifelse(max(fireDens)==0,0,fireDens/max(fireDens))) %>% #scale fire densities to muni and month
    ungroup() 
+ 
+ ## Mosquito Occurrence -----------------
+ 
+ mosq.occurence <- readRDS("../data_clean/environmental/mosiProb.rds")
    
 ## YF cases------------------------------ 
 cases <- readRDS("../data_clean/YFcases/YFlong.rds")
