@@ -20,6 +20,7 @@ library(ggthemes)
 library(lubridate)
 library(grid)
 library(scales)
+library(ggsn)
 ```
 
 Color scheme:
@@ -315,7 +316,7 @@ braz.outline <- st_read("../data_clean/shapefiles", "brazilOutline")
 braz.outline <- select(braz.outline, ADMIN)
 
 #get other neighboring countries
-s.america <- st_read("../data_clean/shapefiles", "South_America")
+s.america <- st_read("../data_clean/shapefiles", "SAmericaCont")
 
 # prediction data
 pred.one.model <- readRDS("../data_out/MS_results/OneModel/wholePredictions.rds")
@@ -363,7 +364,6 @@ pred.all.2008 <- pred.all %>%
 pred.map <- left_join(pred.all.2008, braz.map, by = "muni.no")
 ```
 
-
 ## Plot
 
 ```{r static map theme}
@@ -405,14 +405,15 @@ Plot.
 
 tiff(file = "../data_out/MS_results/figures/manuscript/PercentileMap.tiff", width = 170, height = 110, units = "mm", res = 250, family = "sans", compression = "lzw") #to get less than 10 MB
 
-#tiff(file = "../data_out/MS_results/figures/manuscript/PercentileMap.tiff", width = 2007, height = 1425, units = "px", res = 300, family = "sans", compression = "lzw")
+bb <- extent(nhp.split.map)
+bb2 <- data.frame(long = unlist(bb[c(1, 2)]), lat = unlist(bb[c(3,4)]))
 
-ggplot() +
-  geom_sf(data = s.america, color = "gray80", fill = "gray80") +
+perc.map <- ggplot() +
+  geom_sf(data = s.america, color = "black", fill = "gray80", size = 0.1) +
   geom_sf(data = pred.map.subset, aes(fill = percentile/100), color = NA, size = 0) +
   scale_fill_distiller(palette = "OrRd", direction = 1, type = "seq",
                      guide = guide_colorbar(
-                       title = "Percentile",
+                       title = "Percentile Rank of\nYellow Fever Spillover",
                        direction = "vertical",
                        title.position = 'top',
                        title.theme = element_text(size = 8, angle = 0),
@@ -423,7 +424,15 @@ ggplot() +
              )) +
   geom_sf(data = nhp.split.map, fill = NA, color = "black", size=0.1) +
   coord_sf(xlim = c(-74, -34.78), ylim = c(-33.8, 5.3), datum = NA) +
-  my_theme_map()
+  my_theme_map() +
+  ggsn::scalebar(data = bb2, dist = 400, dd2km = T,
+           model = "WGS84", st.size = 1.5, height= 0.03, 
+           facet.var = c("monthLabel"), facet.lev = c("Jan"),
+           location = "bottomright"
+           )
+perc.map
+
+north2(perc.map, x = 0.87, y = 0.2, scale = 0.1, symbol = 14)
 
 dev.off()
 ```
