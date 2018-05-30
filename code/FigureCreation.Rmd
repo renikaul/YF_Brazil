@@ -21,6 +21,7 @@ library(lubridate)
 library(grid)
 library(scales)
 library(ggsn)
+library(magick)
 ```
 
 Color scheme:
@@ -313,10 +314,17 @@ nhp.split.map <- left_join(braz.map, nhp.split, by = "muni.no") %>%
 
 #get brazil outline
 braz.outline <- st_read("../data_clean/shapefiles", "brazilOutline")
-braz.outline <- select(braz.outline, ADMIN)
+braz.outline <- dplyr::select(braz.outline, ADMIN)
 
 #get other neighboring countries
 s.america <- st_read("../data_clean/shapefiles", "SAmericaCont")
+
+# reproject to SAD69 Brazil Polyconic
+braz.map <- st_transform(braz.map, 29101)
+nhp.split.map <- st_transform(nhp.split.map, 29101)
+braz.outline <- st_transform(braz.outline, 29101)
+s.america <- st_transform(s.america, 29101)
+
 
 # prediction data
 pred.one.model <- readRDS("../data_out/MS_results/OneModel/wholePredictions.rds")
@@ -401,19 +409,18 @@ pred.map.subset <- pred.map %>%
 Plot.
 
 ```{r}
-#pdf(file = "../data_out/MS_results/figures/manuscript/PercentileMap.pdf", width = 6.69, height = 4.75, family = "sans")
-
-tiff(file = "../data_out/MS_results/figures/manuscript/PercentileMap.tiff", width = 170, height = 110, units = "mm", res = 250, family = "sans", compression = "lzw") #to get less than 10 MB
 
 bb <- extent(nhp.split.map)
 bb2 <- data.frame(long = unlist(bb[c(1, 2)]), lat = unlist(bb[c(3,4)]))
 
-perc.map <- ggplot() +
+tiff(file = "../data_out/MS_results/figures/manuscript/PercentileMap2.tiff", width = 170, height = 110, units = "mm", res = 250, family = "sans", compression = "lzw") #to get less than 10 MB
+
+ggplot() +
   geom_sf(data = s.america, color = "black", fill = "gray80", size = 0.1) +
   geom_sf(data = pred.map.subset, aes(fill = percentile/100), color = NA, size = 0) +
   scale_fill_distiller(palette = "OrRd", direction = 1, type = "seq",
                      guide = guide_colorbar(
-                       title = "Percentile Rank of\nYellow Fever Spillover",
+                       title = "Relative Risk of\nYF Spillover (%)",
                        direction = "vertical",
                        title.position = 'top',
                        title.theme = element_text(size = 8, angle = 0),
@@ -423,18 +430,17 @@ perc.map <- ggplot() +
                model = c("one.model" = 'National Model', "two.model" = 'Regional Model')
              )) +
   geom_sf(data = nhp.split.map, fill = NA, color = "black", size=0.1) +
-  coord_sf(xlim = c(-74, -34.78), ylim = c(-33.8, 5.3), datum = NA) +
+  coord_sf(xlim = c(2788000, 7127000), ylim = c(6256000, 10593000), datum = NA) +
   my_theme_map() +
-  ggsn::scalebar(data = bb2, dist = 400, dd2km = T,
-           model = "WGS84", st.size = 1.5, height= 0.03, 
-           facet.var = c("monthLabel"), facet.lev = c("Jan"),
-           location = "bottomright"
-           )
-perc.map
-
-north2(perc.map, x = 0.87, y = 0.2, scale = 0.1, symbol = 14)
+  ggsn::scalebar(data = bb2, dist = 400, dd2km = F,
+                 st.size = 1, height= 0.03, 
+                  location = "bottomright"
+           ) +
+  north(bb2, symbol = 3 , scale = 0.1, 
+        anchor = c(x = 6700000, y = 7000000))
 
 dev.off()
+
 ```
 
 # Lattice Plot 
@@ -561,12 +567,12 @@ my_theme_map <- function(...) {
 ```
 
 
-```{r facet}
+```{r}
 top.row <- ggplot() +
     geom_sf(data = s.america, color = "gray80", fill = "gray80") +
     geom_sf(data = braz.outline, color = "gray25", size = 0.1) +
     geom_sf(data = var.all.models, aes(fill = pred.var), color = NA) +
-    scale_fill_viridis(option = "magma", direction = -1, discrete = F,
+    scale_fill_distiller(palette = "PuBu", direction = 1, type ="seq",
                      na.value = "gray70", 
                      guide = guide_colorbar(
                        title = "Seasonality\nin Intensity\n(Variance)",
@@ -590,7 +596,7 @@ top.row <- ggplot() +
 
 We plot a line for each year, with a detrended loess line in a darker color.
 
-```{r try a facet}
+```{r}
 bottom.row <-  ggplot(data = time.all.models, aes(x = monthLabel, y = pred.mean)) +
     geom_line(aes(group = year), color = "gray70")+
     geom_smooth(aes(x = cal.month, y = pred.mean), se = F, color = "black") +
@@ -792,3 +798,44 @@ Use ImageMagick to create plot from png files
 cd into `../data_out/MS_results/figures/poster/gifs`
 CMDLINE: `convert -delay 50 *.png \MapPercentile.gif` (for gif)
 CMDLINE: `convert -antialias -delay 1 *.png MapPercentile.mp4` (for mp4)
+
+# Supp. Figure: Covariate Correlation and Collinearity
+
+## Load Data
+
+Get all the csvs into one giant dataframe. Need to check which municipality these all belong too.
+
+```{r}
+brazil <- readOGR(dsn="../data_clean", layer="BRAZpolygons")#this must be loaded
+muni.no <- brazil$muni_no
+
+##minT
+files <- list.files("../data_raw/environmental/allEnvironmental/Temperature/min", full.names = T)
+filenames <- list.files("../data_raw/environmental/allEnvironmental/Temperature/min")
+merge.files <- lapply(files, read.csv, header = T, stringsAsFactors = F)
+minT <- do.call(cbind, merge.files)
+colnames(minT) <- gsub("month", "", gsub(".csv", "", filenames))
+minT$muni.inds <- muni.no
+minT <- gather(minT, year, minTemp, 1:168)
+
+##maxT
+```
+
+Correlation Matrix Using Spearman's:
+
+```{r}
+M <- cor(env.vars)
+
+
+col <- colorRampPalette(c("#BB4444", "#EE9988", "#FFFFFF", "#77AADD", "#4477AA"))
+corrplot(M, method = "color", col = col(200),  
+         type = "upper", order = "hclust", 
+         addCoef.col = "black", # Add coefficient of correlation
+         tl.col = "darkblue", tl.srt = 45, #Text label color and rotation
+         # Combine with significance level
+         p.mat = p_mat, sig.level = 0.01,  
+         # hide correlation coefficient on the principal diagonal
+         diag = FALSE 
+         )
+```
+
