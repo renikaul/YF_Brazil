@@ -582,8 +582,8 @@ bb2 <- data.frame(long = unlist(bb[c(1, 2)]), lat = unlist(bb[c(3,4)]))
 
 top.row <- ggplot() +
     geom_sf(data = s.america, color = "black", fill = "gray80", size = 0.1) +
-    geom_sf(data = var.all.models, aes(fill = pred.var), color = NA) +
     geom_sf(data = nhp.split.map, color = "black", size = 0.1, fill = NA) +
+    geom_sf(data = var.all.models, aes(fill = pred.var), color = NA) +
     scale_fill_distiller(palette = "Greens", direction = 1, type ="seq",
                      na.value = "gray70", 
                      guide = guide_colorbar(
