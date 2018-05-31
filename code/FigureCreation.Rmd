@@ -21,7 +21,6 @@ library(lubridate)
 library(grid)
 library(scales)
 library(ggsn)
-library(magick)
 ```
 
 Color scheme:
@@ -313,8 +312,8 @@ nhp.split.map <- left_join(braz.map, nhp.split, by = "muni.no") %>%
   st_buffer(0.01)
 
 #get brazil outline
-braz.outline <- st_read("../data_clean/shapefiles", "brazilOutline")
-braz.outline <- dplyr::select(braz.outline, ADMIN)
+# braz.outline <- st_read("../data_clean/shapefiles", "brazilOutline")
+# braz.outline <- dplyr::select(braz.outline, ADMIN)
 
 #get other neighboring countries
 s.america <- st_read("../data_clean/shapefiles", "SAmericaCont")
@@ -413,7 +412,7 @@ Plot.
 bb <- extent(nhp.split.map)
 bb2 <- data.frame(long = unlist(bb[c(1, 2)]), lat = unlist(bb[c(3,4)]))
 
-tiff(file = "../data_out/MS_results/figures/manuscript/PercentileMap2.tiff", width = 170, height = 110, units = "mm", res = 250, family = "sans", compression = "lzw") #to get less than 10 MB
+tiff(file = "../data_out/MS_results/figures/manuscript/PercentileMap.tiff", width = 170, height = 110, units = "mm", res = 250, family = "sans", compression = "lzw") #to get less than 10 MB
 
 ggplot() +
   geom_sf(data = s.america, color = "black", fill = "gray80", size = 0.1) +
@@ -436,8 +435,8 @@ ggplot() +
                  st.size = 1, height= 0.03, 
                   location = "bottomright"
            ) +
-  north(bb2, symbol = 3 , scale = 0.1, 
-        anchor = c(x = 6700000, y = 7000000))
+  north(bb2, symbol = 14, scale = 0.1, 
+        anchor = c(x = 6950000, y = 7000000))
 
 dev.off()
 
@@ -453,12 +452,21 @@ Figure showing results collapsed over space and time in a lattice.
 braz.map <- st_read("../data_clean/shapefiles", "BRAZNoIslands")
 braz.map <- rename(braz.map, muni.no = muni_no)
 
-#get brazil outline
-braz.outline <- getData('GADM', country ='BRA', level = 0)
-braz.outline <- dplyr::select(st_as_sf(braz.outline), ISO)
+# NHP split index
+nhp.split <- readRDS("../data_clean/environmental/twoModelSplit.rds")
+nhp.split.map <- left_join(braz.map, nhp.split, by = "muni.no") %>%
+  group_by(above5split) %>%
+  summarize() %>%
+  #gets out any weird lines between polygons
+  st_buffer(0.01)
 
 #get other neighboring countries
-s.america <- st_read("../data_clean/shapefiles", "South_America")
+s.america <- st_read("../data_clean/shapefiles", "SAmericaCont")
+
+# reproject to SAD69 Brazil Polyconic
+braz.map <- st_transform(braz.map, 29101)
+s.america <- st_transform(s.america, 29101)
+nhp.split.map <- st_transform(nhp.split.map, 29101)
 
 # prediction data
 pred.one.model <- readRDS("../data_out/MS_results/OneModel/wholePredictions.rds")
@@ -561,6 +569,7 @@ my_theme_map <- function(...) {
     strip.background = element_blank(),
     strip.text = element_blank(),
     plot.margin = unit(c(0,5,0,5), unit = "pt"),
+    legend.title.align = 0.5,
     ...
   )
 }
@@ -568,17 +577,20 @@ my_theme_map <- function(...) {
 
 
 ```{r}
+bb <- extent(nhp.split.map)
+bb2 <- data.frame(long = unlist(bb[c(1, 2)]), lat = unlist(bb[c(3,4)]))
+
 top.row <- ggplot() +
-    geom_sf(data = s.america, color = "gray80", fill = "gray80") +
-    geom_sf(data = braz.outline, color = "gray25", size = 0.1) +
+    geom_sf(data = s.america, color = "black", fill = "gray80", size = 0.1) +
     geom_sf(data = var.all.models, aes(fill = pred.var), color = NA) +
-    scale_fill_distiller(palette = "PuBu", direction = 1, type ="seq",
+    geom_sf(data = nhp.split.map, color = "black", size = 0.1, fill = NA) +
+    scale_fill_distiller(palette = "Greens", direction = 1, type ="seq",
                      na.value = "gray70", 
                      guide = guide_colorbar(
-                       title = "Seasonality\nin Intensity\n(Variance)",
+                       title = "Seasonal Variation\nin Spillover\nIntensity",
                        direction = "vertical",
                        barheight = unit(35, units = "mm"),
-                       barwidth = unit(2, units = "mm"),
+                       barwidth = unit(4, units = "mm"),
                        draw.ulim = F,
                        title.position = 'top',
                        # some shifting around
@@ -588,7 +600,12 @@ top.row <- ggplot() +
                        label.theme = element_text(size = 8, angle = 0))) +
   my_theme_map() +
   facet_wrap(~model, dir = "h") +
-  coord_sf(xlim = c(-74, -34.78), ylim = c(-33.8, 5.3), datum = NA)
+  coord_sf(xlim = c(2788000, 7127000), ylim = c(6256000, 10593000), datum = NA) +
+  ggsn::scalebar(data = bb2, dist = 400, dd2km = F,
+                 st.size = 1, height= 0.03, 
+                  location = "bottomright") +
+  north(bb2, symbol = 14, scale = 0.1, 
+        anchor = c(x = 6950000, y = 7000000))
 ```
 
 
@@ -634,10 +651,10 @@ tiff(file = "../data_out/MS_results/figures/manuscript/LatticePlot.tiff", width 
 
 ggdraw() +
   draw_plot(top.row, x = 0, y = 0.5, width = 1, height = 0.5) +
-  draw_plot(bottom.row, x = 0.04, y = 0, width = 0.96, height = 0.5) +
+  draw_plot(bottom.row, x = 0.095, y = 0, width = 0.905, height = 0.5) +
   draw_plot_label(label = letters[1:6],
-                  x = c(0.12,0.42,0.70,0.12,0.42,0.70),
-                  y = c(1,1,1,0.53,0.53,0.53), 
+                  x = rep(c(0.16,0.45,0.71), 2),
+                  y = rep(c(0.98,0.53), each = 3), 
                   size = 12)
 
 dev.off()
@@ -802,24 +819,6 @@ CMDLINE: `convert -antialias -delay 1 *.png MapPercentile.mp4` (for mp4)
 # Supp. Figure: Covariate Correlation and Collinearity
 
 ## Load Data
-
-Get all the csvs into one giant dataframe. Need to check which municipality these all belong too.
-
-```{r}
-brazil <- readOGR(dsn="../data_clean", layer="BRAZpolygons")#this must be loaded
-muni.no <- brazil$muni_no
-
-##minT
-files <- list.files("../data_raw/environmental/allEnvironmental/Temperature/min", full.names = T)
-filenames <- list.files("../data_raw/environmental/allEnvironmental/Temperature/min")
-merge.files <- lapply(files, read.csv, header = T, stringsAsFactors = F)
-minT <- do.call(cbind, merge.files)
-colnames(minT) <- gsub("month", "", gsub(".csv", "", filenames))
-minT$muni.inds <- muni.no
-minT <- gather(minT, year, minTemp, 1:168)
-
-##maxT
-```
 
 Correlation Matrix Using Spearman's:
 
