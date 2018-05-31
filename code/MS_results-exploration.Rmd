@@ -92,7 +92,8 @@ nhp.split.map <- left_join(braz.map, nhp.split, by = "muni.no") %>%
   st_buffer(dist = 1000)
 
 #link to slope data
-braz.slope <- merge(braz.map, tidy.mod, by = "muni.no")
+braz.slope <- merge(braz.map, tidy.mod, by = "muni.no") %>%
+  mutate(monthLabel = factor(month.abb[cal.month], levels = month.abb))
 ```
 
 Plot (this will be pretty slow).
@@ -100,12 +101,14 @@ Plot (this will be pretty slow).
 ```{r}
 pdf("figures/trendsAcrossSpace.pdf", height = 12, width = 9)
 
+tiff(file = "figures/trendsAcrossSpace.tiff", width = 2007, height = 1425, units = "px", res = 300, family = "sans", compression = "lzw")
+
 braz.slope %>%
   filter(type=="Regional") %>%
   ggplot(data=.) +
     geom_sf(aes(fill = slope), color = NA) +
     geom_sf(data = nhp.split.map, fill = NA, color = "black", size = 0.1) +
-  facet_wrap(~cal.month, nrow = 4, ncol = 3) +
+  facet_wrap(~monthLabel, nrow = 4, ncol = 3) +
   scale_fill_gradient2(low = "#2166AC", mid = "white", high = "#B2182B", midpoint = 0, limits = c(-0.04, 0.04))
 
 dev.off()
@@ -123,10 +126,84 @@ Note, I'm just going to do this for the regional model.
 ## Calculate Highs
 
 ```{r}
+#which of the 156 is highest for that municipality?
 month.peak <- pred.all %>%
-  group_by(muni.no)
+  filter(type == "Regional") %>%
+  group_by(muni.no) %>%
+  arrange(desc(prediction)) %>%
+  slice(1) %>%
+  select(muni.no, peak.month = month.no)
+
+#which calendar month is highest averaged over all 13 years?
+cal.month.peak <- pred.all %>%
+  filter(type == "Regional") %>%
+  group_by(muni.no, cal.month) %>%
+  summarise(mean.pred = mean(prediction)) %>%
+  arrange(desc(mean.pred)) %>%
+  slice(1) %>%
+  select(muni.no, peak.cal.month = cal.month)
+
+#highest year (averaging across all months?)
+year.peak <- pred.all %>%
+  filter(type == "Regional") %>%
+  group_by(muni.no, year) %>%
+  summarise(mean.pred = mean(prediction)) %>%
+  arrange(desc(mean.pred)) %>%
+  slice(1) %>%
+  select(muni.no, peak.year = year)
 ```
 
+## Plot Over Time
+
+```{r}
+hist(month.peak$peak.month, breaks = 156)
+
+hist(cal.month.peak$peak.cal.month, breaks =12)
+
+hist(year.peak$peak.year, breaks = 13)
+```
+
+2008 was definitely the worst year (and 2001). This matches what we know about the El Nino cycles, and really isn't different than what other studies have found (or even just an analysis of cases).
+
+## Plot Across Space
+
+Load shapefile on line 75.
+
+```{r}
+peak.map <- merge(braz.map, month.peak, by = "muni.no") %>%
+  merge(cal.month.peak, by = "muni.no") %>%
+  merge(year.peak, by = "muni.no") 
+```
+
+Peak month no.
+
+```{r}
+ggplot(data = peak.map) +
+  geom_sf(aes(fill = peak.month), color = NA)+
+  geom_sf(data = nhp.split.map, fill = NA, color = "black", size = 0.1) + 
+  ggtitle("Peak month per muni (1-156)") +
+  scale_fill_distiller(type="seq", palette = 5, direction = -1)
+```
+
+Peak calendar month (Jan - Dec.)
+
+```{r}
+ggplot(data = peak.map) +
+  geom_sf(aes(fill = as.factor(peak.cal.month)), color = NA) +
+  geom_sf(data = nhp.split.map, fill = NA, color = "black", size = 0.1) + 
+  ggtitle("Peak calendar month averaged from 2001 - 2013") +
+  scale_fill_discrete()
+```
+
+Peak year
+
+```{r}
+ggplot(data = peak.map) +
+  geom_sf(aes(fill = peak.year), color = NA) +
+  geom_sf(data = nhp.split.map, fill = NA, color = "black", size = 0.1) + 
+  ggtitle("Peak year averaged across all 12 months") +
+  scale_fill_distiller(type = "seq", palette = 14, direction = 1)
+```
 
 
 # Deprecated
