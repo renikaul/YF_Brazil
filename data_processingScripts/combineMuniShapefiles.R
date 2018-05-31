@@ -69,8 +69,5 @@ modelMunis <- preds$muni.no
 modelMunis[!(modelMunis %in% braz.diss$muni.no)]
 braz.diss$muni.no[!(braz.diss$muni.no %in% modelMunis)]
 
-#if good, then save
-
-
-
-
+#if good, then save (this replaces old one with Pinto Bandeira)
+writeOGR(braz.diss, dsn = "../data_clean/", layer = "BRAZpolygons", driver = "ESRI Shapefile", overwrite_layer = T)

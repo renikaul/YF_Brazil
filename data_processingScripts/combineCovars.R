@@ -51,9 +51,9 @@ mat <- nb2mat(neighbors, zero.policy=T)
 colnames(mat) <- as.character(brazil@data$muni_no)
 
 ####--------Rainfall ####
-#rainfallMax <- read.csv("../data_raw/environmental/maxRFall.csv")
-#rainfallMin <- read.csv("../data_raw/environmental/minRFall.csv")
-rainfallMean <- read.csv("../data_raw/environmental/meanRFall.csv")
+rainfallMax <- read.csv("../data_raw/environmental/allClimate/Rainfall/maxRFall.csv")
+rainfallMin <- read.csv("../data_raw/environmental/allClimate/Rainfall/minRFall.csv")
+rainfallMean <- read.csv("../data_raw/environmental/allClimate/Rainfall/meanRFall.csv")
 
 process_rainfall <- function(rainfallDF, type){
   #' Reformat rainfall for bagged logreg
@@ -63,10 +63,8 @@ process_rainfall <- function(rainfallDF, type){
   require(dplyr)
   require(tidyr)
   newDF <- rainfallDF %>%
-    #drop lagoons because no one lives there
-    filter(muni.no!=430000) %>%
     #go from wide to long
-    gather(date, measurement, X20010101:X20141201) %>%
+    gather(date, measurement, X20010101:X20131201) %>%
     #get year column
     mutate(year= as.numeric(substr(date, 2,5))) %>%
     # get month column
@@ -76,55 +74,28 @@ process_rainfall <- function(rainfallDF, type){
     #calculate month.no
     mutate(month.no=month.noFunc(year=year, month=month, startYear=2001, startMonth=1))%>%
     #reorder columns to keep us sane
-    dplyr::select(muni.no, muni.name, year, cal.month=month, month.no, measurement) 
+    dplyr::select(muni.no, year, cal.month=month, month.no, measurement) 
   
   #rename measurement column
   measureLabel <- paste0("hourlyRainfall", type)
   colnames(newDF)[colnames(newDF)=="measurement"] <- measureLabel
   
-  #switch muni name to character to avoid weird factors while merging
-  newDF$muni.name <- as.character(newDF$muni.name)
-  
   return(newDF)
 }
 
 #apply function to all rainfall dataframes
-# newRFmin <- process_rainfall(rainfallDF=rainfallMin, type="Min")
-# newRFmax <- process_rainfall(rainfallDF=rainfallMax, type="Max")
+newRFmin <- process_rainfall(rainfallDF=rainfallMin, type="Min")
+newRFmax <- process_rainfall(rainfallDF=rainfallMax, type="Max")
 newRFmean <- process_rainfall(rainfallDF = rainfallMean, type="Mean")
 
 # merge dataframes together into one
-# RFall <- join_all(list(newRFmin, newRFmax, newRFmean), by=c("muni.no", "year", "cal.month"), type="full")
+RFall <- join_all(list(newRFmin, newRFmax, newRFmean), by=c("muni.no", "year", "cal.month"), type="full")
 
-#adjust for muni corrections
-inds2fix <- which(newRFmean$muni.no %in% c(431454,430210))
-toAppend <- newRFmean[inds2fix,]
-toAppend <- toAppend %>%
-  #scale by area
-  mutate(scaled=case_when(
-    muni.no==431454 ~ hourlyRainfallMean*pintoArea,
-    muni.no==430210 ~ hourlyRainfallMean*bentoArea
-  )) %>%
-  dplyr::select(-hourlyRainfallMean) %>%
-  group_by(cal.month, year, month.no) %>%
-  #take average of scaled values
-  summarise(hourlyRainfallMean=sum(scaled)/(pintoArea+bentoArea)) %>%
-  #add in appropriate muni name and number
-  mutate(muni.no=430210) %>%
-  mutate(muni.name="Bento Gonçalves") %>%
-  #order columns appropriately to join
-  dplyr::select(muni.no, muni.name, year, cal.month, month.no, hourlyRainfallMean) %>%
-  ungroup()
-
-#drop ones we needed to fix
-RFmean <- newRFmean[-inds2fix,]
-#add new ones
-RFmean <- as.data.frame(rbind(RFmean, toAppend))
 
 #save as R object
-saveRDS(RFmean, "../data_clean/environmental/allRainfall.rds")
+saveRDS(newRFmean, "../data_clean/environmental/meanRainfall.rds")
+saveRDS(RFall, "../data_clean/environmental/may2018/allRainfall.rds")
 
-rm(toAppend)
 ####--------NDVI ####
 
 ndvi <- read.csv("../data_raw/environmental/NDVIall.csv") #dates are julian (1-365)
@@ -213,9 +184,9 @@ ndviAll <- as.data.frame(rbind(ndviAll, toAppend))
 saveRDS(ndviAll, "../data_clean/environmental/allNDVI.rds") 
   
 #####----------Temperature ####
-# tempMax <- read.csv("../data_raw/environmental/maxTall.csv")
-# tempMin <- read.csv("../data_raw/environmental/minTall.csv")
-tempMean <- read.csv("../data_raw/environmental/meanTall.csv")
+tempMax <- read.csv("../data_raw/environmental/allClimate/Temperature/maxTall.csv")
+tempMin <- read.csv("../data_raw/environmental/allClimate/Temperature/minTall.csv")
+tempMean <- read.csv("../data_raw/environmental/allClimate/Temperature/meanTall.csv")
 
 process_temp <- function(tempDF, type){
   #' Reformat temperature for bagged logreg
@@ -225,10 +196,8 @@ process_temp <- function(tempDF, type){
   require(dplyr)
   require(tidyr)
   newDF <- tempDF %>%
-      #drop lagoons because no one lives there
-      filter(muni.no!=430000) %>%
       #reorder columns
-      dplyr::select(muni.no, muni.name, month100:month9) %>% #double check columns match when running
+      dplyr::select(muni.no, month100:month9) %>% #double check columns match when running
       #go from wide to long
       gather(date, measurement, month100:month9) %>%
       #rescale temperature and change to C
@@ -236,8 +205,7 @@ process_temp <- function(tempDF, type){
       #get month.no
       mutate(month.no=as.numeric(gsub("month", "", date))) %>%
       #get year
-      arrange(month.no) %>%
-      mutate(year=rep(2001:2014, each=5561*12)) %>% #repeat each year number of munis *12
+      mutate(year = ((month.no-1) %/% 12) + 2001) %>%
       #get month (remainder, then correct for 12)
       mutate(cal.month=case_when(
         (month.no %% 12) !=0 ~ month.no %% 12,
@@ -245,32 +213,26 @@ process_temp <- function(tempDF, type){
           )
         ) %>%
       #drop date
-      dplyr::select(muni.no, muni.name, year, cal.month, month.no, measurement)
+      dplyr::select(muni.no, year, cal.month, month.no, measurement)
   
-
     #rename measurement column
     measureLabel <- paste0("temp", type)
     colnames(newDF)[colnames(newDF)=="measurement"] <- measureLabel
-    
-    #muni.name as character
-    newDF$muni.name <- as.character(newDF$muni.name)
       
     return(newDF)
 }      
 
 #apply function to all temperature dataframes
-# newTmin <- process_temp(tempDF=tempMin, type="Min")
-# newTmax <- process_temp(tempDF=tempMax, type="Max")
+newTmin <- process_temp(tempDF=tempMin, type="Min")
+newTmax <- process_temp(tempDF=tempMax, type="Max")
 newTmean <- process_temp(tempDF=tempMean, type="Mean")
 
 #merge dataframes together into one
-# tempAll <- join_all(list(newTmin, newTmax, newTmean), by=c("muni.no", "year", "cal.month", "month.no"), type="full")
-
-tempAll <- newTmean
+tempAll <- join_all(list(newTmin, newTmax, newTmean), by=c("muni.no", "year", "cal.month", "month.no"), type="full")
 
 #---two muni x month have NA due to cloud cover
 
-spatialPermute <- function(missingMuni.no, missingMuni.name, missingMonth, missingYear, missingmonth.no, nbMat=mat){
+spatialPermute <- function(missingMuni.no, missingMonth, missingYear, missingmonth.no, nbMat=mat){
   temp <- nbMat[rownames(nbMat)==missingMuni.no,]
   nbs <- names(temp[temp>0]) #get muni.no of neighbors
   nbValues <- newTmean %>%
@@ -279,49 +241,24 @@ spatialPermute <- function(missingMuni.no, missingMuni.name, missingMonth, missi
     dplyr::filter(muni.no %in% nbs) %>%
     dplyr::filter(!is.na(tempMean)) %>%
     dplyr::summarise(tempMean=mean(tempMean, na.rm=T))
-  newValues <- data.frame(muni.no=missingMuni.no, muni.name=missingMuni.name, year=missingYear, cal.month=missingMonth, month.no=missingmonth.no, tempMean= nbValues[,c('tempMean')])
-  return(newValues)
+  replaceTemp <- nbValues$tempMean[1]
+  return(replaceTemp)
 }
 
 #apply spatial permute to the missing rows
 missInds <- which(is.na(tempAll$tempMean))
 
 for (i in missInds){
-  newVals <- spatialPermute(missingMuni.no=tempAll[i,1], missingMuni.name=tempAll[i,2], missingYear=tempAll[i,3],
-                 missingMonth = tempAll[i,4], missingmonth.no = tempAll[i,5])
-  tempAll <- rbind(tempAll, newVals) #append to end
+  newVals <- spatialPermute(missingMuni.no=tempAll[i,1], missingYear=tempAll[i,2],
+                 missingMonth = tempAll[i,3], missingmonth.no = tempAll[i,4])
+  tempAll$tempMean[i] <- newVals
 }
 
-#drop everything that we have fixed and appended
-tempAll <- tempAll[-missInds,]
-
-#adjust for muni corrections
-inds2fix <- which(tempAll$muni.no %in% c(431454,430210))
-toAppend <- tempAll[inds2fix,]
-toAppend <- toAppend %>%
-  #scale by area
-  mutate(scaled=case_when(
-    muni.no==431454 ~ tempMean*pintoArea,
-    muni.no==430210 ~ tempMean*bentoArea
-  )) %>%
-  dplyr::select(-tempMean) %>%
-  group_by(cal.month, year, month.no) %>%
-  #take average of scaled values
-  summarise(tempMean=sum(scaled)/(pintoArea+bentoArea)) %>%
-  #add in appropriate muni name and number
-  mutate(muni.no=430210) %>%
-  mutate(muni.name="Bento Gonçalves") %>%
-  #order columns appropriately to join
-  dplyr::select(muni.no, muni.name, year, cal.month, month.no, tempMean) %>%
-  ungroup()
-
-#drop ones we needed to fix
-tempAll <- tempAll[-inds2fix,]
-#add new ones
-tempAll <- as.data.frame(rbind(tempAll, toAppend))
-
 #save as R object
-saveRDS(tempAll, "../data_clean/environmental/meanTemperature.rds") 
+saveRDS(tempAll, "../data_clean/environmental/may2018/allTemperature.rds")
+#just mean
+only.mean.T <- dplyr::select(tempAll, -tempMin, -tempMax)
+saveRDS(only.mean.T, "../data_clean/environmental/may2018/meanTemperature.rds")
 
 
 ####--------fire####
