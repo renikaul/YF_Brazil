@@ -1,0 +1,166 @@
+---
+title: "Results Exploration"
+author: "Michelle Evans"
+date: "May 31, 2018"
+output: html_document
+---
+
+This document explores temporal and spatial patterns in the predicions from the national and regional model.
+
+
+# Package Loading and Setup
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(tidyverse)
+library(sf)
+```
+
+
+# Long Term Trends in Data
+
+Longterm trends in predictions were analyzed using slope-tests for each municipality. The prediction for each municipality is assessed overtime, resulting in positive, negative, or no slope. This is done individually for months to get rid of monthly variation.
+
+## Load Data
+
+```{r}
+pred.one.model <- readRDS("../data_out/MS_results/OneModel/wholePredictions.rds")
+pred.highNHP <- readRDS("../data_out/MS_results/HighModel/wholePredictions.rds")
+pred.lowNHP <- readRDS("../data_out/MS_results/LowModel/wholePredictions.rds")
+
+#combine together
+pred.one.model$type <- "National"
+pred.highNHP$type <- "Regional"
+pred.lowNHP$type <- "Regional"
+pred.all <- rbind(pred.one.model, pred.highNHP, pred.lowNHP)
+
+
+# add in year and cal month
+pred.all <- pred.all %>%
+  mutate(year = ((month.no-1) %/% 12) + 2001) %>%
+  mutate(cal.month = month.no %% 12) %>%
+  mutate(cal.month = case_when(
+    cal.month==0 ~ 12,
+    TRUE ~ cal.month
+  ))
+  
+```
+
+## Get Slope Coefficients
+
+```{r}
+models <- pred.all %>%
+    group_by(cal.month, muni.no, type) %>%
+    do(model = lm(prediction ~ year, data = .))
+    
+tidy.mod <- tidy(models, model) %>%
+    filter(term=="year") %>%
+    mutate(slope = case_when(
+      p.value < 0.05 ~ estimate,
+      p.value >= 0.05 ~ 0
+    ))
+
+#save
+saveRDS(tidy.mod, "../data_out/slopeTests.rds")
+```
+
+## Summary of Slope Over Time
+
+```{r}
+slope.summary <- tidy.mod %>%
+  group_by(type) %>%
+  summarise(none = sum(slope==0), neg = sum(slope<0), pos = sum(slope>0))
+```
+
+
+## Across Space
+
+Load shapefile and attach to slope data
+
+```{r}
+braz.map <- st_read("../data_clean/shapefiles", "BRAZNoIslands")
+braz.map <- rename(braz.map, muni.no = muni_no)
+
+#reproject
+braz.map <- st_transform(braz.map, 29101)
+
+# NHP split index
+nhp.split <- readRDS("../data_clean/environmental/twoModelSplit.rds")
+nhp.split.map <- left_join(braz.map, nhp.split, by = "muni.no") %>%
+  group_by(above5split) %>%
+  summarize() %>%
+  #gets out any weird lines between polygons
+  st_buffer(dist = 1000)
+
+#link to slope data
+braz.slope <- merge(braz.map, tidy.mod, by = "muni.no")
+```
+
+Plot (this will be pretty slow).
+
+```{r}
+pdf("figures/trendsAcrossSpace.pdf", height = 12, width = 9)
+
+braz.slope %>%
+  filter(type=="Regional") %>%
+  ggplot(data=.) +
+    geom_sf(aes(fill = slope), color = NA) +
+    geom_sf(data = nhp.split.map, fill = NA, color = "black", size = 0.1) +
+  facet_wrap(~cal.month, nrow = 4, ncol = 3) +
+  scale_fill_gradient2(low = "#2166AC", mid = "white", high = "#B2182B", midpoint = 0, limits = c(-0.04, 0.04))
+
+dev.off()
+```
+
+
+# Monthly & Yearly Peaks
+
+Which month had the highest predicted value? Which year?
+
+What about if we average across months (ie all January's)? What if we average across months to get one value for the year?
+
+Note, I'm just going to do this for the regional model.
+
+## Calculate Highs
+
+```{r}
+month.peak <- pred.all %>%
+  group_by(muni.no)
+```
+
+
+
+# Deprecated
+
+
+
+## Using Mixed-Effect Models
+
+Another way is to use a mixed effect model with a random intercept for each municipality and a random slope for each month.
+
+```{r}
+pred.one.model$muni.no <- as.factor(pred.one.model$muni.no)
+pred.one.model$cal.month <- as.factor(pred.one.model$cal.month)
+pred.one.model$time <- pred.one.model$year-2000
+
+mix.mod <- lmer(prediction~ time + (0 + time|cal.month) + (1|muni.no), data = pred.one.model)
+
+summary(mix.mod)
+```
+
+Mixed model finds no change overtime, however there is a lot of variance explained by random effects.
+
+```{r}
+ranef.muni <- ranef(mix.mod)$muni.no
+
+ranef.month <- ranef(mix.mod)$cal.month
+```
+
+*Using a giant mixed model introduces a lot of craziness, probably easier to just make thousands of regressions*
+
+## Giant Linear Model
+
+```{r}
+mod <- lm(prediction ~ time:cal.month + time:muni.no, data = pred.one.model)
+```
+
+Nope, this is way too large to run on a normal computer.
