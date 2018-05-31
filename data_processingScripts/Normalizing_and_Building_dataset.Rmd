@@ -1,0 +1,345 @@
+---
+title: "Normalizing and Building Dataset"
+author: "Reni Kaul"
+date: "5/31/2018"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Building the data set
+
+This file builds the data set used for the YF model. The variables are currently saved seperately with entries identified by muni.no and month.no. Scaled variables are also created in the process. The normality of variable distributions are visually checked. 
+
+- case :reporting of any YF cases (0,1)
+- numCase :number of reported YF cases 
+
+- ndvi : NDVI for that month
+- ndviScale : NDVI rescaled to max value for that muni and calendar month
+
+- popLog10 : population density; log10 transformed
+
+- rf : mean hourly rainfall; cube root transformed
+- rfScale : mean hourly rainfall rescaled to max value for that muni and calendar month; cube root transformed
+
+- temp : mean monthly air temperature 
+- tempScale : mean monthly air temperature rescaled to max value for that muni and calendar month
+
+- fire : density of fires oberserved in month per muni; cube root transformed
+- fireScale : density of fires oberserved in month per muni rescaled to max value for that muni and calendar month. NA values converted to zero; cube root transformed 
+
+- spRich : number of non-human primates by species with ranges based on IUCN {0-22}; cube root transformed 
+
+- primProp : sum of each municipalities relative area that is both agricultural and falls within a primate genus range. {0,9}; cube root transformed
+
+- vectorOcc : maximum probability of a known spillover vector occuring within that municipality {0,1}
+
+- muni.no : unique number to identify municipality
+- month.no : numbered month of observation {1,168}
+- muni.name : character string name
+- cal.month : calendar month {1,12}
+- year : year {2001,2014}
+
+
+```{r library and functions}
+library(dplyr)
+library(gplots)
+library(ROCR)
+library(pROC)
+library(rgdal)
+library(rgeos)
+library(BalancedSampling)
+library(scatterplot3d)
+library(rcompanion) # useful for plotNormalHistogram fnc
+
+## function to explore transformation
+ExploreTransformations = function(data, VarName = "", shift = FALSE){
+  if(shift == TRUE){
+  transLog <- log(data + 1)
+  } else {
+    transLog <- log(data)
+  }
+  transSrt <- sqrt(data)
+  transCube <- sign(data) * abs(data)^(1/3)
+  par(mfrow=c(2,2))
+  plotNormalHistogram(data, main= "original")
+  plotNormalHistogram(transLog, main = "Log")
+  plotNormalHistogram(transSrt, main = "Srt")
+  plotNormalHistogram(transCube, main = "Cube")
+  title(VarName, outer=TRUE, line= -1)
+}
+
+TranCube = function(x) {sign(x) * abs(x)^(1/3)}
+
+```
+
+```{r load dynamic data}
+# Dynamic values for muni's (trimmed to study range)
+pop <- readRDS("../data_clean/demographic/pop.rds") %>% filter(year<2014)
+rf <- readRDS("../data_clean/environmental/allRainfall.rds") %>% filter(year<2014)
+fires <- readRDS("../data_clean/environmental/numFires.rds") %>% filter(year<2014)
+ndvi <- readRDS("../data_clean/environmental/allNDVI.rds") %>% filter(year<2014)
+temp <- readRDS("../data_clean/environmental/meanTemperature.rds") %>% filter(year<2014)
+```
+
+
+```{r load static like data}
+
+# Static value for muni's 
+NHPProp <- readRDS("../data_clean/environmental/primProp.rds") #changes every year, missing 2014
+NHPRichness <- readRDS("../data_clean/environmental/primRichness.rds") #doesn't change with time
+mosi.occurence <- readRDS("../data_clean/environmental/mosiProb.rds")
+
+```
+
+# Check the distribution of covariates
+Check different transformations of covariates against a normal distribution. The natural log, square root, and cube root transformations were applied and then visually compared to a normal distribution with the same mean (blue line in plots). In cases where the original data contained zeros the log transformation was `log(x+1)`
+
+**Transformation summary** 
+
+Unaltered variables:
+
+- NDVI*
+- Temperature*
+- Mosi occurance
+
+Cube root transformed:
+
+- Rainfall*
+- Fire density*
+- NHP richness
+- NHP/Ag Overlap
+
+Log10 transformed:
+
+- Population density
+
+Details below. 
+
+### Population density 
+
+Population density is by year. and should be $log_{10}$ transformed. 
+
+```{r population trans}
+par(mfrow=c(1,2))
+  plotNormalHistogram(pop$densitypop, main= "original")
+  plotNormalHistogram(log10(pop$densitypop), main = "Log10")
+  title("Population Density", outer=TRUE,  line = -1)
+
+```
+
+### Rainfall
+
+Mean hourly rainfall and scaled mean hourly rainfall should both be cube root transformed. 
+```{r rainfall trans}
+rf <- rf %>% 
+  group_by(muni.no, cal.month) %>%
+  mutate(RFScale = hourlyRainfallMean/max(hourlyRainfallMean))
+
+ExploreTransformations(rf$hourlyRainfallMean, VarName = "Rainfall", shift = TRUE)
+
+ExploreTransformations(rf$RFScale,VarName = "Rainfall Scale", shift = TRUE)
+
+```
+
+### Fire density 
+
+Fire density is ugly despite any transformation. For consistency, we should cube root transform. 
+```{r fire trans}
+fires <- fires %>%
+      group_by(muni.no, cal.month) %>%
+   mutate(fireDenScale = ifelse(max(fireDens)==0,0,fireDens/max(fireDens))) %>% #scale fire densities to muni and month
+   ungroup() 
+
+ExploreTransformations(fires$fireDens,  VarName = "Fire Density", shift = TRUE)
+ExploreTransformations(fires$fireDenScale, shift = TRUE)
+
+```
+
+### NDVI
+
+Tranformations aren't needed for NDVI or NDVI scaled values. 
+```{r NDVI trans}
+ndvi <- ndvi %>%
+  group_by(muni.no, cal.month) %>%
+  mutate(NDVIScale = NDVI/max(NDVI)) %>% #scale NDVI to muni and month
+  ungroup()
+
+ExploreTransformations(ndvi$NDVI,  VarName = "NDVI")
+ExploreTransformations(ndvi$NDVIScale, VarName = "NDVI Scale")
+```
+
+### Temp 
+
+Transformations aren't needed for temp or temp scale
+```{r temp trans}
+temp <- temp %>%
+  group_by(muni.no, cal.month) %>%
+  mutate(tempScale = tempMean/max(tempMean)) %>%
+  ungroup()
+
+ExploreTransformations(temp$tempMean, VarName = "Temp")
+ExploreTransformations(temp$tempScale, VarName = "Temp Scale")
+
+```
+
+### NHP Prop
+
+Primate proportion should be cube root transformed
+
+```{r NHP trans}
+ExploreTransformations(NHPProp$primProp, shift = TRUE)
+```
+
+### Species Richness
+
+Species richness should be cube root transformed. 
+```{r}
+ExploreTransformations(NHPRichness$spRich, shift = TRUE)
+```
+
+### Mosi Occurence 
+
+Mosi occurance does not need to be transformed. 
+
+```{r}
+ExploreTransformations(mosi.occurence$vector.prob, shift =TRUE)
+```
+
+
+
+# Assemble the data
+
+```{r cleaning environmental data, eval = FALSE}
+all.enviro <- plyr::join_all(list(ndvi, pop, rf, temp, fires), 
+                           by=c("muni.no", "month.no"), type="full") %>%
+              select(-c(muni, muniArea, area, pop, numFire))
+
+environCovar <- all.enviro %>%
+  # scaled variables 
+    group_by(muni.no, cal.month) %>%
+    mutate(tempScale = tempMean/max(tempMean)) %>%
+    mutate(ndviScale = NDVI/max(NDVI)) %>%
+    mutate(rfScale = hourlyRainfallMean/max(hourlyRainfallMean)) %>%
+    mutate(fireScale = ifelse(max(fireDens)==0,0,fireDens/max(fireDens))) %>%
+    ungroup() %>%
+  # transformations with name changes
+    mutate(popLog10 = log10(densitypop)) %>%
+    mutate(rf = TranCube(hourlyRainfallMean)) %>%
+    mutate(rfScale = TranCube(rfScale)) %>%
+    mutate(fire = TranCube(fireDens)) %>%
+    mutate(fireScale = TranCube(fireScale)) %>%
+  # just name changes
+    mutate(ndvi = NDVI) %>%
+    mutate(temp = tempMean) %>%
+  # drop the extra things
+    select(c(muni.no, muni.name, year, cal.month, month.no, rf, rfScale, ndvi, ndviScale, temp, tempScale, popLog10, fire, fireScale))
+                
+```
+
+```{r cleaning static data, eval = FALSE}
+NHPenvironCovar <- NHPRichness %>%
+    mutate(spRich = TranCube(spRich)) %>%
+    select(-c(muni.name)) %>%
+    dplyr::right_join(environCovar, by=c('muni.no')) 
+
+NHPenvironCovar <-  NHPProp %>%
+    mutate(primProp = TranCube(primProp)) %>%
+    select(-c(muni.name)) %>%
+    dplyr::right_join(NHPenvironCovar, by=c('muni.no','year')) 
+
+allCovar <- mosi.occurence %>%
+    mutate(vectorOcc = vector.prob/1000) %>%
+    select(-c(vector.prob)) %>%
+    dplyr::right_join(NHPenvironCovar, by=c('muni.no')) 
+
+```
+
+
+## YF case data
+
+```{r YF case, eval = FALSE}
+## YF cases------------------------------ 
+cases <- readRDS("../data_clean/YFcases/YFlong.rds")
+ #dimensions: Entries for all muni ONLY if a case reported in any muni that month
+cases[is.na(cases)] <- 0 #replace NA with zero  
+
+cases <- cases %>%
+  filter(year<2014) %>%
+  #drop annual totals
+  filter(cal.month<=12) %>%
+  #drop unknown origin totals %>%
+  filter(!grepl("ignorado", muni)) %>%
+  mutate(numCase=case) %>% 
+  mutate(case=ifelse(numCase==0,0,1))
+
+
+#add in cases
+allData <- cases %>%
+            select(c(muni.no, month.no, case, numCase)) %>%
+            dplyr::right_join(allCovar, by=c('muni.no', 'month.no')) %>%
+            mutate(case=ifelse(is.na(case),0,case)) %>% #replace NA with zero
+            mutate(numCase=ifelse(is.na(numCase) == TRUE,0,numCase)) #replace NA with zero
+   
+saveRDS(allData, "../data_clean/FinalData_Mosi/allData.rds")       
+allData <- readRDS("../data_clean/FinalData_Mosi/allData.rds")
+```
+
+
+
+```{r , eval = FALSE}
+# Index used for spatial and temp stratified train/test data (from GiantDataFrameMaker)
+load("IndexForDataSplitSpat.RData")
+
+all.pres <- filter(allData, case==1)
+all.bg <- filter(allData, case==0)
+
+#split testing
+test.pres <- all.pres[test.pres.inds,]
+train.pres <- all.pres[-test.pres.inds,]
+
+#split training (not stratified at all because there are so many)
+#Split background data
+#test.bg.inds <- base::sample(nrow(all.bg), ceiling(nrow(all.bg)/3))
+test.bg <- all.bg[test.bg.inds,]
+train.bg <- all.bg[-c(test.bg.inds),]
+
+#combine background and presence into full training and testing data
+training <- rbind(train.pres, train.bg)
+testing <- rbind(test.pres, test.bg)
+
+# Save data with spatial and temporal stratification
+#individual training and testing data
+ saveRDS(training, file="../data_clean/FinalData_Mosi/TrainingData.rds")
+ saveRDS(testing, file="../data_clean/FinalData_Mosi/TestingData.rds")
+
+```
+
+
+```{r high and low NHP regions, eval = FALSE}
+# Muni index of splits (from nhpSplit.R)
+indexSplit <- readRDS( "../data_clean/environmental/twoModelSplit.rds")
+
+# Split training and testing data -----
+
+highNHP <- filter(indexSplit, above5split == "above5")
+test.data.lowNHP <- filter(testing, !(muni.no %in% highNHP$muni.no)) #28 cases
+test.data.highNHP <- filter(testing, (muni.no %in% highNHP$muni.no)) #7 cases
+
+train.data.lowNHP <- filter(training, !(muni.no %in% highNHP$muni.no))  #67 cases
+train.data.highNHP <- filter(training, (muni.no %in% highNHP$muni.no)) #only 14 cases
+
+#70/30 split seems to be kept relatively well
+
+# save new datasets
+
+saveRDS(test.data.lowNHP, "../data_clean/FinalData_Mosi/TestingDataLowNHP.rds")
+saveRDS(test.data.highNHP, "../data_clean/FinalData_Mosi/TestingDataHighNHP.rds")
+
+saveRDS(train.data.lowNHP, "../data_clean/FinalData_Mosi/TrainingDataLowNHP.rds")
+saveRDS(train.data.highNHP, "../data_clean/FinalData_Mosi/TrainingDataHighNHP.rds")
+
+```
+
