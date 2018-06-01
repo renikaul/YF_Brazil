@@ -230,28 +230,64 @@ newTmean <- process_temp(tempDF=tempMean, type="Mean")
 #merge dataframes together into one
 tempAll <- join_all(list(newTmin, newTmax, newTmean), by=c("muni.no", "year", "cal.month", "month.no"), type="full")
 
-#---two muni x month have NA due to cloud cover
+#---two muni x month have NA due to cloud cover (also -Inf for Min and Inf for Max)
 
-spatialPermute <- function(missingMuni.no, missingMonth, missingYear, missingmonth.no, nbMat=mat){
+spatialPermute <- function(missingMuni.no, missingMonth, missingYear, missingmonth.no, nbMat=mat, measurement){
   temp <- nbMat[rownames(nbMat)==missingMuni.no,]
   nbs <- names(temp[temp>0]) #get muni.no of neighbors
+  if(measurement =="mean"){
   nbValues <- newTmean %>%
     dplyr::filter(year==missingYear) %>%
     dplyr::filter(cal.month==missingMonth) %>%
     dplyr::filter(muni.no %in% nbs) %>%
     dplyr::filter(!is.na(tempMean)) %>%
-    dplyr::summarise(tempMean=mean(tempMean, na.rm=T))
-  replaceTemp <- nbValues$tempMean[1]
+    dplyr::summarise(new=mean(tempMean, na.rm=T))
+  } else if (measurement == "min"){
+    nbValues <- newTmin %>%
+      dplyr::filter(year==missingYear) %>%
+      dplyr::filter(cal.month==missingMonth) %>%
+      dplyr::filter(muni.no %in% nbs) %>%
+      dplyr::filter(!is.na(tempMin) & tempMin != -Inf & tempMin != Inf) %>%
+      dplyr::summarise(new=mean(tempMin, na.rm=T))
+  } else if (measurement == "max"){
+    nbValues <- newTmax %>%
+      dplyr::filter(year==missingYear) %>%
+      dplyr::filter(cal.month==missingMonth) %>%
+      dplyr::filter(muni.no %in% nbs) %>%
+      dplyr::filter(!is.na(tempMax) & tempMax != Inf & tempMax != -Inf) %>%
+      dplyr::summarise(new=mean(tempMax, na.rm=T))
+  }
+  
+  replaceTemp <- nbValues$new[1]
   return(replaceTemp)
 }
 
 #apply spatial permute to the missing rows
+# TempMean
 missInds <- which(is.na(tempAll$tempMean))
 
 for (i in missInds){
   newVals <- spatialPermute(missingMuni.no=tempAll[i,1], missingYear=tempAll[i,2],
-                 missingMonth = tempAll[i,3], missingmonth.no = tempAll[i,4])
+                 missingMonth = tempAll[i,3], missingmonth.no = tempAll[i,4], measurement = "mean")
   tempAll$tempMean[i] <- newVals
+}
+
+#TempMin
+missInds <- which(tempAll$tempMin==Inf)
+
+for (i in missInds){
+  newVals <- spatialPermute(missingMuni.no=tempAll[i,1], missingYear=tempAll[i,2],
+                            missingMonth = tempAll[i,3], missingmonth.no = tempAll[i,4], measurement = "min")
+  tempAll$tempMin[i] <- newVals
+}
+
+#TempMax
+missInds <- which(tempAll$tempMax==-Inf)
+
+for (i in missInds){
+  newVals <- spatialPermute(missingMuni.no=tempAll[i,1], missingYear=tempAll[i,2],
+                            missingMonth = tempAll[i,3], missingmonth.no = tempAll[i,4], measurement = "max")
+  tempAll$tempMax[i] <- newVals
 }
 
 #save as R object
