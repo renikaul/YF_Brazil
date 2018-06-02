@@ -382,54 +382,63 @@ allData &lt;- cases %&gt;%
             mutate(case=ifelse(is.na(case),0,case)) %&gt;% #replace NA with zero
             mutate(numCase=ifelse(is.na(numCase) == TRUE,0,numCase)) #replace NA with zero
    
-saveRDS(allData, &quot;../data_clean/FinalData_Mosi/allData.rds&quot;)       
+saveRDS(allData, &quot;../data_clean/FinalData_Mosi/allData.rds&quot;) 
+# rm(list = ls())
 allData &lt;- readRDS(&quot;../data_clean/FinalData_Mosi/allData.rds&quot;)</code></pre>
-<pre class="r"><code># Index used for spatial and temp stratified train/test data (from GiantDataFrameMaker)
-load(&quot;IndexForDataSplitSpat.RData&quot;)
+</div>
+</div>
+<div id="spliting-data" class="section level1">
+<h1>Spliting data</h1>
+<p>Data splits made based on old dataset muni.no and month.no</p>
+<pre class="r"><code># Pull in the old data
 
-all.pres &lt;- filter(allData, case==1)
-all.bg &lt;- filter(allData, case==0)
+oldTest &lt;- readRDS(&quot;../data_clean/TestingDataSpat2.rds&quot;) 
+oldTestLow &lt;- readRDS(&quot;../data_clean/TestingDataLowNHP2.rds&quot;) 
+oldTestHigh &lt;- readRDS(&quot;../data_clean/TestingDataHighNHP2.rds&quot;)
 
-#split testing
-test.pres &lt;- all.pres[test.pres.inds,]
-train.pres &lt;- all.pres[-test.pres.inds,]
+# pull out rows in common between old data set and new
+testing &lt;-  allData %&gt;% semi_join(oldTest, by=c(&quot;muni.no&quot;, &quot;month.no&quot;))
+testingLow &lt;- allData %&gt;% semi_join(oldTestLow, by = c(&quot;muni.no&quot;, &quot;month.no&quot;))
+testingHigh &lt;- allData %&gt;% semi_join(oldTestHigh, by = c(&quot;muni.no&quot;, &quot;month.no&quot;))
 
-#split training (not stratified at all because there are so many)
-#Split background data
-#test.bg.inds &lt;- base::sample(nrow(all.bg), ceiling(nrow(all.bg)/3))
-test.bg &lt;- all.bg[test.bg.inds,]
-train.bg &lt;- all.bg[-c(test.bg.inds),]
+# save testing data
+saveRDS(testing, file = &quot;../data_clean/FinalData_Mosi/TestingData.rds&quot;)
+saveRDS(testingLow, &quot;../data_clean/FinalData_Mosi/TestingDataLowNHP.rds&quot;)
+saveRDS(testingHigh, &quot;../data_clean/FinalData_Mosi/TestingDataHighNHP.rds&quot;)
 
-#combine background and presence into full training and testing data
-training &lt;- rbind(train.pres, train.bg)
-testing &lt;- rbind(test.pres, test.bg)
+# Repeat steps for training 
+
+# pull in the old data
+oldTrain &lt;- readRDS(&quot;../data_clean/TrainingDataSpat2.rds&quot;)
+oldTrainLow &lt;- readRDS(&quot;../data_clean/TrainingDataLowNHP2.rds&quot;)
+oldTrainHigh &lt;- readRDS(&quot;../data_clean/TrainingDataHighNHP2.rds&quot;)
+
+# pull out rows in common between old data set and new
+training &lt;-  allData %&gt;% semi_join(oldTrain, by=c(&quot;muni.no&quot;, &quot;month.no&quot;))
+trainingLow &lt;- allData %&gt;% semi_join(oldTrainLow, by = c(&quot;muni.no&quot;, &quot;month.no&quot;))
+trainingHigh &lt;- allData %&gt;% semi_join(oldTrainHigh, by = c(&quot;muni.no&quot;, &quot;month.no&quot;))
 
 # Save data with spatial and temporal stratification
 #individual training and testing data
- saveRDS(training, file=&quot;../data_clean/FinalData_Mosi/TrainingData.rds&quot;)
- saveRDS(testing, file=&quot;../data_clean/FinalData_Mosi/TestingData.rds&quot;)</code></pre>
-<pre class="r"><code># Muni index of splits (from nhpSplit.R)
-indexSplit &lt;- readRDS( &quot;../data_clean/environmental/twoModelSplit.rds&quot;)
+saveRDS(training, file=&quot;../data_clean/FinalData_Mosi/TrainingData.rds&quot;)
+saveRDS(trainingLow, &quot;../data_clean/FinalData_Mosi/TrainingDataLowNHP.rds&quot;)
+saveRDS(trainingHigh, &quot;../data_clean/FinalData_Mosi/TrainingDataHighNHP.rds&quot;)</code></pre>
+<pre class="r"><code>CaseSummary = function(x){
+  pos &lt;- sum(x$case)
+  total &lt;- dim(x)[1]
+  bg &lt;- total - pos
+  return(c(pos,bg,total))
+}
 
-# Split training and testing data -----
+# uick sanity check. 
+CaseSummary(training)
+CaseSummary(trainingLow)
+CaseSummary(trainingHigh)
 
-highNHP &lt;- filter(indexSplit, above5split == &quot;above5&quot;)
-test.data.lowNHP &lt;- filter(testing, !(muni.no %in% highNHP$muni.no)) #28 cases
-test.data.highNHP &lt;- filter(testing, (muni.no %in% highNHP$muni.no)) #7 cases
 
-train.data.lowNHP &lt;- filter(training, !(muni.no %in% highNHP$muni.no))  #67 cases
-train.data.highNHP &lt;- filter(training, (muni.no %in% highNHP$muni.no)) #only 14 cases
-
-#70/30 split seems to be kept relatively well
-
-# save new datasets
-
-saveRDS(test.data.lowNHP, &quot;../data_clean/FinalData_Mosi/TestingDataLowNHP.rds&quot;)
-saveRDS(test.data.highNHP, &quot;../data_clean/FinalData_Mosi/TestingDataHighNHP.rds&quot;)
-
-saveRDS(train.data.lowNHP, &quot;../data_clean/FinalData_Mosi/TrainingDataLowNHP.rds&quot;)
-saveRDS(train.data.highNHP, &quot;../data_clean/FinalData_Mosi/TrainingDataHighNHP.rds&quot;)</code></pre>
-</div>
+CaseSummary(testing)
+CaseSummary(testingLow)
+CaseSummary(testingHigh)</code></pre>
 </div>
 
 

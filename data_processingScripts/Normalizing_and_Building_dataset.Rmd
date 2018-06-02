@@ -283,63 +283,69 @@ allData <- cases %>%
             mutate(case=ifelse(is.na(case),0,case)) %>% #replace NA with zero
             mutate(numCase=ifelse(is.na(numCase) == TRUE,0,numCase)) #replace NA with zero
    
-saveRDS(allData, "../data_clean/FinalData_Mosi/allData.rds")       
+saveRDS(allData, "../data_clean/FinalData_Mosi/allData.rds") 
+# rm(list = ls())
 allData <- readRDS("../data_clean/FinalData_Mosi/allData.rds")
 ```
 
+# Spliting data
 
+Data splits made based on old dataset muni.no and month.no
 
 ```{r , eval = FALSE}
-# Index used for spatial and temp stratified train/test data (from GiantDataFrameMaker)
-load("IndexForDataSplitSpat.RData")
+# Pull in the old data
 
-all.pres <- filter(allData, case==1)
-all.bg <- filter(allData, case==0)
+oldTest <- readRDS("../data_clean/TestingDataSpat2.rds") 
+oldTestLow <- readRDS("../data_clean/TestingDataLowNHP2.rds") 
+oldTestHigh <- readRDS("../data_clean/TestingDataHighNHP2.rds")
 
-#split testing
-test.pres <- all.pres[test.pres.inds,]
-train.pres <- all.pres[-test.pres.inds,]
+# pull out rows in common between old data set and new
+testing <-  allData %>% semi_join(oldTest, by=c("muni.no", "month.no"))
+testingLow <- allData %>% semi_join(oldTestLow, by = c("muni.no", "month.no"))
+testingHigh <- allData %>% semi_join(oldTestHigh, by = c("muni.no", "month.no"))
 
-#split training (not stratified at all because there are so many)
-#Split background data
-#test.bg.inds <- base::sample(nrow(all.bg), ceiling(nrow(all.bg)/3))
-test.bg <- all.bg[test.bg.inds,]
-train.bg <- all.bg[-c(test.bg.inds),]
+# save testing data
+saveRDS(testing, file = "../data_clean/FinalData_Mosi/TestingData.rds")
+saveRDS(testingLow, "../data_clean/FinalData_Mosi/TestingDataLowNHP.rds")
+saveRDS(testingHigh, "../data_clean/FinalData_Mosi/TestingDataHighNHP.rds")
 
-#combine background and presence into full training and testing data
-training <- rbind(train.pres, train.bg)
-testing <- rbind(test.pres, test.bg)
+# Repeat steps for training 
+
+# pull in the old data
+oldTrain <- readRDS("../data_clean/TrainingDataSpat2.rds")
+oldTrainLow <- readRDS("../data_clean/TrainingDataLowNHP2.rds")
+oldTrainHigh <- readRDS("../data_clean/TrainingDataHighNHP2.rds")
+
+# pull out rows in common between old data set and new
+training <-  allData %>% semi_join(oldTrain, by=c("muni.no", "month.no"))
+trainingLow <- allData %>% semi_join(oldTrainLow, by = c("muni.no", "month.no"))
+trainingHigh <- allData %>% semi_join(oldTrainHigh, by = c("muni.no", "month.no"))
 
 # Save data with spatial and temporal stratification
 #individual training and testing data
- saveRDS(training, file="../data_clean/FinalData_Mosi/TrainingData.rds")
- saveRDS(testing, file="../data_clean/FinalData_Mosi/TestingData.rds")
+saveRDS(training, file="../data_clean/FinalData_Mosi/TrainingData.rds")
+saveRDS(trainingLow, "../data_clean/FinalData_Mosi/TrainingDataLowNHP.rds")
+saveRDS(trainingHigh, "../data_clean/FinalData_Mosi/TrainingDataHighNHP.rds")
 
 ```
 
 
-```{r high and low NHP regions, eval = FALSE}
-# Muni index of splits (from nhpSplit.R)
-indexSplit <- readRDS( "../data_clean/environmental/twoModelSplit.rds")
+```{r sum of cases, eval = FALSE}
+CaseSummary = function(x){
+  pos <- sum(x$case)
+  total <- dim(x)[1]
+  bg <- total - pos
+  return(c(pos,bg,total))
+}
 
-# Split training and testing data -----
+# uick sanity check. 
+CaseSummary(training)
+CaseSummary(trainingLow)
+CaseSummary(trainingHigh)
 
-highNHP <- filter(indexSplit, above5split == "above5")
-test.data.lowNHP <- filter(testing, !(muni.no %in% highNHP$muni.no)) #28 cases
-test.data.highNHP <- filter(testing, (muni.no %in% highNHP$muni.no)) #7 cases
 
-train.data.lowNHP <- filter(training, !(muni.no %in% highNHP$muni.no))  #67 cases
-train.data.highNHP <- filter(training, (muni.no %in% highNHP$muni.no)) #only 14 cases
-
-#70/30 split seems to be kept relatively well
-
-# save new datasets
-
-saveRDS(test.data.lowNHP, "../data_clean/FinalData_Mosi/TestingDataLowNHP.rds")
-saveRDS(test.data.highNHP, "../data_clean/FinalData_Mosi/TestingDataHighNHP.rds")
-
-saveRDS(train.data.lowNHP, "../data_clean/FinalData_Mosi/TrainingDataLowNHP.rds")
-saveRDS(train.data.highNHP, "../data_clean/FinalData_Mosi/TrainingDataHighNHP.rds")
-
+CaseSummary(testing)
+CaseSummary(testingLow)
+CaseSummary(testingHigh)
 ```
 
