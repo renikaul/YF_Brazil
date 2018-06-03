@@ -15,22 +15,22 @@ source("functions/baggingWperm.R")
 
 ##Model function
 #Model
-glm.formula <- as.formula("case~  popLog10+
-                          NDVI+NDVIScale+
-                          RFsqrt+RFScale+
-                          tempMean+tempScale+
-                          fireDenSqrt+fireDenScale+
-                          spRich+primProp") 
+glm.formula <- as.formula("case~  popLog10 +
+                          ndvi + ndviScale +
+                          rf + rfScale +
+                          temp + tempScale +
+                          fire + fireScale +
+                          spRich + primProp + vectorOcc") 
 
 #1. High NHP Model----
-## Load data----
-high.training <- readRDS("../data_clean/TrainingDataHighNHP2.rds")
-high.testing <- readRDS("../data_clean/TestingDataHighNHP2.rds")
+## Load data
+high.training <- readRDS("../data_clean/FinalData_Mosi/TrainingDataHighNHP.rds")
+high.testing <- readRDS("../data_clean/FinalData_Mosi/TestingDataHighNHP.rds")
 
-## Build the models and training predictions ----
+## Build the models and training predictions
 high.model <-  BaggedModel(form.x.y = glm.formula, training = high.training, new.data = high.training, no.iterations = 500, bag.fnc = baggingTryCatch)
 
-## Predict on testing data ----
+## Predict on testing data
 list.of.high.models <- high.model[[1]] #pull out models from object returned by BaggedModel
 high.test.pred <- baggedPredictions(list.of.high.models, high.testing) #predict on testing data
 
@@ -43,28 +43,28 @@ high.model.prediction <- high.model[[2]] %>%
   mutate(set=c(rep("train", dim(high.model[[2]])[1]), rep("test", dim(high.test.pred[[2]])[1])))
 
 #save all the things
-saveRDS(high.model, file="../data_out/MS_results/HighModel/model.rds")
-saveRDS(high.test.pred, file="../data_out/MS_results/HighModel/testingPredictions.rds")
-saveRDS(high.model.prediction, file="../data_out/MS_results/HighModel/wholePredictions.rds")
+saveRDS(high.model, file="../data_out/MS_results_revisions/HighModel/model.rds")
+saveRDS(high.test.pred, file="../data_out/MS_results_revisions/HighModel/testingPredictions.rds")
+saveRDS(high.model.prediction, file="../data_out/MS_results_revisions/HighModel/wholePredictions.rds")
 
 
-## Assess variable importance through permutation test ----
+## Assess variable importance through permutation test
 
 hPermFull <- permOneVar(formula = glm.formula, bag.fnc = baggingTryCatch, traindata = high.training, cores = 10, no.iterations = 500, perm = 100, viz = TRUE, title="High NHP Full Model")
 
-saveRDS(hPermFull, "../data_out/MS_results/HighModel/HPerm100Model500TryCatch.rds")
+saveRDS(hPermFull, "../data_out/MS_results_revisions/HighModel/HPerm100Model500TryCatch.rds")
 
 ###################
 
 #2. Low NHP Model----
-## Load data----
-low.training <- readRDS("../data_clean/TrainingDataLowNHP2.rds")
-low.testing <- readRDS("../data_clean/TestingDataLowNHP2.rds")
+## Load data
+low.training <- readRDS("../data_clean/FinalData_Mosi/TrainingDataLowNHP.rds")
+low.testing <- readRDS("../data_clean/FinalData_Mosi/TestingDataLowNHP.rds")
 
-## Build the models and training predictions ----
+## Build the models and training predictions
 low.model <-  BaggedModel(form.x.y = glm.formula, training = low.training, new.data = low.training, no.iterations = 500, bag.fnc = baggingTryCatch)
 
-## Predict on testing data ----
+## Predict on testing data
 list.of.low.models <- low.model[[1]] #pull out models from object returned by BaggedModel
 low.test.pred <- baggedPredictions(list.of.low.models, low.testing) #predict on testing data
 
@@ -77,28 +77,28 @@ low.model.prediction <- low.model[[2]] %>%
   mutate(set=c(rep("train", dim(low.model[[2]])[1]), rep("test", dim(low.test.pred[[2]])[1])))
 
 #save all the things
-saveRDS(low.model, file="../data_out/MS_results/LowModel/model.rds")
-saveRDS(low.test.pred, file="../data_out/MS_results/LowModel/testingPredictions.rds")
-saveRDS(low.model.prediction, file="../data_out/MS_results/LowModel/wholePredictions.rds")
+saveRDS(low.model, file="../data_out/MS_results_revisions/LowModel/model.rds")
+saveRDS(low.test.pred, file="../data_out/MS_results_revisions/LowModel/testingPredictions.rds")
+saveRDS(low.model.prediction, file="../data_out/MS_results_revisions/LowModel/wholePredictions.rds")
 
 
-## Assess variable importance through permutation test ----
+## Assess variable importance through permutation test
 
 lPermFull <- permOneVar(formula = glm.formula, bag.fnc = baggingTryCatch, traindata = low.training, cores = 10, no.iterations = 500, perm = 100, viz = TRUE, title="Low NHP Full Model")
 
-saveRDS(hPermFull, "../data_out/MS_results/LowModel/lPerm100Model500TryCatch.rds")
+saveRDS(hPermFull, "../data_out/MS_results_revisions/LowModel/lPerm100Model500TryCatch.rds")
 
 ###################
 
 #3. One Model----
-## Load data----
-one.training <- readRDS("../data_clean/TrainingDataSpat2.rds")
-one.testing <- readRDS("../data_clean/TestingDataSpat2.rds")
+## Load data
+one.training <- readRDS("../data_clean/FinalData_Mosi/TrainingData.rds")
+one.testing <- readRDS("../data_clean/FinalData_Mosi/TestingData.rds")
 
-## Build the models and training predictions ----
+## Build the models and training predictions
 one.model <-  BaggedModel(form.x.y = glm.formula, training = one.training, new.data = one.training, no.iterations = 500, bag.fnc = baggingTryCatch)
 
-## Predict on testing data ----
+## Predict on testing data
 list.of.one.models <- one.model[[1]]
 one.test.pred <- baggedPredictions(list.of.one.models, one.testing) #predict on testing data
 
@@ -111,19 +111,19 @@ one.model.prediction <- one.model[[2]] %>%
   mutate(set=c(rep("train", dim(one.model[[2]])[1]), rep("test", dim(one.test.pred[[2]])[1])))
 
 #save all the things
-saveRDS(one.model, file="../data_out/MS_results/OneModel/model.rds")
-saveRDS(one.test.pred, file="../data_out/MS_results/OneModel/testingPredictions.rds")
-saveRDS(one.model.prediction, file="../data_out/MS_results/OneModel/wholePredictions.rds")
+saveRDS(one.model, file="../data_out/MS_results_revisions/OneModel/model.rds")
+saveRDS(one.test.pred, file="../data_out/MS_results_revisions/OneModel/testingPredictions.rds")
+saveRDS(one.model.prediction, file="../data_out/MS_results_revisions/OneModel/wholePredictions.rds")
 
-## Assess variable importance through permutation test ----
+## Assess variable importance through permutation test
 
 PermFullModel <- permOneVar(formula = glm.formula,bag.fnc = baggingTryCatch,traindata = one.training, cores = 10, no.iterations = 500, perm = 100, viz = TRUE, title="Full Model")
-saveRDS(PermFullModel, "../data_out/MS_results/OneModel/Perm100FullModel500TryCatch.rds")
+saveRDS(PermFullModel, "../data_out/MS_results_revisions/OneModel/Perm100FullModel500TryCatch.rds")
 
 #####################
 
 #4. Exploring Model testing AUC----
-#load data is not already in ws ----
+#load data if not already in ws ----
 # one.model.prediction <- readRDS("../data_out/MS_results/OneModel/wholePredictions.rds")
 # low.model.prediction <- readRDS("../data_out/MS_results/LowModel/wholePredictions.rds")
 # high.model.prediction <- readRDS("../data_out/MS_results/HighModel/wholePredictions.rds")
@@ -149,7 +149,17 @@ highAUC <- CalcAUC(high.model.prediction)
 #save AUCs in table
 sumAUC <- rbind(oneAUC,lowAUC,highAUC)
 colnames(sumAUC) <- c('train','test')
-write.csv(sumAUC, file="../data_out/MS_results/summaryAUC.csv")
+write.csv(sumAUC, file="../data_out/MS_results_revisions/summaryAUC.csv")
 
 
+#5. Additional model including year as an ordered factor ----
 
+# Model
+glm.formula <- as.formula("case~  popLog10 +
+                          ndvi + ndviScale +
+                          rf + rfScale +
+                          temp + tempScale +
+                          fire + fireScale +
+                          spRich + primProp + vectorOcc + year") 
+
+# Make sure year is factor in data 
