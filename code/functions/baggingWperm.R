@@ -256,8 +256,7 @@ permOneVar=function(formula = glm.formula, bag.fnc=bagging,permute.fnc=permuteda
     print(c(j,variablesName[j])) #let us know where the simulation is at. 
     VarToPerm <- j
 
-    permOneVarSave=function(VarToPerm, formula = glm.formula, bag.fnc=bagging,permute.fnc=permutedata, traindata = training, cores=2, no.iterations= 100, perm=10, 
-                            filename = "permutations", viz=TRUE, title= "NA"){
+    permOneVarSave=function(VarToPerm, formula = glm.formula, bag.fnc=baggingTryCatch, permute.fnc = permutedata, traindata = training, cores=2, no.iterations= 100, perm=10){
 
       # VarToPerm: number from 1 to length(variableNames)+1
       # glm.formula: full formula for the model to use
@@ -271,7 +270,7 @@ permOneVar=function(formula = glm.formula, bag.fnc=bagging,permute.fnc=permuteda
       require(doParallel)
       require(ROCR)
       
-    cl <- makeCluster(cores.to.use)
+    cl <- makeCluster(cores)
     registerDoParallel(cl)
     results <- foreach(i = 1:perm) %dopar% {
       #permute data
