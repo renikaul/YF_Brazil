@@ -7,7 +7,7 @@ bagging<-function(form.x.y,training,new.data){
   
   # returns predictions based on logreg model for new data and coefficients of model
   #0. load packages
-  library(dplyr)
+  require(dplyr)
   #1. Create subset of data with fixed number of pres and abs
   training.pres <- dplyr::filter(training, case==1) #pull out just present points
   training.abs <- dplyr::filter(training, case==0)  #pull out just absence points
@@ -43,7 +43,7 @@ BaggedModel = function(form.x.y, training, new.data, no.iterations= 100, bag.fnc
 
 # Making predictions from a bagged models (Bagged Model[[2]] output) ----
 baggedPredictions = function(list.of.models, new.data){
-  library(ROCR)
+  require(ROCR)
   
   matrix.of.predictions <- matrix(NA, ncol=length(list.of.models), nrow = dim(new.data)[1])
   
@@ -77,7 +77,7 @@ baggingTryCatch<-function(form.x.y,training,new.data, keep.model=FALSE){
   }
   # returns predictions based on logreg model for new data and coefficients of model
   #0. load packages
-  library(dplyr)
+  require(dplyr)
   #1. Create subset of data with fixed number of pres and abs
   training.pres <- dplyr::filter(training, case==1) #pull out just present points
   training.abs <- dplyr::filter(training, case==0)  #pull out just absence points
@@ -95,7 +95,7 @@ baggingTryCatch<-function(form.x.y,training,new.data, keep.model=FALSE){
       break
     }
     #escape for stupid amounts of attempts
-    if(attempt > 250){
+    if(attempt > 50){
       break
     }
   }
@@ -109,13 +109,15 @@ baggingTryCatch<-function(form.x.y,training,new.data, keep.model=FALSE){
         }
     }  
   #If model fails after 100 attempts return just NAs  
-  if(attempt>250){
+  if(attempt>50){
     predictions <- rep(NA, dim(new.data)[1])
     return(predictions)
     }
   }
 
-# Permute Variable based on loop iteration of PermOneVar ----
+# Permutation Specific functions ----
+
+# Permute Variable based on loop iteration of PermOneVar
 permutedata=function(formula = glm.formula,trainingdata, i){
   # glm.formula:
   # training : training data with pres and abs
@@ -151,114 +153,12 @@ permutedata=function(formula = glm.formula,trainingdata, i){
   return(permuted.data)
 } 
 
-# Models with permutated variables ----
-permOneVar=function(formula = glm.formula, bag.fnc=bagging,permute.fnc=permutedata, traindata = training, cores=2, no.iterations= 100, perm=10, 
-                    viz=TRUE, title= "NA"){
-  #cores should be =< perm
-  
-  # glm.formula: full formula for the model to use
-  # traindata : training data with pres and abs
-  # cores : number of cores to use for parallel; default to 2
-  # no.iterations : number of low bias models to make; default to 100
-  # bag.fnc : bagging(form.x.y,training,new.data); bagging function 
-  # permute.fnc : permutedata(formula = glm.formula,trainingdata, i); function to permute single variable 
-  library(dplyr)
-  library(doParallel)
-  library(ROCR)
-  
-  
-  #make some local objects----
-  cores.to.use <- cores
-  #parse out variables from formula object 
-  variables <- trimws(unlist(strsplit(as.character(formula)[3], "+", fixed = T)), which = "both")
-  variablesName <- c("full model", variables, "all permutated")
-  
-  #make objects for outputs to be saved in ----
-  perm.auc <- matrix(NA, nrow=perm, ncol=length(variablesName)) #place to save AUC of models based on different permuation
-  
-  #loop through permutations for each variable ----
-  for (j in 1:length(variablesName)){
-    print(c(j,variablesName[j])) #let us know where the simulation is at. 
-    VarToPerm <- j
-    
-    cl <- makeCluster(cores.to.use)
-    registerDoParallel(cl)
-    results <- foreach(i = 1:perm) %dopar% {
-      #permute data
-      permuted.data <- permute.fnc(formula = formula, trainingdata = traindata, i = VarToPerm)
-      #create model and prediction no.iterations times
-      matrix_of_predictions <- replicate(n = no.iterations, expr = bag.fnc(form.x.y = formula, training = permuted.data, new.data = traindata))
-      #calculate mean prediction 
-      output.preds<- apply(matrix_of_predictions, 1, function(x) mean(x, na.rm=TRUE)) 
-      #prediction errors out if NA for output.preds so need to add alternative route for NA
-      if(anyNA(output.preds)==TRUE){
-        perm.auc <- NA
-      }else{
-        preds <- ROCR::prediction(output.preds, traindata$case) #other projects have used dismo::evaluate instead. Not sure if is makes a difference. 
-        #AUC to return
-        perm.auc <- unlist(ROCR::performance(preds, "auc")@y.values)
-      }
-    }
-    
-    stopCluster(cl)
-    #matrix of AUC to return
-    perm.auc[,j] <- unlist(results)
-  }
-  
-  #count number of permutations used to make stats 
-  no.failed <- apply(perm.auc, 2, function(x) sum(is.na(x)))
-  no.suc.perm <- perm - no.failed  
-  
-  #calculate relative importance ----
-  perm.auc.mean <- apply(perm.auc,2,function(x) mean(x,na.rm=TRUE))
-  perm.auc.sd <- apply(perm.auc, 2, function(x) sd(x,na.rm=TRUE))
-  delta.auc <- perm.auc.mean[1] - perm.auc.mean[-c(1, length(perm.auc.mean))] #change in AUC from base model only for single variable permutation
-  rel.import <- delta.auc/max(delta.auc, na.rm = TRUE) # normalized relative change in AUC from base model only for single variable permutation
-  
-  #Output for relative importance
-  relative.import <- as.data.frame(cbind(Variable=variables,varImp=rel.import))
-  #plot it for fun
-  if(viz==TRUE){barplot(rel.import, names.arg = variables, main= title)}
-  #Output for mean and sd of permutations for all permutations (non, single var, and all var)
-  mean.auc <- as.data.frame(cbind(Model=variablesName,meanAUC=perm.auc.mean, sdAUC=perm.auc.sd, perms=no.suc.perm))
-  
-  #Output of AUC for each permutation
-  colnames(perm.auc) <- variablesName
-  
-  #return training coefs and AUC for each iteration
-  #return(list(train.auc, Coefs))
-  return(list(relative.import, mean.auc,perm.auc))
-}
-
 
 # PermOneVar to write after each permutation ----
-  #cores should be =< perm
-  
-  # glm.formula: full formula for the model to use
-  # traindata : training data with pres and abs
-  # cores : number of cores to use for parallel; default to 2
-  # no.iterations : number of low bias models to make; default to 100
-  # bag.fnc : bagging(form.x.y,training,new.data); bagging function 
-  # permute.fnc : permutedata(formula = glm.formula,trainingdata, i); function to permute single variable 
-  
-  
-  #make some local objects----
-  cores.to.use <- cores
-  #parse out variables from formula object 
-  variables <- trimws(unlist(strsplit(as.character(formula)[3], "+", fixed = T)), which = "both")
-  variablesName <- c("full model", variables, "all permutated")
-  
-  #make objects for outputs to be saved in ----
-  perm.auc <- matrix(NA, nrow=perm, ncol=length(variablesName)) #place to save AUC of models based on different permuation
-  
-  #loop through permutations for each variable ----
-  for (j in 1:length(variablesName)){
-    print(c(j,variablesName[j])) #let us know where the simulation is at. 
-    VarToPerm <- j
+PermOneVar=function(VarToPerm, formula = glm.formula, bag.fnc=baggingTryCatch, permute.fnc = permutedata, traindata = training, 
+                              cores=2, no.iterations= 100, perm=10){
 
-    permOneVarSave=function(VarToPerm, formula = glm.formula, bag.fnc=baggingTryCatch, permute.fnc = permutedata, traindata = training, cores=2, no.iterations= 100, perm=10){
-
-      # VarToPerm: number from 1 to length(variableNames)+1
+      # VarToPerm: number from 1 to length(variableNames)+2
       # glm.formula: full formula for the model to use
       # traindata : training data with pres and abs
       # cores : number of cores to use for parallel; default to 2
@@ -269,10 +169,22 @@ permOneVar=function(formula = glm.formula, bag.fnc=bagging,permute.fnc=permuteda
       require(dplyr)
       require(doParallel)
       require(ROCR)
-      
+        
+      f <- function(){
+          pb <- txtProgressBar(min=1, max=perm-1,style=3)
+          count <- 0
+          function(...) {
+            count <<- count + length(list(...)) - 1
+            setTxtProgressBar(pb,count)
+            Sys.sleep(0.01)
+            flush.console()
+            c(...)
+          }
+        }    
+        
     cl <- makeCluster(cores)
     registerDoParallel(cl)
-    results <- foreach(i = 1:perm) %dopar% {
+    results <- foreach(i = icount(perm), .combine = f()) %dopar% {
       #permute data
       permuted.data <- permute.fnc(formula = formula, trainingdata = traindata, i = VarToPerm)
       #create model and prediction no.iterations times
@@ -293,34 +205,32 @@ permOneVar=function(formula = glm.formula, bag.fnc=bagging,permute.fnc=permuteda
     #matrix of AUC to return
     return(unlist(results))
     }
-    
-  
-  #count number of permutations used to make stats 
-  no.failed <- apply(perm.auc, 2, function(x) sum(is.na(x)))
-  no.suc.perm <- perm - no.failed  
-  
-  #calculate relative importance ----
-  perm.auc.mean <- apply(perm.auc,2,function(x) mean(x,na.rm=TRUE))
-  perm.auc.sd <- apply(perm.auc, 2, function(x) sd(x,na.rm=TRUE))
-  delta.auc <- perm.auc.mean[1] - perm.auc.mean[-c(1, length(perm.auc.mean))] #change in AUC from base model only for single variable permutation
-  rel.import <- delta.auc/max(delta.auc, na.rm = TRUE) # normalized relative change in AUC from base model only for single variable permutation
-  
-  #Output for relative importance
-  relative.import <- as.data.frame(cbind(Variable=variables,varImp=rel.import))
-  #plot it for fun
-  if(viz==TRUE){barplot(rel.import, names.arg = variables, main= title)}
-  #Output for mean and sd of permutations for all permutations (non, single var, and all var)
-  mean.auc <- as.data.frame(cbind(Model=variablesName,meanAUC=perm.auc.mean, sdAUC=perm.auc.sd, perms=no.suc.perm))
-  
-  #Output of AUC for each permutation
-  colnames(perm.auc) <- variablesName
-  
-  #return training coefs and AUC for each iteration
-  #return(list(train.auc, Coefs))
-  return(list(relative.import, mean.auc,perm.auc))
+
+SumPermOneVar = function(perm.auc, permutations, viz = TRUE, title = ""){
+#count number of permutations used to make stats 
+no.failed <- apply(perm.auc, 2, function(x) sum(is.na(x)))
+no.suc.perm <- permutations - no.failed  
+
+#calculate relative importance ----
+perm.auc.mean <- apply(perm.auc,2,function(x) mean(x,na.rm=TRUE))
+perm.auc.sd <- apply(perm.auc, 2, function(x) sd(x,na.rm=TRUE))
+delta.auc <- perm.auc.mean[1] - perm.auc.mean[-c(1, length(perm.auc.mean))] #change in AUC from base model only for single variable permutation
+rel.import <- delta.auc/max(delta.auc, na.rm = TRUE) # normalized relative change in AUC from base model only for single variable permutation
+
+#Output for relative importance
+relative.import <- as.data.frame(cbind(Variable=variables,varImp=rel.import))
+#plot it for fun
+if(viz==TRUE){barplot(rel.import, names.arg = variables, main= title)}
+#Output for mean and sd of permutations for all permutations (non, single var, and all var)
+mean.auc <- as.data.frame(cbind(Model=variablesName,meanAUC=perm.auc.mean, sdAUC=perm.auc.sd, perms=no.suc.perm))
+
+#Output of AUC for each permutation
+colnames(perm.auc) <- variablesName
+
+#return training coefs and AUC for each iteration
+#return(list(train.auc, Coefs))
+return(list(relative.import, mean.auc,perm.auc))
 }
-
-
 
 
 
