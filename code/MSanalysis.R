@@ -7,20 +7,30 @@ library(dplyr)
 library(gplots)
 library(parallel)
 library(doParallel)
+library(foreach)
 library(ROCR)
 library(pROC)
 
 ##functions (all stored in single script) ----
 source("functions/baggingWperm.R")
 
-##Model function
-#Model
+## Model function ----
+# Models
 glm.formula <- as.formula("case~  popLog10 +
                           ndvi + ndviScale +
                           rf + rfScale +
                           temp + tempScale +
                           fire + fireScale +
                           spRich + primProp + vectorOcc") 
+
+
+
+## Constants ----
+
+variables <- trimws(unlist(strsplit(as.character(glm.formula)[3], "+", fixed = T)), which = "both")
+variablesName <- c("full model", variables, "all permutated")
+permutations <- 100
+
 
 #1. High NHP Model----
 ## Load data
@@ -47,12 +57,24 @@ saveRDS(high.model, file="../data_out/MS_results_revisions/HighModel/model.rds")
 saveRDS(high.test.pred, file="../data_out/MS_results_revisions/HighModel/testingPredictions.rds")
 saveRDS(high.model.prediction, file="../data_out/MS_results_revisions/HighModel/wholePredictions.rds")
 
-
 ## Assess variable importance through permutation test
 
-hPermFull <- permOneVar(formula = glm.formula, bag.fnc = baggingTryCatch, traindata = high.training, cores = 10, no.iterations = 500, perm = 100, viz = TRUE, title="High NHP Full Model")
+#parse out variables from formula object 
+high.perm.auc <- matrix(NA, nrow=permutations, ncol=length(variablesName)) #place to save AUC of models based on different permuation
 
-saveRDS(hPermFull, "../data_out/MS_results_revisions/HighModel/HPerm100Model500TryCatch.rds")
+#loop through permutations for each variable
+for (j in 1:length(variablesName)){
+  print(c(j,variablesName[j])) #let us know where the simulation is at. 
+  
+  high.perm.auc[,j] <-  PermOneVar(VarToPerm = j,formula = glm.formula, bag.fnc = baggingTryCatch, permute.fnc = permutedata, traindata = high.training, 
+                                  cores = 10, no.iterations = 500, perm = permutations) 
+}  
+
+
+saveRDS(high.perm.auc, "../data_out/MS_results_revisions/HighModel/lPerm100Model500TryCatch.rds")
+
+high.perm.summary <- SumPermOneVar(perm.auc = high.perm.auc, permutations = 100, title = "high NHP")
+saveRDS(high.perm.summary, "../data_out/MS_results_revisions/HighModel/SummaryLPerm100Model500TryCatch.rds")
 
 ###################
 
@@ -84,9 +106,22 @@ saveRDS(low.model.prediction, file="../data_out/MS_results_revisions/LowModel/wh
 
 ## Assess variable importance through permutation test
 
-lPermFull <- permOneVar(formula = glm.formula, bag.fnc = baggingTryCatch, traindata = low.training, cores = 10, no.iterations = 500, perm = 100, viz = TRUE, title="Low NHP Full Model")
+#parse out variables from formula object 
+low.perm.auc <- matrix(NA, nrow=permutations, ncol=length(variablesName)) #place to save AUC of models based on different permuation
 
-saveRDS(hPermFull, "../data_out/MS_results_revisions/LowModel/lPerm100Model500TryCatch.rds")
+#loop through permutations for each variable
+for (j in 1:length(variablesName)){
+  print(c(j,variablesName[j])) #let us know where the simulation is at. 
+  
+  low.perm.auc[,j] <-  PermOneVar(VarToPerm = j,formula = glm.formula, bag.fnc = baggingTryCatch, permute.fnc = permutedata, traindata = low.training, 
+                                  cores = 10, no.iterations = 500, perm = permutations) 
+}  
+
+
+saveRDS(low.perm.auc, "../data_out/MS_results_revisions/LowModel/lPerm100Model500TryCatch.rds")
+
+low.perm.summary <- SumPermOneVar(perm.auc = low.perm.auc, permutations = 100, title = "Low NHP")
+saveRDS(low.perm.summary, "../data_out/MS_results_revisions/LowModel/SummaryLPerm100Model500TryCatch.rds")
 
 ###################
 
@@ -117,18 +152,31 @@ saveRDS(one.model.prediction, file="../data_out/MS_results_revisions/OneModel/wh
 
 ## Assess variable importance through permutation test
 
-PermFullModel <- permOneVar(formula = glm.formula,bag.fnc = baggingTryCatch,traindata = one.training, cores = 10, no.iterations = 500, perm = 100, viz = TRUE, title="Full Model")
-saveRDS(PermFullModel, "../data_out/MS_results_revisions/OneModel/Perm100FullModel500TryCatch.rds")
+#make objects for outputs to be saved in
+national.perm.auc <- matrix(NA, nrow=permutations, ncol=length(variablesName)) #place to save AUC of models based on different permuation
 
-#####################
+#loop through permutations for each variable
+for (j in 1:length(variablesName)){
+  print(c(j,variablesName[j])) #let us know where the simulation is at. 
+  
+  national.perm.auc[,j] <-  PermOneVar(VarToPerm = j,formula = glm.formula, bag.fnc = baggingTryCatch, permute.fnc = permutedata, traindata = one.training, 
+                                       cores = 10, no.iterations = 500, perm = permutations) 
+}  
+
+
+saveRDS(national.perm.auc, "../data_out/MS_results_revisions/OneModel/Perm100Model500TryCatch.rds")
+
+national.perm.summary <- SumPermOneVar(perm.auc = national.perm.auc, permutations = 100, title = "National")
+saveRDS(national.perm.summary, "../data_out/MS_results_revisions/OneModel/SummaryPerm100Model500TryCatch.rds")  
+
 
 #4. Exploring Model testing AUC----
-#load data if not already in ws ----
-# one.model.prediction <- readRDS("../data_out/MS_results/OneModel/wholePredictions.rds")
-# low.model.prediction <- readRDS("../data_out/MS_results/LowModel/wholePredictions.rds")
-# high.model.prediction <- readRDS("../data_out/MS_results/HighModel/wholePredictions.rds")
+###################
+#load data if not already in ws
+ one.model.prediction <- readRDS("../data_out/MS_results_revisions/OneModel/wholePredictions.rds")
+ low.model.prediction <- readRDS("../data_out/MS_results_revisions/LowModel/wholePredictions.rds")
+ high.model.prediction <- readRDS("../data_out/MS_results_revisions/HighModel/wholePredictions.rds")
 
-#function to return training and testing ----
 CalcAUC=function(x){
   train <-x %>% filter(set=="train") %>% select(c("case", "prediction"))
   train.preds <- ROCR::prediction(train$prediction, train$case)
@@ -141,7 +189,7 @@ CalcAUC=function(x){
   return(c(train.auc, test.auc))
 }
 
-#calculate training and testing AUC ----
+#calculate training and testing AUC
 oneAUC <- CalcAUC(one.model.prediction)
 lowAUC <- CalcAUC(low.model.prediction)
 highAUC <- CalcAUC(high.model.prediction)
@@ -152,14 +200,6 @@ colnames(sumAUC) <- c('train','test')
 write.csv(sumAUC, file="../data_out/MS_results_revisions/summaryAUC.csv")
 
 
-#5. Additional model including year as an ordered factor ----
 
-# Model
-glm.formula <- as.formula("case~  popLog10 +
-                          ndvi + ndviScale +
-                          rf + rfScale +
-                          temp + tempScale +
-                          fire + fireScale +
-                          spRich + primProp + vectorOcc + year") 
 
-# Make sure year is factor in data 
+
