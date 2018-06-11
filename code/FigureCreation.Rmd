@@ -318,9 +318,9 @@ s.america <- st_read("../data_clean/shapefiles", "SAmericaCont")
 s.america <- st_transform(s.america, 29101)
 
 # prediction data
-pred.one.model <- readRDS("../data_out/MS_results/OneModel/wholePredictions.rds")
-pred.highNHP <- readRDS("../data_out/MS_results/HighModel/wholePredictions.rds")
-pred.lowNHP <- readRDS("../data_out/MS_results/LowModel/wholePredictions.rds")
+pred.one.model <- readRDS("../data_out/MS_results_revisions/OneModel/wholePredictions.rds")
+pred.highNHP <- readRDS("../data_out/MS_results_revisions/HighModel/wholePredictions.rds")
+pred.lowNHP <- readRDS("../data_out/MS_results_revisions/LowModel/wholePredictions.rds")
 ```
 
 ## Calculate Data for Plots
@@ -404,7 +404,7 @@ Plot.
 bb <- extent(nhp.split.map)
 bb2 <- data.frame(long = unlist(bb[c(1, 2)]), lat = unlist(bb[c(3,4)]))
 
-tiff(file = "../data_out/MS_results/figures/manuscript/PercentileMap.tiff", width = 170, height = 110, units = "mm", res = 250, family = "sans", compression = "lzw") #to get less than 10 MB
+tiff(file = "../data_out/MS_results_revisions/figures/manuscript/PercentileMap.tiff", width = 170, height = 110, units = "mm", res = 250, family = "sans", compression = "lzw") #to get less than 10 MB
 
 ggplot() +
   geom_sf(data = s.america, color = "black", fill = "gray80", size = 0.1) +
@@ -460,9 +460,9 @@ s.america <- st_transform(s.america, 29101)
 
 
 # prediction data
-pred.one.model <- readRDS("../data_out/MS_results/OneModel/wholePredictions.rds")
-pred.highNHP <- readRDS("../data_out/MS_results/HighModel/wholePredictions.rds")
-pred.lowNHP <- readRDS("../data_out/MS_results/LowModel/wholePredictions.rds")
+pred.one.model <- readRDS("../data_out/MS_results_revisions/OneModel/wholePredictions.rds")
+pred.highNHP <- readRDS("../data_out/MS_results_revisions/HighModel/wholePredictions.rds")
+pred.lowNHP <- readRDS("../data_out/MS_results_revisions/LowModel/wholePredictions.rds")
 
 ```
 
@@ -635,9 +635,9 @@ bottom.row <-  ggplot(data = time.all.models, aes(x = monthLabel, y = pred.mean)
 Use cowplot. Note sometimes you need to make sure any pdf devices are off by running `dev.off()` a whole bunch of times first.
 
 ```{r}
-#pdf(file = "../data_out/MS_results/figures/manuscript/LatticePlot.pdf", width = 6.69, height = 4.75, family = "sans")
+#pdf(file = "../data_out/MS_results_revisions/figures/manuscript/LatticePlot.pdf", width = 6.69, height = 4.75, family = "sans")
 
-tiff(file = "../data_out/MS_results/figures/manuscript/LatticePlot.tiff", width = 2007, height = 1425, units = "px", res = 300, family = "sans", compression = "lzw")
+tiff(file = "../data_out/MS_results_revisions/figures/manuscript/LatticePlot.tiff", width = 2007, height = 1425, units = "px", res = 300, family = "sans", compression = "lzw")
 
 
 ggdraw() +

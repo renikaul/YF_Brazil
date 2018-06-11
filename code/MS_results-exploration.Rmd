@@ -13,6 +13,7 @@ This document explores temporal and spatial patterns in the predicions from the 
 knitr::opts_chunk$set(echo = TRUE)
 library(tidyverse)
 library(sf)
+library(broom)
 ```
 
 
@@ -23,9 +24,9 @@ Longterm trends in predictions were analyzed using slope-tests for each municipa
 ## Load Data
 
 ```{r}
-pred.one.model <- readRDS("../data_out/MS_results/OneModel/wholePredictions.rds")
-pred.highNHP <- readRDS("../data_out/MS_results/HighModel/wholePredictions.rds")
-pred.lowNHP <- readRDS("../data_out/MS_results/LowModel/wholePredictions.rds")
+pred.one.model <- readRDS("../data_out/MS_results_revisions/OneModel/wholePredictions.rds")
+pred.highNHP <- readRDS("../data_out/MS_results_revisions/HighModel/wholePredictions.rds")
+pred.lowNHP <- readRDS("../data_out/MS_results_revisions/LowModel/wholePredictions.rds")
 
 #combine together
 pred.one.model$type <- "National"
@@ -60,17 +61,44 @@ tidy.mod <- tidy(models, model) %>%
     ))
 
 #save
-saveRDS(tidy.mod, "../data_out/slopeTests.rds")
+saveRDS(tidy.mod, "../data_out/MS_results_revisions/slopeTests.rds")
+
+#load
+tidy.mod <- readRDS("../data_out/MS_results_revisions/slopeTests.rds")
+```
+
+Slope tests across all months (instead of by month)
+
+```{r}
+month.models <- pred.all %>%
+    group_by(muni.no, type) %>%
+    do(model = lm(prediction ~ month.no, data = .))
+
+tidy.month.mod <- tidy(month.models, model) %>%
+    filter(term=="month.no") %>%
+    mutate(slope = case_when(
+      p.value < 0.05 ~ estimate,
+      p.value >= 0.05 ~ 0
+    ))
+
+tidy.month.mod %>%
+  group_by(type) %>%
+  summarise(none = sum(slope==0), neg = sum(slope<0), pos = sum(slope>0))
 ```
 
 ## Summary of Slope Over Time
 
 ```{r}
 slope.summary <- tidy.mod %>%
-  group_by(type) %>%
+  group_by(type, cal.month) %>%
   summarise(none = sum(slope==0), neg = sum(slope<0), pos = sum(slope>0))
 ```
 
+```{r}
+ggplot(data = slope.summary, aes(y=pos, x = as.factor(cal.month))) +
+  geom_point()+
+  facet_wrap(~type)
+```
 
 ## Across Space
 
@@ -96,20 +124,37 @@ braz.slope <- merge(braz.map, tidy.mod, by = "muni.no") %>%
   mutate(monthLabel = factor(month.abb[cal.month], levels = month.abb))
 ```
 
-Plot (this will be pretty slow).
+Plot (this will be pretty slow, 10 min).
 
 ```{r}
-pdf("figures/trendsAcrossSpace.pdf", height = 12, width = 9)
+#pdf("../data_out/MS_results_revisions/figures/trendsAcrossSpace.pdf", height = 12, width = 9)
 
-tiff(file = "figures/trendsAcrossSpace.tiff", width = 2007, height = 1425, units = "px", res = 300, family = "sans", compression = "lzw")
+tiff(file = "../data_out/MS_results_revisions/figures/trendsAcrossSpace.tiff", width = 2007, height = 1425, units = "px", res = 300, family = "sans", compression = "lzw")
 
 braz.slope %>%
   filter(type=="Regional") %>%
   ggplot(data=.) +
-    geom_sf(aes(fill = slope), color = NA) +
+    geom_sf(aes(fill = estimate), color = NA) +
     geom_sf(data = nhp.split.map, fill = NA, color = "black", size = 0.1) +
   facet_wrap(~monthLabel, nrow = 4, ncol = 3) +
   scale_fill_gradient2(low = "#2166AC", mid = "white", high = "#B2182B", midpoint = 0, limits = c(-0.04, 0.04))
+
+dev.off()
+```
+
+Across all 156 months
+
+```{r}
+month.slope <- merge(braz.map, tidy.month.mod, by = "muni.no") 
+
+tiff(file = "../data_out/MS_results_revisions/figures/trendsAcrossSpace_156months.tiff", width = 2007, height = 1425, units = "px", res = 300, family = "sans", compression = "lzw")
+
+month.slope %>%
+  filter(type=="Regional") %>%
+  ggplot(data=.) +
+    geom_sf(aes(fill = estimate), color = NA) +
+    geom_sf(data = nhp.split.map, fill = NA, color = "black", size = 0.1) +
+  scale_fill_gradient2(low = "#2166AC", mid = "white", high = "#B2182B", midpoint = 0, limits = c(-0.002, 0.002))
 
 dev.off()
 ```
@@ -132,7 +177,8 @@ month.peak <- pred.all %>%
   group_by(muni.no) %>%
   arrange(desc(prediction)) %>%
   slice(1) %>%
-  select(muni.no, peak.month = month.no)
+  ungroup() %>%
+  dplyr::select(muni.no, peak.month = month.no)
 
 #which calendar month is highest averaged over all 13 years?
 cal.month.peak <- pred.all %>%
@@ -141,7 +187,8 @@ cal.month.peak <- pred.all %>%
   summarise(mean.pred = mean(prediction)) %>%
   arrange(desc(mean.pred)) %>%
   slice(1) %>%
-  select(muni.no, peak.cal.month = cal.month)
+  ungroup() %>%
+  dplyr::select(muni.no, peak.cal.month = cal.month)
 
 #highest year (averaging across all months?)
 year.peak <- pred.all %>%
@@ -150,7 +197,8 @@ year.peak <- pred.all %>%
   summarise(mean.pred = mean(prediction)) %>%
   arrange(desc(mean.pred)) %>%
   slice(1) %>%
-  select(muni.no, peak.year = year)
+  ungroup() %>%
+  dplyr::select(muni.no, peak.year = year)
 ```
 
 ## Plot Over Time
@@ -163,7 +211,7 @@ hist(cal.month.peak$peak.cal.month, breaks =12)
 hist(year.peak$peak.year, breaks = 13)
 ```
 
-2008 was definitely the worst year (and 2001). This matches what we know about the El Nino cycles, and really isn't different than what other studies have found (or even just an analysis of cases).
+2008 was definitely the worst year (and 2001). This matches what we know about the El Nino cycles, and really isn't different than what other studies have found (or even just an analysis of cases). Romano etl a. 2014
 
 ## Plot Across Space
 
@@ -202,7 +250,7 @@ ggplot(data = peak.map) +
   geom_sf(aes(fill = peak.year), color = NA) +
   geom_sf(data = nhp.split.map, fill = NA, color = "black", size = 0.1) + 
   ggtitle("Peak year averaged across all 12 months") +
-  scale_fill_distiller(type = "seq", palette = 14, direction = 1)
+  scale_fill_distiller(type = "qual", palette = 14, direction = 1)
 ```
 
 
