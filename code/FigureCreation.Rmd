@@ -505,17 +505,20 @@ This looks at a time series, averaged over all municipalities by month. This is 
 ```{r}
 time.one.model <- as.data.frame(pred.one.model) %>%
   group_by(month.no) %>%
-  summarise(pred.mean = mean(prediction, na.rm = T)) %>%
+  summarise(pred.mean = mean(prediction, na.rm = T), 
+            sumCases = sum(case)) %>%
   mutate(model = "one.model")
 
 time.lowNHP <- as.data.frame(pred.lowNHP) %>%
   group_by(month.no) %>%
-  summarise(pred.mean = mean(prediction, na.rm = T)) %>%
+  summarise(pred.mean = mean(prediction, na.rm = T),
+            sumCases = sum(case)) %>%
   mutate(model = "lowNHP")
 
 time.highNHP <- as.data.frame(pred.highNHP) %>%
   group_by(month.no) %>%
-  summarise(pred.mean = mean(prediction, na.rm = T)) %>%
+  summarise(pred.mean = mean(prediction, na.rm = T),
+            sumCases = sum(case)) %>%
   mutate(model = "highNHP")
 
 time.all.models <- rbind(time.one.model, time.highNHP, time.lowNHP) 
@@ -627,6 +630,10 @@ bottom.row <-  ggplot(data = time.all.models, aes(x = monthLabel, y = pred.mean)
       axis.ticks = element_line()
     ) +
   facet_wrap(~model) +
+    geom_rug(aes(x=jitter(as.numeric(monthLabel),0.3), alpha = sumCases^0.5, size = sumCases), inherit.aes = FALSE) +
+  scale_alpha(range = c(0,1)) +
+  scale_size(range = c(0.5,3)) +
+  guides(alpha = F, size = F) +
   panel_border()
 ```
 
@@ -660,26 +667,25 @@ Load Data
 ```{r}
 braz.map <- st_read("../data_clean/shapefiles", "BRAZNoIslands")
 braz.map <- rename(braz.map, muni.no = muni_no)
-
+braz.map <- st_transform(braz.map, 29101)
 # NHP split index
 nhp.split <- readRDS("../data_clean/environmental/twoModelSplit.rds")
 nhp.split.map <- left_join(braz.map, nhp.split, by = "muni.no") %>%
   group_by(above5split) %>%
   summarize() %>%
   #gets out any weird lines between polygons
-  st_buffer(0.01)
-
-#get brazil outline
-braz.outline <- st_read("../data_clean/shapefiles", "brazilOutline")
-braz.outline <- select(braz.outline, ADMIN)
+  st_buffer(1000)
 
 #get other neighboring countries
-s.america <- st_read("../data_clean/shapefiles", "South_America")
+s.america <- st_read("../data_clean/shapefiles", "SAmericaCont")
+
+# reproject to SAD69 Brazil Polyconic
+s.america <- st_transform(s.america, 29101)
 
 # prediction data
-pred.one.model <- readRDS("../data_out/MS_results/OneModel/wholePredictions.rds")
-pred.highNHP <- readRDS("../data_out/MS_results/HighModel/wholePredictions.rds")
-pred.lowNHP <- readRDS("../data_out/MS_results/LowModel/wholePredictions.rds")
+pred.one.model <- readRDS("../data_out/MS_results_revisions/OneModel/wholePredictions.rds")
+pred.highNHP <- readRDS("../data_out/MS_results_revisions/HighModel/wholePredictions.rds")
+pred.lowNHP <- readRDS("../data_out/MS_results_revisions/LowModel/wholePredictions.rds")
 ```
 
 Calculate Percentiles
@@ -713,10 +719,7 @@ pred.all$cal.month[pred.all$cal.month==0] <- 12
 
 pred.all <- mutate(pred.all, year = 2001 + month.no %/% 12)
 
-
 pred.map.all <- left_join(pred.all, braz.map, by = "muni.no")
-
-
 ```
 
 Calculate case centroids
@@ -759,7 +762,7 @@ my_theme_map <- function(...) {
 ```{r} 
 for (i in 1:max(pred.map.all$month.no)){
   
-  png(file = paste0("../data_out/MS_results/figures/manuscript/gifs/month", 
+  png(file = paste0("../data_out/MS_results_revisions/figures/manuscript/gifs/month", 
                     formatC(i, width = 3, format = "d", flag = "0"), ".png"), 
       width = 600, height = 330, units = "px", res = 100, bg = 'white')
   #adjust for my bad ability at division which makes december respond strange
@@ -790,7 +793,7 @@ gif.plot <- ggplot() +
              )) +
   geom_sf(data = nhp.split.map, fill = NA, color = "black", size=0.1) +
   geom_sf(data = case.centroids[case.centroids$month.no==i,], size = 1) + 
-  coord_sf(xlim = c(-74, -34.78), ylim = c(-33.8, 5.3), datum = NA) +
+  coord_sf(xlim = c(2788000, 7127000), ylim = c(6256000, 10593000), datum = NA) +
   my_theme_map() +
   ggtitle(plotTitle)
 
@@ -805,4 +808,4 @@ Use ImageMagick to create plot from png files
 
 cd into `../data_out/MS_results/figures/poster/gifs`
 CMDLINE: `convert -delay 50 *.png \MapPercentile.gif` (for gif)
-CMDLINE: `convert -antialias -delay 1 *.png MapPercentile.mp4` (for mp4)
+CMDLINE: `convert -antialias -delay 100 *.png MapPercentile.mp4` (for mp4)
