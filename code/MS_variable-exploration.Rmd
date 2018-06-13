@@ -74,7 +74,7 @@ col <- colorRampPalette(c("#BB4444", "#EE9988", "#FFFFFF", "#77AADD", "#4477AA")
 
 ```{r}
 
-tiff(file = "../data_out/MS_results/figures/manuscript/correlationMatrix.tiff", width = 1500, height = 1500, units = "px", res = 300, family = "sans", compression = "lzw")
+tiff(file = "../data_out/MS_results_revisions/figures/correlationMatrix.tiff", width = 1500, height = 1500, units = "px", res = 300, family = "sans", compression = "lzw")
 
 corrplot(cor.mat, method = "color", col = col(200),  
          type = "upper", order = "hclust", 
@@ -89,7 +89,7 @@ dev.off()
 
 # Univariate Analyses
 
-There are some variables that have an over 0.9 correlation with each other. We created univariate logistic regressions on the whole dataset to see which are more explanatory. Note our actual model is a bagged logistic regression
+There are some variables that have an over 0.9 correlation with each other. We created univariate logistic regressions on the whole dataset to see which are more explanatory. Note our actual model is a bagged logistic regression, so a single logistic regression may have different results
 
 For this, we will use AIC with a \deltaAIC > 10 denoting a difference amongst models.
 
