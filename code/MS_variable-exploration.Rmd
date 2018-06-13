@@ -13,6 +13,7 @@ library(tidyverse)
 library(corrplot)
 library(PerformanceAnalytics)
 library(Hmisc)
+library(ROCR)
 ```
 
 This document explores collinearity between covariates and then uses a univariate analysis of each to provide support for variable selection.
@@ -93,6 +94,76 @@ There are some variables that have an over 0.9 correlation with each other. We c
 
 For this, we will use AIC with a \deltaAIC > 10 denoting a difference amongst models.
 
+## Set Up Bagged Model
+
+```{r}
+bagging<-function(form.x.y,training,new.data){
+  # modified JP's bagging function 12/1/17 RK 
+  # form.x.y the formula for model to use
+  # training dataframe containing training data (presence and abs)
+  # new.data new data for logreg model to predict onto
+  
+  # returns predictions based on logreg model for new data and coefficients of model
+  #0. load packages
+  require(dplyr)
+  #1. Create subset of data with fixed number of pres and abs
+  training.pres <- dplyr::filter(training, case==1) #pull out just present points
+  training.abs <- dplyr::filter(training, case==0)  #pull out just absence points
+  training_positions.p <- sample(nrow(training.pres),size=10) #randomly choose 10 present point rows
+  training_positions.b <- sample(nrow(training.abs),size=100) #randomly choose 100 absence point rows  
+  train_pos.p<-1:nrow(training.pres) %in% training_positions.p #presence 
+  train_pos.b<-1:nrow(training.abs) %in% training_positions.b #background
+  #2. Build logreg model with subset of data    
+  glm_fit<-glm(form.x.y,data=rbind(training.pres[train_pos.p,],training.abs[train_pos.b,]),family=binomial(logit))
+  #3. Pull out model coefs  
+  #glm.coef <- coef(glm_fit)
+  #4. Use model to predict (0,1) on whole training data   
+  predictions <- predict(glm_fit,newdata=new.data,type="response")
+  return(predictions)
+}
+```
+
+```{r}
+univariateBag <- function(IV, iters = 25, data.set = all.data){
+  #' Runs a univariate bagged model 
+  
+  #' @param IV independent variable to use in univariate analysis
+  #' @param iters number of bags to use (default = 25)
+  #' @param data.set dataset to train and predict over. This does not use a holdout dataset as it is really just to show that univariate analyses of correlated variables are all the same
+  
+  #' @results mean and sd of AUC over dataset provided
+  
+  univar.form <- as.formula(paste0("case ~ ", IV))
+  outputs <- matrix(nrow = nrow(data.set), ncol = iters)
+  for (i in 1:ncol(outputs)){
+    outputs[,i] <- bagging(univar.form, data.set, data.set)
+  }
+  
+  #calculate AUC for each bag
+  AUC.df <- numeric(ncol(outputs))
+  truth <- data.set$case
+  for (i in 1:ncol(outputs)){
+    preds <- outputs[,i]
+    AUC.obj <- ROCR::prediction(preds, truth)
+    AUC.df[i] <- unlist(ROCR::performance(AUC.obj, "auc")@y.values)
+  }
+  return(list(AUC.mean = mean(AUC.df), AUC.sd = sd(AUC.df)))
+}
+
+```
+ 
+AUC function
+ 
+```{r}
+# AUC function
+calcAUC <- function(model){
+  truth <- model$data$case
+  preds <- model$fitted.values
+  AUC.obj <- ROCR::prediction(preds, truth)
+  return(unlist(ROCR::performance(AUC.obj, "auc")@y.values))
+}
+```
+
 ## Temperature
 
 min, mean, and max temp were highly correlated with pearson's \rho values between 0.89 and 0.97.
@@ -102,10 +173,27 @@ min, mean, and max temp were highly correlated with pearson's \rho values betwee
 tmean.mod <- glm(case ~ temp, data = all.data, family = binomial (link = "logit"))
 tmin.mod <- glm(case ~ tempMin, data = all.data, family = binomial (link = "logit"))
 tmax.mod <- glm(case ~ tempMax, data = all.data, family = binomial (link = "logit"))
+```
 
+```{r}
 #compare AIC
 AIC(tmean.mod, tmin.mod, tmax.mod)
+bbmle::AICtab(tmean.mod, tmin.mod, tmax.mod, weights = T)
+
+#compare AUC
+calcAUC(tmean.mod)
+calcAUC(tmin.mod)
+calcAUC(tmax.mod)
 ```
+
+Or use a bagged approach that matches our own:
+
+```{r}
+t.mean.uni.bag <- univariateBag("temp")
+t.min.uni.bag <- univariateBag("tempMin")
+t.max.uni.bag <- univariateBag("tempMax")
+```
+
 
 ## Rainfall
 
@@ -116,8 +204,24 @@ Min, mean, max rf were all highly correlated with pearson's coefficients between
 rf.mean.mod <- glm(case ~ rf, data = all.data, family = binomial (link = "logit"))
 rf.min.mod <- glm(case ~ rf.min, data = all.data, family = binomial (link = "logit"))
 rf.max.mod <- glm(case ~ rf.max, data = all.data, family = binomial (link = "logit"))
+```
 
+```{r}
 #compare AIC
 AIC(rf.mean.mod, rf.min.mod, rf.max.mod)
+bbmle::AICtab(rf.mean.mod, rf.min.mod, rf.max.mod, weights = T)
+
+#compare AUC
+calcAUC(rf.mean.mod)
+calcAUC(rf.min.mod)
+calcAUC(rf.max.mod)
+```
+
+Using a bagged approach:
+
+```{r}
+rf.mean.uni.bag <- univariateBag("rf")
+rf.min.uni.bag <- univariateBag("rf.min")
+rf.max.uni.bag <- univariateBag("rf.max")
 ```
 
