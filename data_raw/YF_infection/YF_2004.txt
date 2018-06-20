@@ -1,0 +1,5 @@
+muni.no,Muni,Mar,Jun,Nov,Total
+130185, Iranduba,1,,,1
+130190, Itacoatiara,,1,,1
+130260, Manaus,,,1,1
+150420, Marab,1,,,1 

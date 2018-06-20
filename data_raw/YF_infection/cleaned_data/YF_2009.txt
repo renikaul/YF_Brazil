@@ -1,0 +1,6 @@
+Muni,Jan,Fev,Mar,Abr,Mai,Ago,Set,Dez,Total ,
+316990 ,Ub,,,,,,1,,,1
+350450 ,Avar,,,3,,,,,,3
+350800 ,Buri,,,5,1,,,,,6
+352350 ,Itatinga,,,1,,,,,,1
+353880 ,Piraju,,,10,,,,,,10

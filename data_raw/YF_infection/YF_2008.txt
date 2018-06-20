@@ -1,0 +1,28 @@
+muni.no,Muni,Jan,Fev,Abr,Mai,Jun,Dez,Total
+150553, Parauapebas,,,,,1,,1
+317040,Una,,1,,,,,1
+354890,So Carlos,,,,1,,,1
+411325, Laranjal,1,,,,,,1
+430783, Eugnio de Castro,,,,,,1,1
+500020,gua Clara,3,,,,,,3
+500220,Bonito,1,,,,,,1
+500370,Dourados,1,,,,,,1
+500710,Ribas do Rio Pardo,1,,,,,,1
+510410,Guarant do Norte,,,1,,,,1
+510510,Juara,,,,,,1,1
+510628, Novo So Joaquim,1,,,,,,1
+520010,Abadinia,1,,,,,,1
+520450,Caldas Novas,2,,,,,,2
+520510,Catalo,1,,,,,,1
+520630,Cristianpolis,2,,,,,,2
+520640,Crixs,1,,,,,,1
+521250,Luzinia,1,,,,,1,2
+521290,Marzago,1,,,,,,1
+521560,Padre Bernardo,1,1,,,,,2
+521730,Pirenpolis,2,,,,,1,3
+521760,Planaltina,1,,,,,,1
+521890,Rubiataba,2,,,,,,2
+522060,Silvnia,1,,,,,,1
+522160,Uruau,,,,,,1,1
+522230,Vila Propcio,,,,,,1,1
+530010,Braslia,4,,,,,1,5

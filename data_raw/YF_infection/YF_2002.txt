@@ -1,0 +1,7 @@
+muni.no,Muni,Jan,Fev,Mar,Mai,Dez,Total
+130120,Coari,,,1,,,1
+130250,Manacapuru,,1,,,,1
+140030,Mucajaí,,,1,,,1
+150180,Breves,,,,1,,1
+313830,Leandro Ferreira,1,,,,,1
+316710,Serro,,,,,3,3

@@ -1,0 +1,3 @@
+muni.no,Muni,Jan,Jun,Ago,Dez,Total
+130130, Codajs,,,,2,2
+140005, Alto Alegre,1,,,,1 

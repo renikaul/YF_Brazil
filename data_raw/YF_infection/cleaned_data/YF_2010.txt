@@ -1,0 +1,4 @@
+Muni;Jan;Fev;Jun;Total
+150030 Afuá;;;1;1
+431020 Ijuí;1;;;1
+500320 Corumbá;;1;;1

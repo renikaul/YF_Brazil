@@ -1,0 +1,4 @@
+muni.no,Muni,Jan,Fev,Jun,Total
+150030,Afu,,,1,1
+431020,Iu,1,,,1
+500320,Corumb,,1,,1

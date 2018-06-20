@@ -1,0 +1,3 @@
+Muni,Jan,Fev,Mar,Mai,Dez,Total ,
+130120 ,Coari,,,1,,,1
+130250 ,Manacapuru,,1,,,,1

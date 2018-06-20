@@ -1,0 +1,16 @@
+muni.no, Muni,Jan,Fev,Mar,Mai,Jun,Jul,Ago,Nov,Total
+110020,Porto Velho,1,,,,,,,,1
+130080,Borba,,,,,,,1,,1
+130310,Nova Olinda do Norte,,,,,,1,,,1
+140010,Boa Vista,,,,,,,,1,1
+150510,bidos,,,,1,,,,,1
+310740,Bom Despacho,,1,1,,,,,,2
+311760,Conceio do Par,,2,,,,,,,2
+312320,Dores do Indai,,1,1,,,,,,2
+312470,Estrela do Indai,,,2,,,,,,2
+313830,Leandro Ferreira,1,5,,,,,,,6
+313880,Luz,,1,,,,,,,1
+314520,Nova Serrana,1,2,,,,,,,3
+316040,Santo Antnio do Monte,4,1,1,,,,,,6
+316210,So Gotardo,,,2,,,,,,2
+ 

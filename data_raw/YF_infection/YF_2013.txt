@@ -1,0 +1,4 @@
+muni.no,Muni,Jan,Mar,Ago,Total
+130010, Anori,,1,,1
+130320, Novo Airo,1,,,1
+150020, Acar,,,1,1

@@ -1,0 +1,5 @@
+Muni,Jan,Fev,Mar,Mai,Jun,Jul,Ago,Nov,Total ,
+110020 ,Porto Velho,1,,,,,,,,1
+130080 ,Borba,,,,,,,1,,1
+130310 ,Nova Olinda do Norte,,,,,,1,,,1
+140010 ,Boa Vista,,,,,,,,1,1
