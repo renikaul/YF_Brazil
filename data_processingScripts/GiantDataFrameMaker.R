@@ -2,23 +2,28 @@
 #Covarate information 
 
 # case :reporting of any YF cases (0,1)
-# NumCase :number of reported YF cases 
+# NumCase :number of reported YF cases
+
 # NDVI : NDVI for that month
 # NDVIScale : NDVI rescaled to max value for that muni and calendar month
-# muniArea : km2
-# popLog10 : population density 
+
+# popLog10 : population density
+
 # RF : mean hourly rainfall
-# RFsqrt : mean hourly rainfall sqrt transformed
 # RFScale : mean hourly rainfall rescaled to max value for that muni and calendar month
-# tempMean : mean monthly air temperature 
+
+# tempMean : mean monthly air temperature
 # tempScale : mean monthly air temperature rescaled to max value for that muni and calendar month
-# fireNum : number of fires oberserved in month
-# fireDen : number of fires oberserved in month divided by muniArea
+
 # fireDenSqrt : number of fires oberserved in month divided by muniArea sqrt transformed
 # firesDenScale : number of fires oberserved in month divided by muniArea rescaled to max value for that muni and calendar month. NA values converted to zero. 
+
 # spRich : number of non-human primates by species with ranges based on IUCN {0-22}
+
 # primProp : sum of each municipalities relative area that is both agricultural and falls within a primate genus range. {0,9} Missing for 2014
+
 # vectorOcc : maximum probability of a known spillover vector occuring within that municipality
+
 # muni.no : unique number to identify municipality
 # month.no : numbered month of observation {1,168}
 # muni.name : character string name
@@ -105,7 +110,7 @@ NHPProp <- readRDS("../data_clean/environmental/primProp.rds") #changes every ye
 NHPRichness <- readRDS("../data_clean/environmental/primRichness.rds") #doesn't change with time
 ## Fires ----------------------------------
 
-fires <- readRDS("../data_clean/environmental/numFires.rds")
+fires <- readRDS("../data_clean/environmental/nuvectoremFires.rds")
   #hist(fires$numFire) #super overdispersed, only about 20% muniXmonth have had a fire. 6% of muniXmonths have only had a single fire. The upper bound is >5000 per a muniXmonth. 
   #standard transformation really cannot correct for this extreme 
   
