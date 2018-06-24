@@ -1,0 +1,813 @@
+---
+title: "Manuscript Figures"
+author: ""
+date: "January 23, 2018"
+output: html_document
+---
+
+# Packages and Set-Up
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(tidyverse)
+library(reshape2)
+library(sf)
+library(raster)
+library(viridis)
+library(RColorBrewer)
+library(cowplot)
+library(ggthemes)
+library(lubridate)
+library(grid)
+library(scales)
+library(ggsn)
+```
+
+Color scheme:
+```{r}
+singleCol <- alpha("#1b9e77", 0.8)
+lrrCol <- alpha("#d95f02",0.8)
+hrrCol <- alpha("#7570b3", 0.8)
+```
+
+This document creates the figures for:
+
+Kaul, RajReni B., Michelle V. Evans, Courtney C. Murdock, John M. Drake. 2018. Spatio-temporal spillover risk of yellow fever in brazil. *BMC Medicine*.
+
+Data is loaded individually for each figure (except coord plot figure), but packages and set up must be run for everything.
+
+Figure sizing (max file size 10 MB):
+
+Half page width = 85mm (3.3 inch)
+Full page width = 170 mm (6.69 inch)
+max height = 225 mm (8.85 inch)
+
+# NHP Split
+
+Plots the distribution of NHP richness and the spatial split.
+
+## Load Data
+
+```{r}
+braz.outline <- st_read("../data_clean/shapefiles", "brazilOutline")
+braz.outline <- dplyr::select(braz.outline, ADMIN)
+
+braz.map <- st_read("../data_clean/shapefiles", "BRAZNoIslands")
+braz.map <- rename(braz.map, muni.no = muni_no)
+
+#primateRichness by municipality
+primRichness <- readRDS("../data_clean/environmental/primRichness.rds")
+
+braz.map <- left_join(braz.map, primRichness, by = "muni.no")
+
+# NHP split index
+nhp.split <- readRDS("../data_clean/environmental/twoModelSplit.rds")
+nhp.split.map <- left_join(braz.map, nhp.split, by = "muni.no") %>%
+  group_by(above5split) %>%
+  summarize() %>%
+  #gets out any weird lines between polygons
+  st_buffer(0.01)
+
+#create dataframe that keeps split and raw NHP richness
+nhpColor <- left_join(primRichness, nhp.split, by = "muni.no")
+```
+
+## Plot
+
+### Map
+
+```{r}
+splitMap <- ggplot(data = nhp.split.map) +
+  geom_sf(aes(fill = above5split)) + 
+  scale_fill_manual(values = c(hrrCol, lrrCol)) +
+  theme_minimal() +
+  coord_sf(xlim = c(-74, -34.78), ylim = c(-33.8, 5.3), datum = NA) +
+  guides(fill = F) +
+  theme(
+    panel.border = element_rect(fill = NA)
+  )
+```
+
+### Histogram
+
+Based on split
+
+```{r}
+histPlot <- ggplot(data = primRichness) +
+  geom_histogram(aes(x=spRich), binwidth = 1, fill = c(rep(lrrCol, 6), rep(hrrCol,  17))) +
+  ylab(expression("No. of Municipalities")) +
+  xlab("NHP Species Richness") +
+  scale_y_continuous(trans = 'log10', expand = c(0,0)) +
+  scale_x_continuous(expand = c(0,0))
+```
+
+Based on species richness
+```{r}
+histPlot <- ggplot(data = nhpColor) +
+  geom_histogram(aes(x=spRich, fill = above5split), binwidth = 1, alpha = 0.8, position = "identity") +
+  ylab(expression("No. of Municipalities")) +
+  xlab("NHP Species Richness") +
+  scale_y_log10(expand = c(0,0)) +
+  scale_x_continuous(expand = c(0,0)) +
+  scale_fill_manual(values = c(hrrCol, lrrCol)) +
+  guides(fill = F)
+```
+
+### Facet Together
+
+```{r}
+vp <- viewport(width = 0.45, height = 0.45, x = 0.75, y = 0.72)
+
+pdf(file = "../data_out/MS_results/figures/manuscript/nhpSplitDist.pdf", width = 3.3, height = 3.3, family = "sans") 
+
+print(histPlot)
+print(splitMap, vp = vp)
+
+dev.off()
+```
+
+# Relative Variable Importance as quantiles
+
+The median, and 95% quantile reported for dAUC scaled to max median dAUC for each model. 
+
+```{r relative variable importance median}
+#function to calculate dAUC stats
+RelativeImportance=function(x, model="NA"){
+  perms <- x[[3]][complete.cases(x[[3]]),-c(1, dim(x[[3]])[2])] # pull out AUC values, but drop full model and all permuted data columns 
+  model.AUC <- as.numeric(as.character(x[[2]][1,2])) # pull out AUC for full model
+  # calculate delta AUC
+  delta.AUC <- model.AUC- perms
+    # scale delta AUC between zero and one
+    #scale.delta.AUC <- delta.AUC/max(delta.AUC)
+  #calculate median, upper and lower quantiles
+  Quant.dAUC <- delta.AUC %>% 
+    melt(value.name="dAUC") %>% 
+    rename(Rep=Var1, Variable=Var2)%>% 
+    group_by(Variable) %>%
+    summarise(dAUCmean=mean(dAUC),dAUCmedian=median(dAUC),Q975=quantile(dAUC, probs=0.975),Q025=quantile(dAUC, probs=0.025) ) %>%
+    ungroup()
+  
+  scale.dAUC <- Quant.dAUC %>%
+      group_by(Variable) %>%
+      mutate_all(funs(./max(Quant.dAUC$dAUCmedian))) %>% # divid all values by max median value
+      arrange(desc(dAUCmedian))%>%
+      ungroup() %>%  
+      mutate(Rank=c(11:1), Model=model)
+      
+  return(scale.dAUC)
+}
+
+#variable names for publication
+niceNames <- c("popLog10"="Population Density",
+               "spRich" = "NHP Richness",
+               "RFsqrt" = "Mean Rainfall",
+               "tempMean" = "Mean Temperature",
+               "NDVIScale" = "Scaled NDVI",
+               "tempScale" = "Scaled Mean Temperature",
+               "primProp" = "NHP Agriculture Overlap",
+               "RFScale" = "Scaled Mean Rainfall",
+               "fireDenScale" = "Scaled Fire Density",
+               "NDVI" ="NDVI",
+               "fireDenSqrt" ="Fire Density")
+
+#load data
+fullM <- readRDS("../data_out/MS_results/OneModel/Perm100FullModel500TryCatch.rds") 
+lowM <- readRDS("../data_out/MS_results/LowModel/lPerm100Model500TryCatch.rds")
+highM <- readRDS('../data_out/MS_results/HighModel/HPerm100Model500TryCatch.rds')
+
+#calculate dAUC stats
+hri <- RelativeImportance(highM, "Regional: HRR")
+lri <- RelativeImportance(lowM, "Regional: LRR")
+fri <- RelativeImportance(fullM, "National")
+allRelImportance<- rbind(fri,lri,hri)
+
+#reorder factors for plotting 
+allRelImportance <- within(allRelImportance, Variable <- factor(Variable, levels = c( "popLog10","spRich","RFsqrt","tempMean","NDVIScale","tempScale","primProp","RFScale","fireDenSqrt","NDVI","fireDenScale")))
+allRelImportance <- within(allRelImportance, Model <- factor(Model, levels = c("National","Regional: LRR","Regional: HRR")))
+
+#   
+# b2  <-  ggplot(allRelImportance, aes(x=Variable, y=dAUCmedian, ymin = Q025, ymax = Q975, fill=Model))+
+#     geom_hline(yintercept = 0.0, color="grey50", linetype=2) +
+#     geom_crossbar(position="dodge")+
+#     #scale_y_continuous(limits=c(-.5,2))+
+#     #geom_point(y=allRelImportance$dAUCmean)+
+#     ylab("Relative Importance") + xlab("variable") +
+#     scale_x_discrete("",labels=niceNames) +
+#     theme_few()+
+#     theme(axis.text.x=element_text(angle=35, hjust=1), legend.position = c(.8,.8) ) +
+#     scale_fill_tableau("colorblind10")
+  
+  #tiff("figures/manuscript/VarImpQuantiles.tiff")
+  #plot(b2)
+  #dev.off()
+  
+ # ggplot(allRelImportance, aes(x=Variable, y=dAUCmedian, ymin = Q025, ymax = Q975, fill=Model))+
+ #    geom_crossbar()+
+ #    facet_grid(Model~.)+
+ #    scale_y_continuous(limits=c(-.05,1))+
+ #    #geom_point(y=allRelImportance$dAUCmean)+
+ #    geom_hline(yintercept = 0.0, color="grey50", linetype=2) +
+ #    ylab("Relative Importance") + xlab("variable") +
+ #    scale_x_discrete("",labels=niceNames) +
+ #    theme_few()+
+ #    theme(axis.text.x=element_text(angle=35, hjust=1), legend.position = c(.9,.9) ) +
+ #    scale_fill_tableau("colorblind10")
+ #  
+ #  tiff("figures/manuscript/VarImpQuantilesLattice.tiff")
+ #  plot(b2)
+ #  dev.off()
+  
+b3 <-  ggplot(allRelImportance, aes(x=Variable, y=dAUCmedian, fill=Model)) + 
+  geom_bar(stat="identity",position="dodge")+
+  scale_y_continuous(expand = c(0, 0)) +
+  scale_x_discrete("Variable",labels=niceNames) +
+  theme(text = element_text(face="bold",size=18))+
+  theme(axis.text.x=element_text(angle=45, hjust=1), legend.position = c(.6,.8) ) +
+  labs(y="Relative Variable Importance") + 
+  scale_fill_manual(values = c(singleCol, lrrCol, hrrCol))
+
+plot(b3)
+
+tiff("../data_out/MS_results/figures/manuscript/VarImpMedian.tiff")
+plot(b3)
+dev.off()
+
+pdf("../data_out/MS_results/figures/manuscript/VarImpMedian.pdf")
+plot(b3)
+dev.off()
+```
+
+
+# Coord Plot of Variable Importance Rank Median
+
+Ordered based on medians calculated in variable importance plots. Must run code above for data prep.
+
+```{r Coord Plot}
+
+justNamesStart <- c("Population Density",
+               "NHP Richness",
+               "Mean Rainfall",
+               "Mean Temperature",
+                "Scaled NDVI",
+               "Scaled Mean\nTemperature",
+               "NHP Agriculture\nOverlap",
+               "Scaled Mean\nRainfall",
+                "Fire\nDensity",
+               "NDVI",
+               "Scaled Fire Density") 
+
+justNamesEnd <- c(
+               "NHP Richness",
+               "Population Density",
+               "Mean Temperature",
+               "NHP Agriculture\nOverlap",
+               "Scaled NDVI",
+               "Mean Rainfall",
+               "Scaled Mean\nTemperature",
+               "Fire\nDensity",
+               "NDVI",
+               "Scaled Mean\nRainfall",
+               "Scaled Fire Density") 
+
+y_levels <- levels(allRelImportance$Variable)
+
+p <- ggplot(allRelImportance, aes(x = Model, y = Rank, group = Variable)) +   # group = id is important!
+  geom_hline(yintercept = c(1:11), color="grey70", linetype=2, alpha=0.5, size=0.25) +
+  geom_path(aes(color = Variable, alpha=.95),lineend = 'round', linejoin = 'round', size=3) +
+  scale_y_discrete(limits = levels(allRelImportance$Variable), labels=c(11:1)) + #ylim/lab details
+  ylab("Ranked Variable Importance") +
+  xlab("Model")+
+  theme(text = element_text(face="bold",size=18))+
+  #theme_few() +
+  scale_x_discrete(expand = c(0, 1)) +
+  annotate("text", x = c(0.5), y=c(11:1), label = justNamesStart) + 
+  annotate("text", x = c(3.5), y=c(11:1), label = justNamesEnd) + 
+  theme(legend.position = "none") 
+
+tiff("../data_out/MS_results/figures/manuscript/RankMedian.tiff")
+plot(p)
+dev.off()
+
+pdf("../data_out/MS_results/figures/manuscript/RankMedian.pdf")
+plot(p)
+dev.off()
+```
+
+#Maps of Calendar Months
+
+This map is a 3 x 2 lattice, showing three time points in 2008 across the national and regional model. These values are represented by percentiles of each individual model.
+
+## Load Data
+
+```{r}
+braz.map <- st_read("../data_clean/shapefiles", "BRAZNoIslands")
+braz.map <- rename(braz.map, muni.no = muni_no)
+braz.map <- st_transform(braz.map, 29101)
+# NHP split index
+nhp.split <- readRDS("../data_clean/environmental/twoModelSplit.rds")
+nhp.split.map <- left_join(braz.map, nhp.split, by = "muni.no") %>%
+  group_by(above5split) %>%
+  summarize() %>%
+  #gets out any weird lines between polygons
+  st_buffer(1000)
+
+#get other neighboring countries
+s.america <- st_read("../data_clean/shapefiles", "SAmericaCont")
+
+# reproject to SAD69 Brazil Polyconic
+s.america <- st_transform(s.america, 29101)
+
+# prediction data
+pred.one.model <- readRDS("../data_out/MS_results_revisions/Infection/OneModel/wholePredictions.rds")
+pred.highNHP <- readRDS("../data_out/MS_results_revisions/Infection/HighModel/wholePredictions.rds")
+pred.lowNHP <- readRDS("../data_out/MS_results_revisions/Infection/LowModel/wholePredictions.rds")
+```
+
+## Calculate Data for Plots
+
+Rescale raw outputs into percentiles and combine into one dataframe
+
+```{r}
+pred.lowNHP <- pred.lowNHP %>%
+  mutate(percentile = cut(prediction, 
+                          quantile(prediction, probs = seq(0,1, by = 0.0001)), 
+                          include.lowest = T,
+                          labels = F)) %>%
+  mutate(model = "two.model")
+
+pred.highNHP <- pred.highNHP %>%
+  mutate(percentile = cut(prediction, 
+                          quantile(prediction, probs = seq(0,1, by = 0.0001)), 
+                          include.lowest = T,
+                          labels = F)) %>%
+  mutate(model = "two.model")
+
+pred.one.model <- pred.one.model %>%
+  mutate(percentile = cut(prediction, 
+                          quantile(prediction, probs = seq(0,1, by = 0.0001)), 
+                          include.lowest = T,
+                          labels = F)) %>%
+  mutate(model = "one.model")
+
+pred.all <- rbind(pred.lowNHP, pred.highNHP, pred.one.model) %>%
+  mutate(cal.month = month.no %% 12)
+
+pred.all$cal.month[pred.all$cal.month==0] <- 12
+
+pred.all.2008 <- pred.all %>%
+  mutate(year = case_when(
+    cal.month != 12 ~ 2001 + month.no %/% 12,
+    cal.month == 12 ~ 2000 + month.no %/% 12)) %>%
+  filter(year==2008)
+
+pred.map <- left_join(pred.all.2008, braz.map, by = "muni.no")
+```
+
+## Plot
+
+```{r static map theme}
+my_theme_map <- function(...) {
+  theme_bw() +
+  theme(
+    axis.line = element_blank(),
+    axis.text.x = element_blank(),
+    axis.text.y = element_blank(),
+    axis.ticks = element_blank(),
+    axis.title.x = element_blank(),
+    axis.title.y = element_blank(),
+    legend.position = "right",
+    plot.background = element_rect(fill = NA, color = NA), 
+    panel.background = element_rect(fill = NA, color = NA), 
+    panel.border = element_rect(fill = NA, color = "black"),
+    legend.background = element_rect(fill = NA, color = NA),
+    strip.background = element_rect(fill = NA, color = NA),
+    panel.grid.major.x = element_blank(),
+    panel.grid.major.y = element_blank(),
+    panel.spacing = unit(10, "pt"),
+    ...
+  )
+}
+```
+
+Subset out months.
+
+```{r}
+pred.map.subset <- pred.map %>%
+  filter(cal.month %in% c(1,6,9)) %>%
+  mutate(monthLabel = factor(month.abb[cal.month], levels = c("Jan", "Jun", "Sep")))
+```
+
+Plot.
+
+```{r}
+
+bb <- extent(nhp.split.map)
+bb2 <- data.frame(long = unlist(bb[c(1, 2)]), lat = unlist(bb[c(3,4)]))
+
+tiff(file = "../data_out/MS_results_revisions/Infection/figures/manuscript/PercentileMap.tiff", width = 170, height = 110, units = "mm", res = 250, family = "sans", compression = "lzw") #to get less than 10 MB
+
+ggplot() +
+  geom_sf(data = s.america, color = "black", fill = "gray80", size = 0.1) +
+  geom_sf(data = pred.map.subset, aes(fill = percentile/100), color = NA, size = 0) +
+  scale_fill_distiller(palette = "OrRd", direction = 1, type = "seq",
+                     guide = guide_colorbar(
+                       title = "Relative Risk of\nYF Spillover (%)",
+                       direction = "vertical",
+                       title.position = 'top',
+                       title.theme = element_text(size = 8, angle = 0),
+                       label.theme = element_text(size = 8, angle = 0))) +
+  facet_grid(model ~ monthLabel, 
+             labeller = labeller(
+               model = c("one.model" = 'National Model', "two.model" = 'Regional Model')
+             )) +
+  geom_sf(data = nhp.split.map, fill = NA, color = "black", size=0.1) +
+  coord_sf(xlim = c(2788000, 7127000), ylim = c(6256000, 10593000), datum = NA) +
+  my_theme_map() +
+  ggsn::scalebar(data = bb2, dist = 400, dd2km = F,
+                 st.size = 1, height= 0.03, 
+                  location = "bottomright"
+           ) +
+  north(bb2, symbol = 14, scale = 0.1, 
+        anchor = c(x = 6950000, y = 7000000))
+
+dev.off()
+
+```
+
+# Lattice Plot 
+
+Figure showing results collapsed over space and time in a lattice. 
+
+## Load Data
+```{r}
+# spatial data
+braz.map <- st_read("../data_clean/shapefiles", "BRAZNoIslands")
+braz.map <- rename(braz.map, muni.no = muni_no)
+# reproject to SAD69 Brazil Polyconic
+braz.map <- st_transform(braz.map, 29101)
+
+# NHP split index
+nhp.split <- readRDS("../data_clean/environmental/twoModelSplit.rds")
+nhp.split.map <- left_join(braz.map, nhp.split, by = "muni.no") %>%
+  group_by(above5split) %>%
+  summarize() %>%
+  #gets out any weird lines between polygons
+  st_buffer(1000)
+
+#get other neighboring countries
+s.america <- st_read("../data_clean/shapefiles", "SAmericaCont")
+s.america <- st_transform(s.america, 29101)
+
+
+# prediction data
+pred.one.model <- readRDS("../data_out/MS_results_revisions/Infection/OneModel/wholePredictions.rds")
+pred.highNHP <- readRDS("../data_out/MS_results_revisions/Infection/HighModel/wholePredictions.rds")
+pred.lowNHP <- readRDS("../data_out/MS_results_revisions/Infection/LowModel/wholePredictions.rds")
+
+```
+
+## Calculate Values
+
+### Over Space
+
+This calculates the variance per municipality to get a measure of "flickering". The variance is calculated on the raw values.
+
+```{r}
+# calculate variance per municipality over whole time period
+var.one.model <- as.data.frame(pred.one.model) %>%
+  group_by(muni.no) %>%
+  summarise(pred.var = var(prediction)) %>%
+  mutate(model = "one.model")
+
+var.highNHP <- as.data.frame(pred.highNHP) %>%
+  group_by(muni.no) %>%
+  summarise(pred.var = var(prediction)) %>%
+  mutate(model = "highNHP")
+
+var.lowNHP <- as.data.frame(pred.lowNHP) %>%
+  group_by(muni.no) %>%
+  summarise(pred.var = var(prediction)) %>%
+  mutate(model = "lowNHP")
+
+var.all.models <- rbind(var.one.model, var.highNHP, var.lowNHP) %>%
+  left_join(braz.map, by = "muni.no")
+
+rm(var.one.model, var.highNHP, var.lowNHP)
+
+var.all.models$model <- factor(var.all.models$model, levels = c("one.model", "lowNHP", "highNHP"))
+```
+
+
+### Over Time
+
+This looks at a time series, averaged over all municipalities by month. This is also plotting the raw outputs.
+
+```{r}
+time.one.model <- as.data.frame(pred.one.model) %>%
+  group_by(month.no) %>%
+  summarise(pred.mean = mean(prediction, na.rm = T), 
+            sumCases = sum(case)) %>%
+  mutate(model = "one.model")
+
+time.lowNHP <- as.data.frame(pred.lowNHP) %>%
+  group_by(month.no) %>%
+  summarise(pred.mean = mean(prediction, na.rm = T),
+            sumCases = sum(case)) %>%
+  mutate(model = "lowNHP")
+
+time.highNHP <- as.data.frame(pred.highNHP) %>%
+  group_by(month.no) %>%
+  summarise(pred.mean = mean(prediction, na.rm = T),
+            sumCases = sum(case)) %>%
+  mutate(model = "highNHP")
+
+time.all.models <- rbind(time.one.model, time.highNHP, time.lowNHP) 
+
+#create cal.month variable (1 - 12)
+time.all.models <- time.all.models %>%
+  mutate(cal.month = month.no %% 12)
+
+time.all.models$cal.month[time.all.models$cal.month==0] <- 12
+
+#create year variable
+time.all.models <- time.all.models %>%
+  mutate(year = ((month.no-1) %/% 12) + 2001) %>%
+  mutate(monthLabel = lubridate::month(cal.month, label = T))
+
+#order models
+time.all.models$model <- factor(time.all.models$model, levels = c("one.model", "lowNHP", "highNHP"))
+
+rm(time.one.model, time.highNHP, time.lowNHP)
+```
+
+## Plot
+
+### Over Space
+
+```{r map theme}
+my_theme_map <- function(...) {
+  theme_minimal() +
+  theme(
+    axis.line = element_blank(),
+    axis.text.x = element_blank(),
+    axis.text.y = element_blank(),
+    axis.ticks = element_blank(),
+    axis.title.x = element_blank(),
+    axis.title.y = element_blank(),
+    legend.position = "left",
+    panel.grid = element_blank(),
+    plot.background = element_rect(fill = NA, color = NA), 
+    panel.background = element_rect(fill = NA, color = NA), 
+    panel.border = element_rect(fill = NA, color = "black"),
+    legend.background = element_rect(fill = NA, color = NA),
+    strip.background = element_blank(),
+    strip.text = element_blank(),
+    plot.margin = unit(c(0,5,0,5), unit = "pt"),
+    legend.title.align = 0.5,
+    ...
+  )
+}
+```
+
+
+```{r}
+bb <- extent(nhp.split.map)
+bb2 <- data.frame(long = unlist(bb[c(1, 2)]), lat = unlist(bb[c(3,4)]))
+
+top.row <- ggplot() +
+    geom_sf(data = s.america, color = "black", fill = "gray80", size = 0.1) +
+    geom_sf(data = nhp.split.map, color = "black", size = 0.1, fill = NA) +
+    geom_sf(data = var.all.models, aes(fill = pred.var), color = NA) +
+    scale_fill_distiller(palette = "Greens", direction = 1, type ="seq",
+                     na.value = "gray70", 
+                     guide = guide_colorbar(
+                       title = "Seasonal Variation\nin Spillover\nIntensity",
+                       direction = "vertical",
+                       barheight = unit(35, units = "mm"),
+                       barwidth = unit(4, units = "mm"),
+                       draw.ulim = F,
+                       title.position = 'top',
+                       # some shifting around
+                       title.hjust = 0.5,
+                       label.hjust = 0.5,
+                       title.theme = element_text(size = 8, angle = 0),
+                       label.theme = element_text(size = 8, angle = 0))) +
+  my_theme_map() +
+  facet_wrap(~model, dir = "h") +
+  coord_sf(xlim = c(2788000, 7127000), ylim = c(6256000, 10593000), datum = NA) +
+  ggsn::scalebar(data = bb2, dist = 400, dd2km = F,
+                 st.size = 1, height= 0.03, 
+                  location = "bottomright") +
+  north(bb2, symbol = 14, scale = 0.1, 
+        anchor = c(x = 6950000, y = 7000000))
+```
+
+
+### Over Time
+
+We plot a line for each year, with a detrended loess line in a darker color.
+
+```{r}
+bottom.row <-  ggplot(data = time.all.models, aes(x = monthLabel, y = pred.mean)) +
+    geom_line(aes(group = year), color = "gray70")+
+    geom_smooth(aes(x = cal.month, y = pred.mean), se = F, color = "black") +
+    theme_minimal() +
+    ylab("Mean Intensity") +
+    xlab("") +
+    scale_x_discrete(breaks = c("Jan","Mar","May","Jul","Sep","Nov")) +
+    theme(
+      axis.title = element_text(size = 12),
+      axis.text = element_text(size = 10),
+      axis.text.x = element_text(size = 10, angle = 90, 
+                                 vjust=0.2, hjust = 0),
+      panel.background = element_blank(),
+      strip.background = element_blank(),
+      strip.text.x = element_blank(),
+      axis.line = element_line(),
+      panel.grid = element_blank(),
+      axis.line.y = element_line(),
+      axis.ticks.length = unit(0.5, "lines"),
+      axis.ticks = element_line()
+    ) +
+  facet_wrap(~model) +
+    geom_rug(aes(x=jitter(as.numeric(monthLabel),0.3), alpha = sumCases^0.5, size = sumCases), inherit.aes = FALSE) +
+  scale_alpha(range = c(0,1)) +
+  scale_size(range = c(0.5,3)) +
+  guides(alpha = F, size = F) +
+  panel_border()
+```
+
+## Combine into one lattice plot
+
+Use cowplot. Note sometimes you need to make sure any pdf devices are off by running `dev.off()` a whole bunch of times first.
+
+```{r}
+#pdf(file = "../data_out/MS_results_revisions/figures/manuscript/LatticePlot.pdf", width = 6.69, height = 4.75, family = "sans")
+dev.off()
+dev.off()
+
+tiff(file = "../data_out/MS_results_revisions/Infection/figures/manuscript/LatticePlot.tiff", width = 2007, height = 1425, units = "px", res = 300, family = "sans", compression = "lzw")
+
+
+ggdraw() +
+  draw_plot(top.row, x = 0, y = 0.5, width = 1, height = 0.5) +
+  draw_plot(bottom.row, x = 0.095, y = 0, width = 0.905, height = 0.5) +
+  draw_plot_label(label = letters[1:6],
+                  x = rep(c(0.16,0.45,0.71), 2),
+                  y = rep(c(0.98,0.53), each = 3), 
+                  size = 12)
+
+dev.off()
+```
+
+# Supp. Figure: GIF of maps
+
+GIF of model predictions as percentiles. This plots indidivudal png files which are then converted to GIF using ImageMagick.
+
+Load Data
+
+```{r}
+braz.map <- st_read("../data_clean/shapefiles", "BRAZNoIslands")
+braz.map <- rename(braz.map, muni.no = muni_no)
+braz.map <- st_transform(braz.map, 29101)
+# NHP split index
+nhp.split <- readRDS("../data_clean/environmental/twoModelSplit.rds")
+nhp.split.map <- left_join(braz.map, nhp.split, by = "muni.no") %>%
+  group_by(above5split) %>%
+  summarize() %>%
+  #gets out any weird lines between polygons
+  st_buffer(1000)
+
+#get other neighboring countries
+s.america <- st_read("../data_clean/shapefiles", "SAmericaCont")
+
+# reproject to SAD69 Brazil Polyconic
+s.america <- st_transform(s.america, 29101)
+
+# prediction data
+pred.one.model <- readRDS("../data_out/MS_results_revisions/Infection/OneModel/wholePredictions.rds")
+pred.highNHP <- readRDS("../data_out/MS_results_revisions/Infection/HighModel/wholePredictions.rds")
+pred.lowNHP <- readRDS("../data_out/MS_results_revisions/Infection/LowModel/wholePredictions.rds")
+```
+
+Calculate Percentiles
+
+```{r}
+pred.lowNHP <- pred.lowNHP %>%
+  mutate(percentile = cut(prediction, 
+                          quantile(prediction, probs = seq(0,1, by = 0.0001)), 
+                          include.lowest = T,
+                          labels = F)) %>%
+  mutate(model = "two.model")
+
+pred.highNHP <- pred.highNHP %>%
+  mutate(percentile = cut(prediction, 
+                          quantile(prediction, probs = seq(0,1, by = 0.0001)), 
+                          include.lowest = T,
+                          labels = F)) %>%
+  mutate(model = "two.model")
+
+pred.one.model <- pred.one.model %>%
+  mutate(percentile = cut(prediction, 
+                          quantile(prediction, probs = seq(0,1, by = 0.0001)), 
+                          include.lowest = T,
+                          labels = F)) %>%
+  mutate(model = "one.model")
+
+pred.all <- rbind(pred.lowNHP, pred.highNHP, pred.one.model) %>%
+  mutate(cal.month = month.no %% 12)
+
+pred.all$cal.month[pred.all$cal.month==0] <- 12
+
+pred.all <- mutate(pred.all, year = 2001 + month.no %/% 12)
+
+pred.map.all <- left_join(pred.all, braz.map, by = "muni.no")
+```
+
+Calculate case centroids
+
+```{r}
+case.centroids <- pred.map.all %>%
+  filter(case==1)
+
+case.centroids <- st_centroid(st_sf(case.centroids))
+```
+
+## Plot
+
+Map theme
+
+```{r}
+my_theme_map <- function(...) {
+  theme_bw() +
+  theme(
+    axis.line = element_blank(),
+    axis.text.x = element_blank(),
+    axis.text.y = element_blank(),
+    axis.ticks = element_blank(),
+    axis.title.x = element_blank(),
+    axis.title.y = element_blank(),
+    legend.position = "right",
+    plot.background = element_rect(fill = NA, color = NA), 
+    panel.background = element_rect(fill = NA, color = NA), 
+    panel.border = element_rect(fill = NA, color = "black"),
+    legend.background = element_rect(fill = NA, color = NA),
+    strip.background = element_rect(fill = NA, color = NA),
+    panel.grid.major.x = element_blank(),
+    panel.grid.major.y = element_blank(),
+    panel.spacing = unit(10, "pt"),
+    ...
+  )
+}
+```
+
+```{r} 
+for (i in 1:max(pred.map.all$month.no)){
+  
+  png(file = paste0("../data_out/MS_results_revisions/Infection/figures/manuscript/gifs/month", 
+                    formatC(i, width = 3, format = "d", flag = "0"), ".png"), 
+      width = 600, height = 330, units = "px", res = 100, bg = 'white')
+  #adjust for my bad ability at division which makes december respond strange
+  if (i%%12 == 0){
+    plot.year <- 2000 + (i%/% 12)
+    plot.month <- "December"
+  } else{
+    plot.year <- 2001 + (i%/% 12)
+    plot.month <- month.name[i %% 12]
+  }
+  
+  plotTitle <- paste("Spillover risk in", plot.month, plot.year, sep = " ")
+  
+gif.plot <- ggplot() +
+  geom_sf(data = s.america, color = "gray80", fill = "gray80") +
+  geom_sf(data = pred.map.all[pred.map.all$month.no==i,], aes(fill = percentile/100), color = NA, size = 0) +
+  scale_fill_distiller(palette = "OrRd", direction = 1, type = "seq", limits = c(0,100),
+                     guide = guide_colorbar(
+                       title = "Percentile",
+                       direction = "vertical",
+                       title.position = 'top',
+                       title.theme = element_text(size = 8, angle = 0),
+                       label.theme = element_text(size = 8, angle = 0))
+                     ) +
+  facet_grid(. ~ model, 
+             labeller = labeller(
+               model = c("one.model" = 'National', "two.model" = 'Regional')
+             )) +
+  geom_sf(data = nhp.split.map, fill = NA, color = "black", size=0.1) +
+  geom_sf(data = case.centroids[case.centroids$month.no==i,], size = 1) + 
+  coord_sf(xlim = c(2788000, 7127000), ylim = c(6256000, 10593000), datum = NA) +
+  my_theme_map() +
+  ggtitle(plotTitle)
+
+print(gif.plot)
+
+dev.off()
+
+}
+```
+
+Use ImageMagick to create plot from png files
+
+cd into `../data_out/MS_results/figures/poster/gifs`
+CMDLINE: `convert -delay 50 *.png \MapPercentile.gif` (for gif)
+CMDLINE: `convert -antialias -delay 100 *.png MapPercentile.mp4` (for mp4)
