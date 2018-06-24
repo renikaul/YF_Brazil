@@ -1,7 +1,7 @@
 ---
 title: "Manuscript Figures"
 author: ""
-date: "January 23, 2018"
+date: ""
 output: html_document
 ---
 
@@ -411,7 +411,7 @@ ggplot() +
   geom_sf(data = pred.map.subset, aes(fill = percentile/100), color = NA, size = 0) +
   scale_fill_distiller(palette = "OrRd", direction = 1, type = "seq",
                      guide = guide_colorbar(
-                       title = "Relative Risk of\nYF Spillover (%)",
+                       title = "Risk Bands",
                        direction = "vertical",
                        title.position = 'top',
                        title.theme = element_text(size = 8, angle = 0),
@@ -427,7 +427,7 @@ ggplot() +
                  st.size = 1, height= 0.03, 
                   location = "bottomright"
            ) +
-  north(bb2, symbol = 14, scale = 0.1, 
+  ggsn::north(bb2, symbol = 14, scale = 0.1, 
         anchor = c(x = 6950000, y = 7000000))
 
 dev.off()
