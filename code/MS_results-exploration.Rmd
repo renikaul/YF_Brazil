@@ -24,9 +24,9 @@ Longterm trends in predictions were analyzed using slope-tests for each municipa
 ## Load Data
 
 ```{r}
-pred.one.model <- readRDS("../data_out/MS_results_revisions/OneModel/wholePredictions.rds")
-pred.highNHP <- readRDS("../data_out/MS_results_revisions/HighModel/wholePredictions.rds")
-pred.lowNHP <- readRDS("../data_out/MS_results_revisions/LowModel/wholePredictions.rds")
+pred.one.model <- readRDS("../data_out/MS_results_revisions/Infection/OneModel/wholePredictions.rds")
+pred.highNHP <- readRDS("../data_out/MS_results_revisions/Infection/HighModel/wholePredictions.rds")
+pred.lowNHP <- readRDS("../data_out/MS_results_revisions/Infection/LowModel/wholePredictions.rds")
 
 #combine together
 pred.one.model$type <- "National"
@@ -59,12 +59,6 @@ tidy.mod <- tidy(models, model) %>%
       p.value < 0.05 ~ estimate,
       p.value >= 0.05 ~ 0
     ))
-
-#save
-saveRDS(tidy.mod, "../data_out/MS_results_revisions/slopeTests.rds")
-
-#load
-tidy.mod <- readRDS("../data_out/MS_results_revisions/slopeTests.rds")
 ```
 
 Slope tests across all months (instead of by month)
@@ -127,9 +121,7 @@ braz.slope <- merge(braz.map, tidy.mod, by = "muni.no") %>%
 Plot (this will be pretty slow, 10 min).
 
 ```{r}
-#pdf("../data_out/MS_results_revisions/figures/trendsAcrossSpace.pdf", height = 12, width = 9)
-
-tiff(file = "../data_out/MS_results_revisions/figures/trendsAcrossSpace.tiff", width = 2007, height = 1425, units = "px", res = 300, family = "sans", compression = "lzw")
+tiff(file = "../data_out/MS_results_revisions/Infection/figures/supplement/trendsAcrossSpace.tiff", width = 2007, height = 1425, units = "px", res = 300, family = "sans", compression = "lzw")
 
 braz.slope %>%
   filter(type=="Regional") %>%
@@ -137,7 +129,11 @@ braz.slope %>%
     geom_sf(aes(fill = estimate), color = NA) +
     geom_sf(data = nhp.split.map, fill = NA, color = "black", size = 0.1) +
   facet_wrap(~monthLabel, nrow = 4, ncol = 3) +
-  scale_fill_gradient2(low = "#2166AC", mid = "white", high = "#B2182B", midpoint = 0, limits = c(-0.04, 0.04))
+  scale_fill_gradient2(low = "#2166AC", mid = "white", high = "#B2182B", midpoint = 0, limits = c(-0.04, 0.04)) +
+  ggtitle("Long-term trends in YF intensity by calendar month") +
+  theme_bw() +
+  coord_sf(datum = NA) +
+  labs(fill = "Yearly change in YF\nspillover intensity")
 
 dev.off()
 ```
@@ -147,14 +143,20 @@ Across all 156 months
 ```{r}
 month.slope <- merge(braz.map, tidy.month.mod, by = "muni.no") 
 
-tiff(file = "../data_out/MS_results_revisions/figures/trendsAcrossSpace_156months.tiff", width = 2007, height = 1425, units = "px", res = 300, family = "sans", compression = "lzw")
+tiff(file = "../data_out/MS_results_revisions/Infection/figures/supplement/trendsAcrossSpace_156months.tiff", width = 2007, height = 1425, units = "px", res = 300, family = "sans", compression = "lzw")
+
+options(scipen = 999)
 
 month.slope %>%
   filter(type=="Regional") %>%
   ggplot(data=.) +
     geom_sf(aes(fill = estimate), color = NA) +
     geom_sf(data = nhp.split.map, fill = NA, color = "black", size = 0.1) +
-  scale_fill_gradient2(low = "#2166AC", mid = "white", high = "#B2182B", midpoint = 0, limits = c(-0.002, 0.002))
+  scale_fill_gradient2(low = "#2166AC", mid = "white", high = "#B2182B", midpoint = 0, limits = c(-0.001, 0.001))+
+  ggtitle("Long-term trends in YF spillover from 2001 - 2013") +
+  theme_bw() +
+  coord_sf(datum = NA) +
+  labs(fill = "Monthly change in YF\nspillover intensity")
 
 dev.off()
 ```

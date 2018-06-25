@@ -27,7 +27,7 @@ This document explores collinearity between covariates and then uses a univariat
 
 ```{r}
 #cleaned data
-train.data <- readRDS("../data_clean/FinalData_Mosi/TrainingData.rds")
+train.data <- readRDS("../data_clean/FinalData_Mosi/Infection/TrainingData.rds")
 
 # extra environmental covariates
 rf <- readRDS("../data_clean/environmental/may2018/allRainfall.rds")
@@ -75,7 +75,7 @@ col <- colorRampPalette(c("#BB4444", "#EE9988", "#FFFFFF", "#77AADD", "#4477AA")
 
 ```{r}
 
-tiff(file = "../data_out/MS_results_revisions/figures/correlationMatrix.tiff", width = 1500, height = 1500, units = "px", res = 300, family = "sans", compression = "lzw")
+tiff(file = "../data_out/MS_results_revisions/Infection/figures/supplement/correlationMatrix.tiff", width = 1500, height = 1500, units = "px", res = 300, family = "sans", compression = "lzw")
 
 corrplot(cor.mat, method = "color", col = col(200),  
          type = "upper", order = "hclust", 
@@ -194,7 +194,6 @@ t.min.uni.bag <- univariateBag("tempMin")
 t.max.uni.bag <- univariateBag("tempMax")
 ```
 
-
 ## Rainfall
 
 Min, mean, max rf were all highly correlated with pearson's coefficients between 0.97 and 0.99.
@@ -223,5 +222,25 @@ Using a bagged approach:
 rf.mean.uni.bag <- univariateBag("rf")
 rf.min.uni.bag <- univariateBag("rf.min")
 rf.max.uni.bag <- univariateBag("rf.max")
+```
+
+## Print univariate AUC table
+
+```{r}
+AUCresults <- data.frame(cbind(c("variable.type", "Minimum", "Mean", "Maximum"),
+                         c("Rainfall", 
+                           paste0(round(rf.min.uni.bag$AUC.mean, 3), " (", round(rf.min.uni.bag$AUC.sd,3), ")"), 
+                           paste0(round(rf.mean.uni.bag$AUC.mean,3), " (", round(rf.mean.uni.bag$AUC.sd, 3), ")"),
+                           paste0(round(rf.max.uni.bag$AUC.mean, 3), " (", round(rf.max.uni.bag$AUC.sd,3), ")")),
+                         c("Temperature", 
+                           paste0(round(t.min.uni.bag$AUC.mean, 3), " (", round(t.min.uni.bag$AUC.sd, 3), ")"), 
+                           paste0(round(t.mean.uni.bag$AUC.mean, 3), " (", round(t.mean.uni.bag$AUC.sd, 3), ")"),
+                           paste0(round(t.max.uni.bag$AUC.mean, 3), " (", round(t.max.uni.bag$AUC.sd, 3), ")"))))
+```
+
+Save results
+
+```{r}
+write.csv(AUCresults, "../data_out/MS_results_revisions/Infection/univariateAUC.csv", row.names = F)
 ```
 
