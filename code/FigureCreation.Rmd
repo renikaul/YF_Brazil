@@ -132,31 +132,6 @@ The median, and 95% quantile reported for dAUC scaled to max median dAUC for eac
 
 ```{r relative variable importance median}
 #function to calculate dAUC stats
-RelativeImportance=function(x, model="NA"){
-  perms <- x[complete.cases(x),-c(1, dim(x)[2])] # pull out AUC values, but drop full model and all permuted data columns 
-  model.AUC <- as.numeric(as.character(x[[2]][1,2])) # pull out AUC for full model
-  # calculate delta AUC
-  delta.AUC <- model.AUC- perms
-    # scale delta AUC between zero and one
-    #scale.delta.AUC <- delta.AUC/max(delta.AUC)
-  #calculate median, upper and lower quantiles
-  Quant.dAUC <- delta.AUC %>% 
-    melt(value.name="dAUC") %>% 
-    rename(Rep=Var1, Variable=Var2)%>% 
-    group_by(Variable) %>%
-    summarise(dAUCmean=mean(dAUC),dAUCmedian=median(dAUC),Q975=quantile(dAUC, probs=0.975),Q025=quantile(dAUC, probs=0.025) ) %>%
-    ungroup()
-  
-  scale.dAUC <- Quant.dAUC %>%
-      group_by(Variable) %>%
-      mutate_all(funs(./max(Quant.dAUC$dAUCmedian))) %>% # divid all values by max median value
-      arrange(desc(dAUCmedian))%>%
-      ungroup() %>%  
-      mutate(Rank=c(12:1), Model=model)
-      
-  return(scale.dAUC)
-}
-
 RelativeImportance = function(x, model="NA"){
   tmp <- x[[1]] %>% 
     arrange(desc(varImp)) %>% 
@@ -244,11 +219,17 @@ allRelImportance$varImp <- ifelse(allRelImportance$varImp<0,0.001,allRelImportan
   scale_y_continuous(expand = c(0, 0)) +
   scale_x_discrete("Variable",labels=niceNames) +
   theme(text = element_text(face="bold",size=18))+
-  theme(axis.text.x=element_text(angle=45, hjust=1), legend.position = c(.6,.8) ) +
+  theme(axis.text.x=element_text(angle=45, hjust=1), legend.position = c(.85,.85), panel.background = element_blank() ) +
+  theme(axis.line.x = element_line(color="black", size = 1),
+        axis.line.y = element_line(color="black", size = 1),
+        axis.ticks = element_line(colour = "black"), 
+        axis.ticks.length = unit(6, "pt"),
+        axis.text = element_text(colour = "black")) +
   labs(y="Relative Variable Importance") + 
-  scale_fill_manual(values = c(singleCol, lrrCol, hrrCol))
+  scale_fill_manual(values = c(singleCol, lrrCol, hrrCol)) +
+  NULL
 
-plot(b3)
+  plot(b3)
 
 tiff("../data_out/MS_results_revisions/Infection/figures/manuscript/VarImpMedian.tiff")
 plot(b3)
@@ -308,7 +289,13 @@ p <- ggplot(allRelImportance, aes(x = Model, y = Rank, group = Variable)) +   # 
   scale_x_discrete(expand = c(0, 1)) +
   annotate("text", x = c(0.5), y=c(12:1), label = justNamesStart) + 
   annotate("text", x = c(3.5), y=c(12:1), label = justNamesEnd) + 
-  theme(legend.position = "none") 
+  theme(legend.position = "none",
+         panel.background = element_blank(),
+        axis.line.x = element_line(color="black", size = 1),
+        axis.line.y = element_line(color="black", size = 1),
+        axis.ticks = element_line(colour = "black"), 
+        axis.ticks.length = unit(6, "pt"),
+        axis.text = element_text(colour = "black")) 
   
 plot(p)
 
