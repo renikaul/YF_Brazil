@@ -75,7 +75,9 @@ col <- colorRampPalette(c("#BB4444", "#EE9988", "#FFFFFF", "#77AADD", "#4477AA")
 
 ```{r}
 
-tiff(file = "../data_out/MS_results_revisions/Infection/figures/supplement/correlationMatrix.tiff", width = 1500, height = 1500, units = "px", res = 300, family = "sans", compression = "lzw")
+pdf(file = "../data_out/MS_results_revisions/Infection/figures/supplement/correlationMatrix.pdf", width = 5, height = 5, family = "sans")
+
+# tiff(file = "../data_out/MS_results_revisions/Infection/figures/supplement/correlationMatrix.tiff", width = 1500, height = 1500, units = "px", res = 300, family = "sans", compression = "lzw")
 
 corrplot(cor.mat, method = "color", col = col(200),  
          type = "upper", order = "hclust", 
@@ -189,9 +191,9 @@ calcAUC(tmax.mod)
 Or use a bagged approach that matches our own:
 
 ```{r}
-t.mean.uni.bag <- univariateBag("temp")
-t.min.uni.bag <- univariateBag("tempMin")
-t.max.uni.bag <- univariateBag("tempMax")
+t.mean.uni.bag <- univariateBag("temp", iters = 50)
+t.min.uni.bag <- univariateBag("tempMin", iters = 50)
+t.max.uni.bag <- univariateBag("tempMax", iters = 50)
 ```
 
 ## Rainfall
@@ -219,9 +221,9 @@ calcAUC(rf.max.mod)
 Using a bagged approach:
 
 ```{r}
-rf.mean.uni.bag <- univariateBag("rf")
-rf.min.uni.bag <- univariateBag("rf.min")
-rf.max.uni.bag <- univariateBag("rf.max")
+rf.mean.uni.bag <- univariateBag("rf", iters = 50)
+rf.min.uni.bag <- univariateBag("rf.min", iters = 50)
+rf.max.uni.bag <- univariateBag("rf.max", iters = 50)
 ```
 
 ## Print univariate AUC table
