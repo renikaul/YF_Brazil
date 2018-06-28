@@ -410,8 +410,9 @@ ggplot() +
   geom_sf(data = s.america, color = "black", fill = "gray80", size = 0.1) +
   geom_sf(data = pred.map.subset, aes(fill = percentile/100), color = NA, size = 0) +
   scale_fill_distiller(palette = "OrRd", direction = 1, type = "seq",
+                       breaks = c(5,95), labels = c("Low Risk", "High Risk"),
                      guide = guide_colorbar(
-                       title = "Risk Bands",
+                       title = "Rank-order",
                        direction = "vertical",
                        title.position = 'top',
                        title.theme = element_text(size = 8, angle = 0),

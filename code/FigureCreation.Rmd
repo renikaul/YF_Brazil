@@ -419,14 +419,14 @@ Plot.
 bb <- extent(nhp.split.map)
 bb2 <- data.frame(long = unlist(bb[c(1, 2)]), lat = unlist(bb[c(3,4)]))
 
-tiff(file = "../data_out/MS_results_revisions/figures/manuscript/PercentileMap.tiff", width = 170, height = 110, units = "mm", res = 250, family = "sans", compression = "lzw") #to get less than 10 MB
+tiff(file = "../data_out/MS_results_revisions/Infection/figures/manuscript/PercentileMap.tiff", width = 170, height = 110, units = "mm", res = 250, family = "sans", compression = "lzw") #to get less than 10 MB
 
 ggplot() +
   geom_sf(data = s.america, color = "black", fill = "gray80", size = 0.1) +
   geom_sf(data = pred.map.subset, aes(fill = percentile/100), color = NA, size = 0) +
   scale_fill_distiller(palette = "OrRd", direction = 1, type = "seq",
                      guide = guide_colorbar(
-                       title = "Relative Risk of\nYF Spillover (%)",
+                       title = "Relative Risk Bands",
                        direction = "vertical",
                        title.position = 'top',
                        title.theme = element_text(size = 8, angle = 0),
