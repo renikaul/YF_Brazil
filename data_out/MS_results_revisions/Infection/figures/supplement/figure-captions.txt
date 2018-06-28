@@ -2,4 +2,4 @@ correlatoinMatrix.tiff: Correlation matrix of full set of covariates. Numeric in
 
 trendsAcrossSpace_156months.tiff: Long-term trends in predicted YF spillover. Results of slope tests exploring the change in predicted spillover intensity in each municipality across all 156 months. Values represent average change over all 156 months. Non-significant (alpha = 0.05) slopes are reported as zero.
 
-trendsAcrossSpace.tiff: Long-term trends in predicted YF spillover by calendar month. Results of slope tests exploring the change in predicted spillover intensity in each municipality and month of the year from 2001 - 2013. Values represent average yearly change for each month. non-significant (alpha = 0.05) slopes are reported as zero.
+trendsAcrossSpace.tiff: Long-term trends in predicted YF spillover by calendar month. Results of slope tests exploring the change in predicted spillover intensity in each municipality and month of the year from 2001 - 2013. Values represent average yearly change for each month. Non-significant (alpha = 0.05) slopes are reported as zero.
