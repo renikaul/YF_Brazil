@@ -132,48 +132,31 @@ The median, and 95% quantile reported for dAUC scaled to max median dAUC for eac
 
 ```{r relative variable importance median}
 #function to calculate dAUC stats
-RelativeImportance=function(x, model="NA"){
-  perms <- x[[3]][complete.cases(x[[3]]),-c(1, dim(x[[3]])[2])] # pull out AUC values, but drop full model and all permuted data columns 
-  model.AUC <- as.numeric(as.character(x[[2]][1,2])) # pull out AUC for full model
-  # calculate delta AUC
-  delta.AUC <- model.AUC- perms
-    # scale delta AUC between zero and one
-    #scale.delta.AUC <- delta.AUC/max(delta.AUC)
-  #calculate median, upper and lower quantiles
-  Quant.dAUC <- delta.AUC %>% 
-    melt(value.name="dAUC") %>% 
-    rename(Rep=Var1, Variable=Var2)%>% 
-    group_by(Variable) %>%
-    summarise(dAUCmean=mean(dAUC),dAUCmedian=median(dAUC),Q975=quantile(dAUC, probs=0.975),Q025=quantile(dAUC, probs=0.025) ) %>%
-    ungroup()
-  
-  scale.dAUC <- Quant.dAUC %>%
-      group_by(Variable) %>%
-      mutate_all(funs(./max(Quant.dAUC$dAUCmedian))) %>% # divid all values by max median value
-      arrange(desc(dAUCmedian))%>%
-      ungroup() %>%  
-      mutate(Rank=c(11:1), Model=model)
-      
-  return(scale.dAUC)
+RelativeImportance = function(x, model="NA"){
+  tmp <- x[[1]] %>% 
+    arrange(desc(varImp)) %>% 
+    mutate(Rank=c(12:1), Model=model)
 }
 
 #variable names for publication
-niceNames <- c("popLog10"="Population Density",
+niceNames <- c("rf" = "Mean Rainfall",
                "spRich" = "NHP Richness",
-               "RFsqrt" = "Mean Rainfall",
-               "tempMean" = "Mean Temperature",
-               "NDVIScale" = "Scaled NDVI",
-               "tempScale" = "Scaled Mean Temperature",
+               "temp" = "Mean Temperature",
+               "fire" ="Fire Density",
+               "rfScale" = "Scaled Mean Rainfall",
+               "vectorOcc" = "Vector Occurrence",
                "primProp" = "NHP Agriculture Overlap",
-               "RFScale" = "Scaled Mean Rainfall",
-               "fireDenScale" = "Scaled Fire Density",
-               "NDVI" ="NDVI",
-               "fireDenSqrt" ="Fire Density")
+               "ndvi" ="NDVI",
+               "popLog10"="Population Density",
+               "ndviScale" = "Scaled NDVI",
+               "tempScale" = "Scaled Mean Temperature",
+               "fireScale" = "Scaled Fire Density"
+               )
 
 #load data
-fullM <- readRDS("../data_out/MS_results/OneModel/Perm100FullModel500TryCatch.rds") 
-lowM <- readRDS("../data_out/MS_results/LowModel/lPerm100Model500TryCatch.rds")
-highM <- readRDS('../data_out/MS_results/HighModel/HPerm100Model500TryCatch.rds')
+fullM <- readRDS("../data_out/MS_results_revisions/Infection/OneModel/SummaryPerm100Model500TryCatch.rds") 
+lowM <- readRDS("../data_out/MS_results_revisions/Infection/LowModel/SummaryPerm100Model500TryCatch.rds")
+highM <- readRDS('../data_out/MS_results_revisions/Infection/HighModel/SummaryPerm100Model500TryCatch.rds')
 
 #calculate dAUC stats
 hri <- RelativeImportance(highM, "Regional: HRR")
@@ -182,9 +165,23 @@ fri <- RelativeImportance(fullM, "National")
 allRelImportance<- rbind(fri,lri,hri)
 
 #reorder factors for plotting 
-allRelImportance <- within(allRelImportance, Variable <- factor(Variable, levels = c( "popLog10","spRich","RFsqrt","tempMean","NDVIScale","tempScale","primProp","RFScale","fireDenSqrt","NDVI","fireDenScale")))
+allRelImportance <- within(allRelImportance, Variable <- factor(Variable, levels = c(
+  "rf",
+  "spRich",
+  "temp",
+  "fire",
+  "rfScale",
+  "vectorOcc",
+  "primProp",
+  "ndvi",
+  "popLog10",
+  "ndviScale",
+  "tempScale",
+  "fireScale"
+  )))
 allRelImportance <- within(allRelImportance, Model <- factor(Model, levels = c("National","Regional: LRR","Regional: HRR")))
-
+allRelImportance$varImp <- as.numeric(as.character(allRelImportance$varImp))
+allRelImportance$varImp <- ifelse(allRelImportance$varImp<0,0.001,allRelImportance$varImp)
 #   
 # b2  <-  ggplot(allRelImportance, aes(x=Variable, y=dAUCmedian, ymin = Q025, ymax = Q975, fill=Model))+
 #     geom_hline(yintercept = 0.0, color="grey50", linetype=2) +
@@ -217,24 +214,31 @@ allRelImportance <- within(allRelImportance, Model <- factor(Model, levels = c("
  #  plot(b2)
  #  dev.off()
   
-b3 <-  ggplot(allRelImportance, aes(x=Variable, y=dAUCmedian, fill=Model)) + 
+  b3 <- ggplot(allRelImportance, aes(x=Variable, y=varImp, fill=Model)) + 
   geom_bar(stat="identity",position="dodge")+
   scale_y_continuous(expand = c(0, 0)) +
   scale_x_discrete("Variable",labels=niceNames) +
   theme(text = element_text(face="bold",size=18))+
-  theme(axis.text.x=element_text(angle=45, hjust=1), legend.position = c(.6,.8) ) +
+  theme(axis.text.x=element_text(angle=45, hjust=1), legend.position = c(.85,.85), panel.background = element_blank() ) +
+  theme(axis.line.x = element_line(color="black", size = 1),
+        axis.line.y = element_line(color="black", size = 1),
+        axis.ticks = element_line(colour = "black"), 
+        axis.ticks.length = unit(6, "pt"),
+        axis.text = element_text(colour = "black")) +
   labs(y="Relative Variable Importance") + 
-  scale_fill_manual(values = c(singleCol, lrrCol, hrrCol))
+  scale_fill_manual(values = c(singleCol, lrrCol, hrrCol)) +
+  NULL
 
+  plot(b3)
+
+tiff("../data_out/MS_results_revisions/Infection/figures/manuscript/VarImpMedian.tiff")
 plot(b3)
+dev.off()
 
-tiff("../data_out/MS_results/figures/manuscript/VarImpMedian.tiff")
+pdf("../data_out/MS_results_revisions/Infection/figures/manuscript/VarImpMedian.pdf")
 plot(b3)
 dev.off()
 
-pdf("../data_out/MS_results/figures/manuscript/VarImpMedian.pdf")
-plot(b3)
-dev.off()
 ```
 
 
@@ -243,52 +247,63 @@ dev.off()
 Ordered based on medians calculated in variable importance plots. Must run code above for data prep.
 
 ```{r Coord Plot}
-
-justNamesStart <- c("Population Density",
-               "NHP Richness",
-               "Mean Rainfall",
+justNamesStart <- c(
+                "Mean Rainfall",
+                "NHP Richness",
                "Mean Temperature",
-                "Scaled NDVI",
-               "Scaled Mean\nTemperature",
-               "NHP Agriculture\nOverlap",
+                "Fire Density",
                "Scaled Mean\nRainfall",
-                "Fire\nDensity",
+               "Vector Occurrence",
+               "NHP Agriculture\nOverlap",
                "NDVI",
+               "Population Density",
+               "Scaled NDVI",
+               "Scaled Mean\nTemperature",
                "Scaled Fire Density") 
 
 justNamesEnd <- c(
                "NHP Richness",
-               "Population Density",
+               "NDVI",
+               "Fire Density",
+               "Scaled Fire Density",
+               "Scaled Mean\nTemperature",
                "Mean Temperature",
-               "NHP Agriculture\nOverlap",
+               "Population Density",
                "Scaled NDVI",
                "Mean Rainfall",
-               "Scaled Mean\nTemperature",
-               "Fire\nDensity",
-               "NDVI",
+               "NHP Agriculture\nOverlap",
                "Scaled Mean\nRainfall",
-               "Scaled Fire Density") 
+               "Vector Occurrence"
+               ) 
 
 y_levels <- levels(allRelImportance$Variable)
 
 p <- ggplot(allRelImportance, aes(x = Model, y = Rank, group = Variable)) +   # group = id is important!
-  geom_hline(yintercept = c(1:11), color="grey70", linetype=2, alpha=0.5, size=0.25) +
-  geom_path(aes(color = Variable, alpha=.95),lineend = 'round', linejoin = 'round', size=3) +
-  scale_y_discrete(limits = levels(allRelImportance$Variable), labels=c(11:1)) + #ylim/lab details
+  geom_hline(yintercept = c(1:12), color="grey70", linetype=2, alpha=0.5, size=0.25) +
+  geom_path(aes(color = Variable, alpha=.95),lineend = 'round', linejoin = 'round', size=2.5) +
+  scale_y_discrete(limits = levels(allRelImportance$Variable), labels=c(12:1)) + #ylim/lab details
   ylab("Ranked Variable Importance") +
   xlab("Model")+
   theme(text = element_text(face="bold",size=18))+
   #theme_few() +
   scale_x_discrete(expand = c(0, 1)) +
-  annotate("text", x = c(0.5), y=c(11:1), label = justNamesStart) + 
-  annotate("text", x = c(3.5), y=c(11:1), label = justNamesEnd) + 
-  theme(legend.position = "none") 
+  annotate("text", x = c(0.5), y=c(12:1), label = justNamesStart) + 
+  annotate("text", x = c(3.5), y=c(12:1), label = justNamesEnd) + 
+  theme(legend.position = "none",
+         panel.background = element_blank(),
+        axis.line.x = element_line(color="black", size = 1),
+        axis.line.y = element_line(color="black", size = 1),
+        axis.ticks = element_line(colour = "black"), 
+        axis.ticks.length = unit(6, "pt"),
+        axis.text = element_text(colour = "black")) 
+  
+plot(p)
 
-tiff("../data_out/MS_results/figures/manuscript/RankMedian.tiff")
+tiff("../data_out/MS_results_revisions/Infection/figures/manuscript/RankMedian.tiff")
 plot(p)
 dev.off()
 
-pdf("../data_out/MS_results/figures/manuscript/RankMedian.pdf")
+pdf("../data_out/MS_results_revisions/Infection/figures/manuscript/RankMedian.pdf")
 plot(p)
 dev.off()
 ```
