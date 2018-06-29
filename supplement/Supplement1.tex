@@ -58,8 +58,8 @@ Monthly fire locations were downloaded from the Fire Information for Resource Ma
 
 Primate species richness data was obtained from the IUCN Redlist of Terrestrial Mammals for species in genera known to be susceptible to yellow fever (\textit{Ateles, Aotus, Alouatta, Saimiri, Cebus, Callicebus, Callithrix, Saguinus, Lagothrix}) \cite{bicca-marques2010,hamrick2017}. Individual species' ranges were combined to calculate the number of species found within a municipality, defined as species richness. We also estimated the relative proportion of primate habitat overlapping with agricultural land use per municipality per year. Shapefiles of geographic ranges of each genus were constructed from the above range maps. Yearly land cover data from 2001 - 2013 was downloaded from the NASA Land Processes Distributed Active Archive Center (LPDAAC). The MODIS MCD12Q1 dataset contains yearly land cover categories at a 1 km resolution by year. The proportion of total municipality area that was both agricultural land use and within a genus range was then calculated for each genus.  These proportions were then summed over all nine genera, resulting in a value from 0 - 9 per municipality by year, defined as the Agricultural and Primate Overlap.
 
-ADD MOSQUITO SPECIES
-
+Probability of mosquito vector species occurence was downloaded from the VectorMap Data portal (http://vectormap.si.edu/) on May 30 2018. These are published MaxEnt models of the probability of species occurences based on environmental covariates and known species presence points. We downloaded data for South and Central America coverage of \textit{Hg. leucocelaenus, Hg. janthinomys, and Sa. chloropterus} (the only species available that are known sylvatic reservoirs of YF). These models were
+created in 2011 by the Walter Reed Biosystematics Unit (WRAIR, Divsiion of Entomology). The data is static and at a spatial resolution of 0.04167 \degree. To calculate the maximum probability of a vector occurence, we created a spatial average value of vector occurence for each municipality and species and selected the maximum value of the three species to use for each municipality.
 
 \section*{Results}
 
@@ -77,7 +77,7 @@ ADD MOSQUITO SPECIES
 
 Preliminary data extraction and exploration involved the calculation of the spatial minima, mean, and maxima of temperature and rainfall for each municipality-month.
 However, these values were extremely correlated with each other \ref{fig:corrmat}.
-Therefore, we conducted univariate analyses of each variable on the national training dataset using a bagged logistic regression with 50 bags.
+Therefore, we conducted univariate analyses of each variable on the national training dataset using a bagged logistic regression with 50 bags to determine if the spatial mean was an appropriate metric to represent spatial variation in these variables and if it had high explanatory power.
 When comparing AUC between models (our chosen metric of model performance), the ability to predict on the training dataset was comparable amongst types of spatially aggregated variables \ref{table:univarateAnalyses}.
 
 \begin{figure}
