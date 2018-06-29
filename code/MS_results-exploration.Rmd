@@ -109,7 +109,7 @@ braz.map <- st_transform(braz.map, 29101)
 nhp.split <- readRDS("../data_clean/environmental/twoModelSplit.rds")
 nhp.split.map <- left_join(braz.map, nhp.split, by = "muni.no") %>%
   group_by(above5split) %>%
-  summarize() %>%
+  dplyr::summarize() %>%
   #gets out any weird lines between polygons
   st_buffer(dist = 1000)
 
@@ -121,7 +121,9 @@ braz.slope <- merge(braz.map, tidy.mod, by = "muni.no") %>%
 Plot (this will be pretty slow, 10 min).
 
 ```{r}
-tiff(file = "../data_out/MS_results_revisions/Infection/figures/supplement/trendsAcrossSpace.tiff", width = 2007, height = 1425, units = "px", res = 300, family = "sans", compression = "lzw")
+#tiff(file = "../data_out/MS_results_revisions/Infection/figures/supplement/trendsAcrossSpace.tiff", width = 2007, height = 1425, units = "px", res = 300, family = "sans", compression = "lzw")
+
+pdf("../data_out/MS_results_revisions/Infection/figures/supplement/trendsAcrossSpace.pdf", width = 7, height = 9)
 
 braz.slope %>%
   filter(type=="Regional") %>%
@@ -143,7 +145,9 @@ Across all 156 months
 ```{r}
 month.slope <- merge(braz.map, tidy.month.mod, by = "muni.no") 
 
-tiff(file = "../data_out/MS_results_revisions/Infection/figures/supplement/trendsAcrossSpace_156months.tiff", width = 2007, height = 1425, units = "px", res = 300, family = "sans", compression = "lzw")
+pdf("../data_out/MS_results_revisions/Infection/figures/supplement/trendsAcrossSpace_156months.pdf", width = 5, height = 5)
+
+#tiff(file = "../data_out/MS_results_revisions/Infection/figures/supplement/trendsAcrossSpace_156months.tiff", width = 2007, height = 1425, units = "px", res = 300, family = "sans", compression = "lzw")
 
 options(scipen = 999)
 
