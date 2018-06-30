@@ -9,9 +9,10 @@ output: html_document
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
-library(tidyverse)
-library(reshape2)
 library(sf)
+library(ggplot2) #must be dev version
+library(dplyr)
+library(reshape2)
 library(raster)
 library(viridis)
 library(RColorBrewer)
@@ -427,7 +428,7 @@ ggplot() +
   scale_fill_distiller(palette = "OrRd", direction = 1, type = "seq",
                        breaks = c(5,95), labels = c("Low Risk", "High Risk"),
                      guide = guide_colorbar(
-                       title = "Rank-order",
+                       title = "Rank-order of\nspillover risk",
                        direction = "vertical",
                        title.position = 'top',
                        title.theme = element_text(size = 8, angle = 0),
