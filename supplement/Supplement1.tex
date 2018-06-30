@@ -76,9 +76,9 @@ created in 2011 by the Walter Reed Biosystematics Unit (WRAIR, Divsiion of Entom
 \subsection*{Univariate analysis of covariates}
 
 Preliminary data extraction and exploration involved the calculation of the spatial minima, mean, and maxima of temperature and rainfall for each municipality-month.
-However, these values were extremely correlated with each other \ref{fig:corrmat}.
+However, these values were extremely correlated with each other (Figure \ref{fig:corrmat}).
 Therefore, we conducted univariate analyses of each variable on the national training dataset using a bagged logistic regression with 50 bags to determine if the spatial mean was an appropriate metric to represent spatial variation in these variables and if it had high explanatory power.
-When comparing AUC between models (our chosen metric of model performance), the ability to predict on the training dataset was comparable amongst types of spatially aggregated variables \ref{table:univarateAnalyses}.
+When comparing AUC between models (our chosen metric of model performance), the ability to predict on the training dataset was comparable amongst types of spatially aggregated variables (Table \ref{table:univarateAnalyses}).
 
 \begin{figure}
 \centering
@@ -90,13 +90,13 @@ When comparing AUC between models (our chosen metric of model performance), the 
 \begin{table}
 \normalsize
 \centering
-\caption{Results of univariate analyses. Mean AUC values (\pm \texit{s.d.}) of univariate bagged logistic regression models on training dataset using spatial minima, mean, or maxima of rainfall and temperature.}
+\caption{Results of univariate analyses. Mean AUC values ($\pm$ \textit{s.d.}) of univariate bagged logistic regression models on training dataset using spatial minima, mean, or maxima of rainfall and temperature.}
 \label{table:univarateAnalyses}
 \begin{tabular}{lcc}
           & Rainfall                     & Temperature                   \\ \hline
-Minimum   & 0.631 \pm 0.056              & 0.530 \pm 0.55                          \\
-Mean      & 0.643 \pm 0.093              & 0.501 \pm 0.016                         \\
-Maximum   & 0.694 \pm 0                  & 0.517 \pm 0.038
+Minimum   & 0.631 $\pm$ 0.056              & 0.530 $\pm$ 0.55                          \\
+Mean      & 0.643 $\pm$ 0.093              & 0.501 $\pm$ 0.016                         \\
+Maximum   & 0.694 $\pm$ 0                  & 0.517 $\pm$ 0.038
 \end{tabular}
 \begin{flushleft}
 \smallskip
@@ -110,14 +110,14 @@ Maximum   & 0.694 \pm 0                  & 0.517 \pm 0.038
 \centering
 \includegraphics[width=0.75\textwidth]{trendsAcrossSpace_156months}
 \caption{Long-term trends in predicted YF spillover. Results of slope tests exploring the change in predicted spillover intensity in each municipality across all 156 months. Values represent average change over all 156 months. Non-significant (alpha = 0.05) slopes are reported as zero.}
-\label{}
+\label{trends156}
 \end{figure}
 
 \begin{figure}
 \centering
 \includegraphics[width=0.75\textwidth]{trendsAcrossSpace}
 \caption{Long-term trends in predicted YF spillover by calendar month. Results of slope tests exploring the change in predicted spillover intensity in each municipality and month of the year from 2001 - 2013. Values represent average yearly change for each month. Non-significant (alpha = 0.05) slopes are reported as zero.}
-\label{}
+\label{monthlytrends}
 \end{figure}
 
 
