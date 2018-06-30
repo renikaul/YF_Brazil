@@ -123,7 +123,10 @@ Plot (this will be pretty slow, 10 min).
 ```{r}
 #tiff(file = "../data_out/MS_results_revisions/Infection/figures/supplement/trendsAcrossSpace.tiff", width = 2007, height = 1425, units = "px", res = 300, family = "sans", compression = "lzw")
 
-pdf("../data_out/MS_results_revisions/Infection/figures/supplement/trendsAcrossSpace.pdf", width = 7, height = 9)
+# pdf("../data_out/MS_results_revisions/Infection/figures/supplement/trendsAcrossSpace.pdf", width = 7, height = 9)
+
+png(file = "../data_out/MS_results_revisions/Infection/figures/supplement/trendsAcrossSpace.png", width = 2100, height = 2700, units = "px", res = 300, family = "sans")
+
 
 braz.slope %>%
   filter(type=="Regional") %>%
