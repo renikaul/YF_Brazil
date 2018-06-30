@@ -45,21 +45,21 @@ RajReni B. Kaul, Michelle V. Evans, Courtney C. Murdock, John M. Drake
 
 \section{Data Collection}
 
-Monthly confirmed cases of yellow fever for each Brazilian Munic\'{i}pio (sub-state administrative units) from 2001 to 2013 were downloaded from the Brazilian government's portal da sa\'{u}de website, \texttt{tabnet} (\url{http://tabnet.datasus.gov.br}) on 20 June 2018.
+Monthly confirmed cases of yellow fever for each Brazilian Munic\'{i}pio (sub-state administrative units) Infec\c{c}\~{a}o (municipality of infection) from 2001 to 2013 were downloaded from the Brazilian government's portal da sa\'{u}de website, \texttt{tabnet} (\url{http://tabnet.datasus.gov.br}) on 20 June 2018.
 Confirmed cases were reported by the Ministry of Health Notification of Injury Information System (SINAN-Net) as determined using clinical-epidemiological criteria.
 
 The annual population for each Munic\'{i}pio from 2001 to 2013 was also downloaded from the Brazilian government's portal da sa\'{u}de website,\texttt{tabnet} on 05 June 2017. The estimated population was calculated by the Instituto Brasileiro de Geografia e Estat\'{i}stica (Brazialian Institure of Geography and Statistics) as intercensorial estimates.
 
-Monthly land surface temperature and normalized difference vegetation index (NDVI) data from 2001 through 2013 were downloaded from the NASA Land Processes Distributed Active Archive Center (LPDAAC). The MODIS MOD11C3 product contains monthly temperature data at a 0.05\degree resolution. THE MODIS MOD13A3 product contains monthly NDVI data at a 1 km resolution. Both gridded data products were then aggregated to the municipality level to obtain a monthly spatially averaged temperature and NDVI value for each municipality.
+Monthly land surface temperature and normalized difference vegetation index (NDVI) data from 2001 through 2013 were downloaded from the NASA Land Processes Distributed Active Archive Center (LPDAAC). The MODIS MOD11C3 product contains monthly temperature data at a 0.05\degree~ resolution. The MODIS MOD13A3 product contains monthly NDVI data at a 1 km resolution. Both gridded data products were then aggregated to the municipality level to obtain a monthly spatially averaged temperature and NDVI value for each municipality.
 
-Rainfall data was obtained from the NASA GESDISC data archive in the form of data from the Tropical Rainfall Monitoring Mission from 2001 through 2013. The 3B43 product contains an average rainfall rate for each month at a 0.25\degree resolution. We aggregated the gridded data to the municipality level by taking the spatial mean.
+Rainfall data was obtained from the NASA GESDISC data archive in the form of data from the Tropical Rainfall Monitoring Mission from 2001 through 2013. The 3B43 product contains an average rainfall rate for each month at a 0.25\degree~ resolution. We aggregated the gridded data to the municipality level by taking the spatial mean.
 
 Monthly fire locations were downloaded from the Fire Information for Resource Management System (FIRMS). The MODIS Active Fire Product (MCD14ML) reports fire at a 1 km resolution by month. This data was then aggregated to the total number of fires per municipality by month, and scaled to density by dividing by the municipality's total area.
 
 Primate species richness data was obtained from the IUCN Redlist of Terrestrial Mammals for species in genera known to be susceptible to yellow fever (\textit{Ateles, Aotus, Alouatta, Saimiri, Cebus, Callicebus, Callithrix, Saguinus, Lagothrix}) \cite{bicca-marques2010,hamrick2017}. Individual species' ranges were combined to calculate the number of species found within a municipality, defined as species richness. We also estimated the relative proportion of primate habitat overlapping with agricultural land use per municipality per year. Shapefiles of geographic ranges of each genus were constructed from the above range maps. Yearly land cover data from 2001 - 2013 was downloaded from the NASA Land Processes Distributed Active Archive Center (LPDAAC). The MODIS MCD12Q1 dataset contains yearly land cover categories at a 1 km resolution by year. The proportion of total municipality area that was both agricultural land use and within a genus range was then calculated for each genus.  These proportions were then summed over all nine genera, resulting in a value from 0 - 9 per municipality by year, defined as the Agricultural and Primate Overlap.
 
-Probability of mosquito vector species occurence was downloaded from the VectorMap Data portal (http://vectormap.si.edu/) on May 30 2018. These are published MaxEnt models of the probability of species occurences based on environmental covariates and known species presence points. We downloaded data for South and Central America coverage of \textit{Hg. leucocelaenus, Hg. janthinomys, and Sa. chloropterus} (the only species available that are known sylvatic reservoirs of YF). These models were
-created in 2011 by the Walter Reed Biosystematics Unit (WRAIR, Divsiion of Entomology). The data is static and at a spatial resolution of 0.04167 \degree. To calculate the maximum probability of a vector occurence, we created a spatial average value of vector occurence for each municipality and species and selected the maximum value of the three species to use for each municipality.
+Probability of mosquito vector species occurrence was downloaded from the VectorMap Data portal (http://vectormap.si.edu/) on May 30 2018. These are published MaxEnt models of the probability of species occurrences based on environmental covariates and known species presence points. We downloaded data for South and Central America coverage of \textit{Hg. leucocelaenus, Hg. janthinomys, and Sa. chloropterus} (the only species available that are known sylvatic reservoirs of YFV). These models were
+created in 2011 by the Walter Reed Biosystematics Unit (WRAIR, Division of Entomology). The data is static and at a spatial resolution of 0.04167 \degree. To calculate the maximum probability of a vector occurrence, we created a spatial average value of vector occurrence for each municipality and species and selected the maximum value of the three species to use for each municipality.
 
 \subsection{Univariate analysis of covariates}
 
@@ -75,7 +75,7 @@ When comparing AUC between models (our chosen metric of model performance), the 
 \label{fig:corrmat}
 \end{figure}
 
-\begin{table}
+\begin{table} [h]
 \normalsize
 \centering
 \caption{Results of univariate analyses. Mean AUC values ($\pm$ \textit{s.d.}) of univariate bagged logistic regression models on training dataset using spatial minima, mean, or maxima of rainfall and temperature.}
@@ -92,28 +92,40 @@ Maximum   & 0.694 $\pm$ 0                  & 0.517 $\pm$ 0.038
 \end{flushleft}
 \end{table}
 
+\newpage
 \section{Results}
 
 \subsection{Summary of YF cases in Brazil}
 
+The majority of municipalities reporting cases, reported a single case in the monthly reporting window (Figure \ref{fig:caseCounts}). The relatively consistent occurrence of single cases per municipality-month supported the collapse of a continuous case counts into a binary spillover variable. Municipalities rarely reported multiple months with a spillover event (Figure \ref{fig:multipleSpills}). However, when municipalities reported cases in more than two months, they were likely consecutive.  Leandro Ferreira, Sabin\'{o}polis, and Santo Ant\^{o}nio de Monte reported cases in three months. The latter two municipalities reported cases in consecutive months. Serro, which reported cases in four months, also had three months of consecutive cases. Municipalities with consecutive reporting months also had higher case counts in a single month.  
 
 \begin{figure} [h]
 \centering
 \includegraphics[width=0.5\textwidth]{Hist_Reported_Cases}
-\caption{}
-\label{}
+\caption{Histogram of number of cases reported in municipality-month. The number of cases reported per municipality-month ranged from 0-18. Municipalities reporting zero cases is not plotted. }
+\label{fig:caseCounts}
+\end{figure}
+
+
+\begin{figure} [h]
+\centering
+\includegraphics[width=0.5\textwidth]{Hist_Repeated_Spillover}
+\caption{Histogram of municipalities with reoccurring spillover events.}
+\label{fig:multipleSpills}
 \end{figure}
 
 \subsection{Supplemental results figures}
 
-\begin{figure}
+\begin{figure}[h]
 \centering
 \includegraphics[width=0.75\textwidth]{trendsAcrossSpace_156months}
 \caption{Long-term trends in predicted YF spillover. Results of slope tests exploring the change in predicted spillover intensity in each municipality across all 156 months. Values represent average change over all 156 months. Non-significant (alpha = 0.05) slopes are reported as zero.}
 \label{trends156}
 \end{figure}
 
-\begin{figure}
+\newpage
+
+\begin{figure} [h]
 \centering
 \includegraphics[width=0.75\textwidth]{trendsAcrossSpace.png}
 \caption{Long-term trends in predicted YF spillover by calendar month. Results of slope tests exploring the change in predicted spillover intensity in each municipality and month of the year from 2001 - 2013. Values represent average yearly change for each month. Non-significant (alpha = 0.05) slopes are reported as zero.}
@@ -122,6 +134,7 @@ Maximum   & 0.694 $\pm$ 0                  & 0.517 $\pm$ 0.038
 
 
 
+\newpage
 
 
 \bibliographystyle{bmc-mathphys} % Style BST file (bmc-mathphys, vancouver, spbasic).

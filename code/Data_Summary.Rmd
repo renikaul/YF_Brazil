@@ -1,0 +1,202 @@
+---
+title: "Data Summary"
+author: "Reni Kaul"
+date: "6/20/2018"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(tidyverse)
+```
+
+# Summary of data used in analysis
+```{r}
+#read in the data
+allData <- readRDS("../data_clean/FinalData_Mosi/Infection/allData.rds")
+```
+
+## Cases
+
+### By Muni
+```{r}
+allData %>% 
+  filter(case == 1) %>%
+  summarise(TotalMunis = sum(case), UniqueMuni = length(unique(muni.no)))
+
+```
+
+
+### By month
+```{r YF case data}
+pdf("../data_out/MS_results_revisions/Infection/figures/supplement/Hist_Repeated_Spillover.pdf", width = 6.69, height = 4.85, family = "sans")
+
+allData %>% 
+  filter(case != 0) %>%
+  group_by(muni.no) %>%
+  summarise(PositiveMonths = sum(case)) %>%
+  ggplot(aes(PositiveMonths)) +
+  geom_bar() +
+  theme(text = element_text(face="bold",size=16),
+        panel.background = element_blank(),
+        axis.line.x = element_line(color="black", size = .9),
+        axis.line.y = element_line(color="black", size = .9),
+        axis.ticks = element_line(colour = "black"), 
+        axis.ticks.length = unit(6, "pt"),
+        axis.text = element_text(colour = "black")) +
+  xlab("Months with spillover event") +
+  ylab("Number of municipalities") +
+  scale_y_continuous(expand = c(0, 0), limits = c(0,100)) +
+  scale_x_continuous(expand = c(-0.1, 0), limits = c(0,5)) +
+  NULL
+dev.off()
+
+# MuniXMonth Positive   
+allData %>% 
+  filter(case != 0) %>%
+  group_by(muni.no) %>%
+  summarise(PositiveMonths = sum(case)) %>%
+  filter(PositiveMonths > 2)
+```
+
+### Number of cases per month
+```{r}
+pdf("../data_out/MS_results_revisions/Infection/figures/supplement/Hist_Reported_Cases.pdf", width = 6.69, height = 4.85, family = "sans")
+allData %>% 
+  filter(case != 0) %>%
+  ggplot(aes(numCase)) +
+  geom_bar() +
+  theme(text = element_text(face="bold",size=16),
+        panel.background = element_blank(),
+        axis.line.x = element_line(color="black", size = .9),
+        axis.line.y = element_line(color="black", size = .9),
+        axis.ticks = element_line(colour = "black"), 
+        axis.ticks.length = unit(6, "pt"),
+        axis.text = element_text(colour = "black")) +
+  xlab("Reported cases per month") +
+  ylab("Number of municipality-months") +
+  scale_y_continuous(expand = c(0, 0), limits = c(0,100)) +
+  scale_x_continuous(expand = c(-0.025, 0), limits = c(0,20)) +
+  NULL
+dev.off()
+
+allData %>%
+  filter(case != 0) %>%
+  summarise(MeanCase = mean(numCase), SdCase = sd(numCase), MaxCase = max(numCase))
+
+allData %>%
+  filter(case != 0) %>%
+  count(numCase)
+
+#Print the outliers
+allData %>%
+  filter(numCase > 2)
+```
+
+### Cases by region
+```{r}
+low.testing <- readRDS("../data_clean/FinalData_Mosi/Infection/TestingDataLowNHP.rds")
+low.training <- readRDS("../data_clean/FinalData_Mosi/Infection/TrainingDataLowNHP.rds")
+
+low <-  cbind(rbind(low.training, low.testing),
+                      set= c(
+                     rep("train", dim(low.training)[1]), 
+                     rep("test", dim(low.testing)[1]))
+)
+
+sum(low$case)
+
+high.testing <- readRDS("../data_clean/FinalData_Mosi/Infection/TestingDataHighNHP.rds")
+high.training <- readRDS("../data_clean/FinalData_Mosi/Infection/TrainingDataHighNHP.rds")
+
+high <-  cbind(rbind(high.training, high.testing),
+                       set= c(
+                     rep("train", dim(high.training)[1]), 
+                     rep("test", dim(high.testing)[1]))
+)
+
+sum(high$case)
+
+```
+
+# Predictions
+
+```{r}
+high.pred <- readRDS("../data_out/MS_results_revisions/Infection/HighModel/wholePredictions.rds")
+low.pred <- readRDS("../data_out/MS_results_revisions/Infection/LowModel/wholePredictions.rds")
+pred <- readRDS("../data_out/MS_results_revisions/Infection/OneModel/wholePredictions.rds")
+
+PlotRank = function(data){
+tmp <- data %>%
+    arrange(desc(prediction)) %>%
+    add_column(Rank = c(1:dim(data)[1]))
+
+ggplot(tmp, aes(x = Rank, y = prediction)) +
+    geom_point(color = "grey") + 
+    geom_point(data = tmp %>% filter(case == 1), aes(color = "red")) 
+}
+
+
+PlotRank(high.pred)
+PlotRank(low.pred)
+PlotRank(pred)
+
+```
+
+# How does training and testing split differ for the high RR data
+
+```{r}
+
+training <- readRDS("../data_clean/FinalData_Mosi/Infection/TrainingData.rds")
+trainingHigh <- readRDS("../data_clean/FinalData_Mosi/Infection/TrainingDataHighNHP.rds")
+trainingLow  <- readRDS("../data_clean/FinalData_Mosi/Infection/TrainingDataLowNHP.rds")
+
+testing <- readRDS("../data_clean/FinalData_Mosi/Infection/TestingData.rds")
+testingHigh <- readRDS("../data_clean/FinalData_Mosi/Infection/TestingDataHighNHP.rds")
+testingLow <- readRDS("../data_clean/FinalData_Mosi/Infection/TestingDataLowNHP.rds")
+
+high <-  cbind(rbind(high.training, high.testing),
+                       set= c(
+                     rep("train", dim(high.training)[1]), 
+                     rep("test", dim(high.testing)[1]))
+)
+
+
+high.old.testing <- readRDS("../data_clean/FinalData_Mosi/TestingDataHighNHP.rds")
+high.old.training <- readRDS("../data_clean/FinalData_Mosi/TrainingDataHighNHP.rds")
+
+high.old <-  cbind(rbind(high.old.training, high.old.testing), 
+                   set= c(
+                     rep("train", dim(high.old.training)[1]), 
+                     rep("test", dim(high.old.testing)[1]))
+)
+
+sum(high$case)                   
+sum(high.old$case)
+
+high %>% 
+      filter(case == 1) %>%
+      inner_join(high.old %>% filter(case ==1), by = c('muni.no','month.no'))
+
+
+```
+
+
+```{r sum of cases, eval = FALSE}
+CaseSummary = function(x){
+  pos <- sum(x$case)
+  total <- dim(x)[1]
+  bg <- total - pos
+  return(c(pos,bg,total))
+}
+
+# uick sanity check. 
+CaseSummary(training)
+CaseSummary(trainingLow)
+CaseSummary(trainingHigh)
+
+
+CaseSummary(testing)
+CaseSummary(testingLow)
+CaseSummary(testingHigh)
+```
