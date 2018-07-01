@@ -43,7 +43,9 @@ RajReni B. Kaul, Michelle V. Evans, Courtney C. Murdock, John M. Drake
 
 \newpage
 
-\section{Data Collection}
+\section{Methods}
+
+\subsection{Data Collection}
 
 Monthly confirmed cases of yellow fever for each Brazilian Munic\'{i}pio (sub-state administrative units) Infec\c{c}\~{a}o (municipality of infection) from 2001 to 2013 were downloaded from the Brazilian government's portal da sa\'{u}de website, \texttt{tabnet} (\url{http://tabnet.datasus.gov.br}) on 20 June 2018.
 Confirmed cases were reported by the Ministry of Health Notification of Injury Information System (SINAN-Net) as determined using clinical-epidemiological criteria.
@@ -82,7 +84,7 @@ When comparing AUC between models (our chosen metric of model performance), the 
 \label{table:univarateAnalyses}
 \begin{tabular}{lcc}
           & Rainfall                     & Temperature                   \\ \hline
-Minimum   & 0.631 $\pm$ 0.056              & 0.530 $\pm$ 0.55                          \\
+Minimum   & 0.631 $\pm$ 0.056              & 0.530 $\pm$ 0.055                          \\
 Mean      & 0.643 $\pm$ 0.093              & 0.501 $\pm$ 0.016                         \\
 Maximum   & 0.694 $\pm$ 0                  & 0.517 $\pm$ 0.038
 \end{tabular}
@@ -97,7 +99,7 @@ Maximum   & 0.694 $\pm$ 0                  & 0.517 $\pm$ 0.038
 
 \subsection{Summary of YF cases in Brazil}
 
-The majority of municipalities reporting cases, reported a single case in the monthly reporting window (Figure \ref{fig:caseCounts}). The relatively consistent occurrence of single cases per municipality-month supported the collapse of a continuous case counts into a binary spillover variable. Municipalities rarely reported multiple months with a spillover event (Figure \ref{fig:multipleSpills}). However, when municipalities reported cases in more than two months, they were likely consecutive.  Leandro Ferreira, Sabin\'{o}polis, and Santo Ant\^{o}nio de Monte reported cases in three months. The latter two municipalities reported cases in consecutive months. Serro, which reported cases in four months, also had three months of consecutive cases. Municipalities with consecutive reporting months also had higher case counts in a single month.  
+The majority of municipalities reporting cases, reported a single case in the monthly reporting window (Figure \ref{fig:caseCounts}). The relatively consistent occurrence of single cases per municipality-month supported the collapse of a continuous case counts into a binary spillover variable. Municipalities rarely reported multiple months with a spillover event (Figure \ref{fig:multipleSpills}). However, when municipalities reported cases in more than two months, they were likely consecutive.  Leandro Ferreira, Sabin\'{o}polis, and Santo Ant\^{o}nio de Monte reported cases in three months. The latter two municipalities reported cases in consecutive months. Serro, which reported cases in four months, also had three months of consecutive cases. Municipalities with consecutive reporting months also had higher case counts in a single month.
 
 \begin{figure} [h]
 \centering
