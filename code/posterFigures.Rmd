@@ -43,9 +43,9 @@ This plot shows the difference in seasonality by taking the average risk across 
 Load data.
 ```{r}
 # prediction data
-pred.one.model <- readRDS("../data_out/MS_results/OneModel/wholePredictions.rds")
-pred.highNHP <- readRDS("../data_out/MS_results/HighModel/wholePredictions.rds")
-pred.lowNHP <- readRDS("../data_out/MS_results/LowModel/wholePredictions.rds")
+pred.one.model <- readRDS("../data_out/MS_results_revisions/Infection/OneModel/wholePredictions.rds")
+pred.highNHP <- readRDS("../data_out/MS_results_revisions/Infection/HighModel/wholePredictions.rds")
+pred.lowNHP <- readRDS("../data_out/MS_results_revisions/Infection/LowModel/wholePredictions.rds")
 
 nhp.split <- readRDS("../data_clean/environmental/twoModelSplit.rds")
 ```
@@ -102,7 +102,7 @@ rm(time.one.model, time.highNHP, time.lowNHP)
 ##Plot
 
 ```{r}
-png(file = "figures/poster/seasonalityTimeSeriesSquare.png", width = 2000, height = 2000, units = "px", res = 300)
+png(file = "../data_out/MS_results_revisions/Infection/figures/poster-seasonality.png", width = 2000, height = 2000, units = "px", res = 300, bg = NA)
 
 ggplot(data = time.all.models, aes(x = monthLabel, y = pred.mean)) +
     geom_line(aes(group = year), color = "gray70", size = 1)+
@@ -132,6 +132,30 @@ ggplot(data = time.all.models, aes(x = monthLabel, y = pred.mean)) +
   guides(alpha = F, size = F)
 
 dev.off()
+```
+
+## Calculate regional AUC's
+
+```{r}
+library(ROCR)
+
+natl.low <- pred.one.model %>%
+  left_join(nhp.split, by = "muni.no") %>%
+  filter(above5split == "less") %>%
+  filter(set == "test")
+
+performance(prediction(natl.low$prediction, natl.low$case), measure = "auc")@y.values
+
+natl.high <- pred.one.model %>%
+  left_join(nhp.split, by = "muni.no") %>%
+  filter(above5split == "above5") %>%
+  filter(set == "test")
+
+performance(prediction(natl.high$prediction, natl.high$case), measure = "auc")@y.values
+
+performance(prediction(pred.highNHP$prediction[pred.highNHP$set == "test"], pred.highNHP$case[pred.highNHP$set == "test"]), measure = "auc")@y.values
+
+performance(prediction(pred.lowNHP$prediction[pred.lowNHP$set == "test"], pred.lowNHP$case[pred.lowNHP$set == "test"]), measure = "auc")@y.values
 ```
 
 
