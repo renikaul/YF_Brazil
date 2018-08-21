@@ -410,7 +410,7 @@ Subset out months.
 ```{r}
 pred.map.subset <- pred.map %>%
   filter(cal.month %in% c(1,6,9)) %>%
-  mutate(monthLabel = factor(month.abb[cal.month], levels = c("Jan", "Jun", "Sep")))
+  mutate(monthLabel = factor(month.name[cal.month], levels = c("January", "June", "September")))
 ```
 
 Plot.
@@ -440,12 +440,13 @@ ggplot() +
   geom_sf(data = nhp.split.map, fill = NA, color = "black", size=0.1) +
   coord_sf(xlim = c(2788000, 7127000), ylim = c(6256000, 10593000), datum = NA) +
   my_theme_map() +
-  ggsn::scalebar(data = bb2, dist = 400, dd2km = F,
-                 st.size = 1, height= 0.03, 
+  ggsn::scalebar(data = bb2, dist = 500, dd2km = F,
+                 st.size = 0, height= 0.05, st.bottom = F, st.dist = 0.05,
                   location = "bottomright"
            ) +
+  annotate("text", x = 6780000, y = 6700000, label = "500km", size = 2) +
   ggsn::north(bb2, symbol = 14, scale = 0.1, 
-        anchor = c(x = 6950000, y = 7000000))
+        anchor = c(x = 6950000, y = 7300000))
 
 dev.off()
 
@@ -612,11 +613,12 @@ top.row <- ggplot() +
   my_theme_map() +
   facet_wrap(~model, dir = "h") +
   coord_sf(xlim = c(2788000, 7127000), ylim = c(6256000, 10593000), datum = NA) +
-  ggsn::scalebar(data = bb2, dist = 400, dd2km = F,
-                 st.size = 1, height= 0.03, 
+  ggsn::scalebar(data = bb2, dist = 500, dd2km = F,
+                 st.size = 0, height= 0.05, 
                   location = "bottomright") +
+  annotate("text", x = 6780000, y = 6700000, label = "500km", size = 2) +
   north(bb2, symbol = 14, scale = 0.1, 
-        anchor = c(x = 6950000, y = 7000000))
+        anchor = c(x = 6950000, y = 7300000))
 ```
 
 
@@ -783,7 +785,7 @@ for (i in 1:max(pred.map.all$month.no)){
   
   png(file = paste0("../data_out/MS_results_revisions/Infection/figures/manuscript/gifs/month", 
                     formatC(i, width = 3, format = "d", flag = "0"), ".png"), 
-      width = 600, height = 330, units = "px", res = 100, bg = 'white')
+      width = 600, height = 338, units = "px", res = 100, bg = 'white')
   #adjust for my bad ability at division which makes december respond strange
   if (i%%12 == 0){
     plot.year <- 2000 + (i%/% 12)
