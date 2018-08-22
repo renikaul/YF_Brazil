@@ -444,7 +444,9 @@ ggplot() +
                  st.size = 0, height= 0.05, st.bottom = F, st.dist = 0.05,
                   location = "bottomright"
            ) +
-  annotate("text", x = 6780000, y = 6700000, label = "500km", size = 2) +
+  # giving up on annotations, will add in manually
+  # annotate("text", x = c(6230000, 7000000), y = 6700000, 
+  #          label = c("0","1000km"), size = 2) +
   ggsn::north(bb2, symbol = 14, scale = 0.1, 
         anchor = c(x = 6950000, y = 7300000))
 
@@ -616,7 +618,8 @@ top.row <- ggplot() +
   ggsn::scalebar(data = bb2, dist = 500, dd2km = F,
                  st.size = 0, height= 0.05, 
                   location = "bottomright") +
-  annotate("text", x = 6780000, y = 6700000, label = "500km", size = 2) +
+  # giving up on annotations, will add in manually
+  # annotate("text", x = 6780000, y = 6700000, label = "500km", size = 2) +
   north(bb2, symbol = 14, scale = 0.1, 
         anchor = c(x = 6950000, y = 7300000))
 ```
