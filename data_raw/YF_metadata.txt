@@ -1,8 +1,8 @@
 Years 2001-2006
 
-Downloaded from http://tabnet.datasus.gov.br/cgi/tabcgi.exe?sinanwin/cnv/febreamarelabr.def on 05 June 2017 
+Downloaded from http://tabnet.datasus.gov.br/cgi/tabcgi.exe?sinanwin/cnv/febreamarelabr.def on 20 June 2018 
 Each year was individually downloaded with the following selections:
-	Linha (Line): Municipio de notificacao (Municipality of notification) 
+	Linha (Line): Municipio Infecção (Municipality of Infection) 
 	Coluna (Column): Mes 1 Sintoma(s) (Month 1 Symptom(s))
 	Conteudo (Content): casos confirmados(Confirmed cases)
 	Periodos Disponiveis: 2001-2006 (variable)
@@ -24,10 +24,10 @@ Notes from website:
 
 ---------------------
 Years 2007-2014
-Downloaded from http://tabnet.datasus.gov.br/cgi/deftohtm.exe?sinannet/cnv/febreamarelabr.def on 05 June 2017
+Downloaded from http://tabnet.datasus.gov.br/cgi/deftohtm.exe?sinannet/cnv/febreamarelabr.def on 20 June 2018
 
 Each year was individually downloaded with the following selections:
-	Linha (Line): Municipio de notificacao (Municipality of notification) 
+	Linha (Line): Municipio de Infecção (Municipality of Infection) 
 	Coluna (Column): Mes 1 Sintoma(s) (Month 1 Symptom(s))
 	Conteudo (Content): casos confirmados(Confirmed cases)
 	Periodos Disponiveis: 2008-2014 (variable)

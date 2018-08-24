@@ -274,9 +274,9 @@ allData <- cases %>%
             mutate(case=ifelse(is.na(case),0,case)) %>% #replace NA with zero
             mutate(numCase=ifelse(is.na(numCase) == TRUE,0,numCase)) #replace NA with zero
    
-saveRDS(allData, "../data_clean/FinalData_Mosi/Infection/allData.rds") 
+saveRDS(allData, "../data_clean/FinalData_Mosi/allData.rds") 
 # rm(list = ls())
- allData <- readRDS("../data_clean/FinalData_Mosi/Infection/allData.rds")
+ allData <- readRDS("../data_clean/FinalData_Mosi/allData.rds")
 ```
 
 # Spliting data
@@ -356,8 +356,8 @@ testing <- rbind(test.pres, test.bg)
 
 #8. Save data with spatial and temporal stratification---------------------------
 #individual training and testing data
-saveRDS(training, file="../data_clean/FinalData_Mosi/Infection/TrainingData.rds")
-saveRDS(testing, file="../data_clean/FinalData_Mosi/Infection/TestingData.rds")
+saveRDS(training, file="../data_clean/FinalData_Mosi/TrainingData.rds")
+saveRDS(testing, file="../data_clean/FinalData_Mosi/TestingData.rds")
 
 #index of data to create training and testing
 indexSplit <- readRDS("../data_clean/environmental/twoModelSplit.rds")
@@ -375,8 +375,8 @@ trainingHigh <- filter(training, (muni.no %in% highNHP$muni.no)) #only 14 cases
 
 
 # save testing data
-saveRDS(testingLow, "../data_clean/FinalData_Mosi/Infection/TestingDataLowNHP.rds")
-saveRDS(testingHigh, "../data_clean/FinalData_Mosi/Infection/TestingDataHighNHP.rds")
+saveRDS(testingLow, "../data_clean/FinalData_Mosi/TestingDataLowNHP.rds")
+saveRDS(testingHigh, "../data_clean/FinalData_Mosi/TestingDataHighNHP.rds")
 
 # Repeat steps for training 
 
@@ -384,8 +384,8 @@ saveRDS(testingHigh, "../data_clean/FinalData_Mosi/Infection/TestingDataHighNHP.
 
 # Save data with spatial and temporal stratification
 #individual training and testing data
-saveRDS(trainingLow, "../data_clean/FinalData_Mosi/Infection/TrainingDataLowNHP.rds")
-saveRDS(trainingHigh, "../data_clean/FinalData_Mosi/Infection/TrainingDataHighNHP.rds")
+saveRDS(trainingLow, "../data_clean/FinalData_Mosi/TrainingDataLowNHP.rds")
+saveRDS(trainingHigh, "../data_clean/FinalData_Mosi/TrainingDataHighNHP.rds")
 
 ```
 

@@ -71,10 +71,10 @@ for (j in 1:length(variablesName)){
 }  
 
 
-saveRDS(high.perm.auc, "../data_out/MS_results_revisions/HighModel/lPerm100Model500TryCatch.rds")
+saveRDS(high.perm.auc, "../data_out/MS_results_revisions/HighModel/Perm100Model500TryCatch.rds")
 
 high.perm.summary <- SumPermOneVar(perm.auc = high.perm.auc, permutations = 100, title = "high NHP")
-saveRDS(high.perm.summary, "../data_out/MS_results_revisions/HighModel/SummaryLPerm100Model500TryCatch.rds")
+saveRDS(high.perm.summary, "../data_out/MS_results_revisions/HighModel/SummaryPerm100Model500TryCatch.rds")
 
 ###################
 
@@ -118,10 +118,10 @@ for (j in 1:length(variablesName)){
 }  
 
 
-saveRDS(low.perm.auc, "../data_out/MS_results_revisions/LowModel/lPerm100Model500TryCatch.rds")
+saveRDS(low.perm.auc, "../data_out/MS_results_revisions/LowModel/Perm100Model500TryCatch.rds")
 
 low.perm.summary <- SumPermOneVar(perm.auc = low.perm.auc, permutations = 100, title = "Low NHP")
-saveRDS(low.perm.summary, "../data_out/MS_results_revisions/LowModel/SummaryLPerm100Model500TryCatch.rds")
+saveRDS(low.perm.summary, "../data_out/MS_results_revisions/LowModel/SummaryPerm100Model500TryCatch.rds")
 
 ###################
 
