@@ -2,7 +2,7 @@
 
 This repository contains the code and data necessary to reproduce the analysis from:
 
-Kaul, RajReni B., Michelle V. Evans, Courtney C. Murdock, John M. Drake. 2018. Spatio-temporal spillover risk of yellow fever in Brazil. *Journal* Issue, ppg.
+Kaul, RajReni B., Michelle V. Evans, Courtney C. Murdock, John M. Drake. 2018. Spatio-temporal spillover risk of yellow fever in Brazil. *Parasite & Vectors* 11, **488**. https://doi.org/10.1186/s13071-018-3063-6
 
 ## Dependencies
 
